@@ -9,9 +9,9 @@
  *
  * External routines:
  *
- *	file_dirscan() - scan a directory for files
- *	file_time() - get timestamp of file, if not done by file_dirscan()
- *	file_archscan() - scan an archive for files
+ *      file_dirscan() - scan a directory for files
+ *      file_time() - get timestamp of file, if not done by file_dirscan()
+ *      file_archscan() - scan an archive for files
  *
  * File_dirscan() and file_archscan() call back a caller provided function
  * for each file found.  A flag to this callback function lets file_dirscan()
@@ -41,62 +41,62 @@
  */
 
 void
-file_dirscan( 
-	const char *dir,
-	scanback func,
-	void	*closure )
+file_dirscan(
+        const char *dir,
+        scanback func,
+        void    *closure )
 {
-	PATHNAME f;
-	char filespec[ MAXJPATH ];
-	char filename[ MAXJPATH ];
-	long handle;
-	int ret;
-	struct _find_t finfo[1];
+        PATHNAME f;
+        char filespec[ MAXJPATH ];
+        char filename[ MAXJPATH ];
+        long handle;
+        int ret;
+        struct _find_t finfo[1];
 
-	/* First enter directory itself */
+        /* First enter directory itself */
 
-	memset( (char *)&f, '\0', sizeof( f ) );
+        memset( (char *)&f, '\0', sizeof( f ) );
 
-	f.f_dir.ptr = dir;
-	f.f_dir.len = strlen(dir);
+        f.f_dir.ptr = dir;
+        f.f_dir.len = strlen(dir);
 
-	dir = *dir ? dir : ".";
+        dir = *dir ? dir : ".";
 
- 	/* Special case \ or d:\ : enter it */
- 
-	strcpy( filespec, dir );
+        /* Special case \ or d:\ : enter it */
 
- 	if( f.f_dir.len == 1 && f.f_dir.ptr[0] == '\\' )
- 	    (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
- 	else if( f.f_dir.len == 3 && f.f_dir.ptr[1] == ':' )
- 	    (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
-	else
-	    strcat( filespec, "/" );
+        strcpy( filespec, dir );
 
-	strcat( filespec, "*" );
+        if( f.f_dir.len == 1 && f.f_dir.ptr[0] == '\\' )
+            (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
+        else if( f.f_dir.len == 3 && f.f_dir.ptr[1] == ':' )
+            (*func)( closure, dir, 0 /* not stat()'ed */, (time_t)0 );
+        else
+            strcat( filespec, "/" );
 
-	/* Now enter contents of directory */
+        strcat( filespec, "*" );
 
-	if( DEBUG_BINDSCAN )
-	    printf( "scan directory %s\n", filespec );
+        /* Now enter contents of directory */
 
-	/* Time info in dos find_t is not very useful.  It consists */
-	/* of a separate date and time, and putting them together is */
-	/* not easy.  So we leave that to a later stat() call. */
+        if( DEBUG_BINDSCAN )
+            printf( "scan directory %s\n", filespec );
 
-	if( !_dos_findfirst( filespec, _A_NORMAL|_A_RDONLY|_A_SUBDIR, finfo ) )
-	{
-	    do
-	    {
-		f.f_base.ptr = finfo->name;
-		f.f_base.len = strlen( finfo->name );
+        /* Time info in dos find_t is not very useful.  It consists */
+        /* of a separate date and time, and putting them together is */
+        /* not easy.  So we leave that to a later stat() call. */
 
-		path_build( &f, filename, 0 );
+        if( !_dos_findfirst( filespec, _A_NORMAL|_A_RDONLY|_A_SUBDIR, finfo ) )
+        {
+            do
+            {
+                f.f_base.ptr = finfo->name;
+                f.f_base.len = strlen( finfo->name );
 
-		(*func)( closure, filename, 0 /* not stat()'ed */, (time_t)0 );
-	    }
-	    while( !_dos_findnext( finfo ) );
-	}
+                path_build( &f, filename, 0 );
+
+                (*func)( closure, filename, 0 /* not stat()'ed */, (time_t)0 );
+            }
+            while( !_dos_findnext( finfo ) );
+        }
 
 }
 
@@ -106,27 +106,27 @@ file_dirscan(
 
 int
 file_time(
-	const char *filename,
-	time_t	*time )
+        const char *filename,
+        time_t  *time )
 {
-	/* This is called on OS2, not NT.  */
-	/* NT fills in the time in the dirscan. */
+        /* This is called on OS2, not NT.  */
+        /* NT fills in the time in the dirscan. */
 
-	struct stat statbuf;
+        struct stat statbuf;
 
-	if( stat( filename, &statbuf ) < 0 )
-	    return -1;
+        if( stat( filename, &statbuf ) < 0 )
+            return -1;
 
-	*time = statbuf.st_mtime;
+        *time = statbuf.st_mtime;
 
-	return 0;
+        return 0;
 }
 
 void
 file_archscan(
-	const char *archive,
-	scanback func,
-	void	*closure )
+        const char *archive,
+        scanback func,
+        void    *closure )
 {
 }
 

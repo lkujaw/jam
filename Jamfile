@@ -10,10 +10,10 @@ include Jamrules ;
 # note that we use the target directory 'bin.unix' to ensure that
 # 'make install' and 'make uninstall' work correctly
 #
-if $(VMS) 	{ LOCATE_TARGET ?= [.binvms] ; }
-else if $(MAC) 	{ LOCATE_TARGET ?= :bin.mac ; }
+if $(VMS)       { LOCATE_TARGET ?= [.binvms] ; }
+else if $(MAC)  { LOCATE_TARGET ?= :bin.mac ; }
 else if $(UNIX) { LOCATE_TARGET ?= bin.unix ; }
-else		{ LOCATE_TARGET ?= bin.$(OSFULL[1]:L) ; }
+else            { LOCATE_TARGET ?= bin.$(OSFULL[1]:L) ; }
 
 # Leave generated source in current directory; it would be nice to use
 # these lines below to build the source into the platform-specific
@@ -39,7 +39,7 @@ if ! $(NT) && $(MINGW)
   JAM_TOOLSET = MINGW ;
 }
 
-if $(NT) 	{ code = execunix.c filent.c pathunix.c ; }
+if $(NT)        { code = execunix.c filent.c pathunix.c ; }
 else if $(OS2)
 {
   # special case for OS/2: when compiling with GCC/EMX, we use
@@ -55,9 +55,9 @@ else if $(OS2)
     code += fileos2.c ;
   }
 }
-else if $(VMS) 	{ code = execvms.c filevms.c pathvms.c ; }
-else if $(MAC)	{ code = execmac.c filemac.c pathmac.c ; }
-else 		{ code = execunix.c fileunix.c pathunix.c ; }
+else if $(VMS)  { code = execvms.c filevms.c pathvms.c ; }
+else if $(MAC)  { code = execmac.c filemac.c pathmac.c ; }
+else            { code = execunix.c fileunix.c pathunix.c ; }
 
 if $(UNIX) && $(OS) = CYGWIN
 {
@@ -68,16 +68,16 @@ if $(UNIX) && $(OS) = CYGWIN
 
 if $(PROFILE)
 {
-	CCFLAGS += -pg ;
-	LINKFLAGS += -pg ;
-	LOCATE_TARGET = $(LOCATE_TARGET)/pg ;
+        CCFLAGS += -pg ;
+        LINKFLAGS += -pg ;
+        LOCATE_TARGET = $(LOCATE_TARGET)/pg ;
 }
 
 if $(DEBUG)
 {
-	CCFLAGS += -g ;
-	LINKFLAGS += -g ;
-	LOCATE_TARGET = $(LOCATE_TARGET)/g ;
+        CCFLAGS += -g ;
+        LINKFLAGS += -g ;
+        LOCATE_TARGET = $(LOCATE_TARGET)/g ;
 }
 
 # We have to signal jam.h for these
@@ -95,7 +95,7 @@ if $(OS) = NT
 
 # Do we know yacc?
 
-if $(YACC) 	{ code += jamgram.y ; }
+if $(YACC)      { code += jamgram.y ; }
 else            { code += jamgram.c ; }
 
 #
@@ -106,20 +106,20 @@ else            { code += jamgram.c ; }
 
 if $(YACC) && $(SUFEXE) = ""
 {
-	GenFile jamgram.y jamgramtab.h : ./yyacc jamgram.yy ;
+        GenFile jamgram.y jamgramt.h : ./yyacc.sh jamgram.yy ;
 }
 
 #
 # How to build the compiled in jambase.
 #
 
-Main		mkjambase : mkjambase.c ;
+Main            mkjamb : mkjamb.c ;
 
 if $(VMS)
 {
-	CC = cxx ;
-	LINK = cxxlink ;
-	CCFLAGS += /define=VMS ;
+        CC = cxx ;
+        LINK = cxxlink ;
+        CCFLAGS += /define=VMS ;
 }
 
 #
@@ -127,8 +127,8 @@ if $(VMS)
 #
 
 Main            jam : jam.c jambase.c ;
-LinkLibraries 	jam : libjam.a ;
-GenFile 	    jambase.c : mkjambase Jambase ;
+LinkLibraries   jam : libjam.a ;
+GenFile             jambase.c : mkjamb Jambase ;
 
 if $(UNIX)
 {
@@ -141,12 +141,12 @@ if $(UNIX)
 }
 
 Library         libjam.a :
-		    builtins.c command.c compile.c $(code) expand.c
-		    glob.c hash.c headers.c lists.c make.c make1.c
-		    newstr.c option.c parse.c regexp.c rules.c scan.c
-		    search.c timestamp.c variable.c
-		    hdrmacro.c
-		    ;
+                    builtins.c command.c compile.c $(code) expand.c
+                    glob.c hash.c headers.c lists.c make.c make1.c
+                    newstr.c option.c parse.c regexp.c rules.c scan.c
+                    search.c timestmp.c variable.c
+                    hdrmacro.c
+                    ;
 
 # Strip the Jam executable on Mingw
 #
@@ -161,40 +161,39 @@ if $(JAM_TOOLSET) = MINGW
 }
 
 
-if $(BINDIR) 	{ InstallBin $(BINDIR) : jam ; }
+if $(BINDIR)    { InstallBin $(BINDIR) : jam ; }
 
 #
 # Distribution making from here on out.
 #
 
 ALLSOURCE =
-	Build.com Build.mpw Jam.html Jambase Jambase.html Jamfile
-	Jamfile.html Porting README RELNOTES builtins.c builtins.h
-	command.c command.h compile.c compile.h execcmd.h execmac.c
-	execnt.c execunix.c execvms.c expand.c expand.h filemac.c filent.c
-	fileos2.c filesys.h fileunix.c filevms.c glob.c hash.c hash.h
-	hdrmacro.c hdrmacro.h headers.c headers.h jam.c jam.h jambase.c
-	jambase.h jamgram.c jamgram.h jamgram.y jamgram.yy jamgramtab.h
-	lists.c lists.h make.c make.h make1.c mkjambase.c newstr.c newstr.h
-	option.c option.h parse.c parse.h patchlevel.h pathmac.c pathsys.h
-	pathunix.c pathvms.c regexp.c regexp.h rules.c rules.h scan.c
-	scan.h search.c search.h timestamp.c timestamp.h variable.c
-	variable.h yyacc
-	hdrmacro.c
-	INSTALL
-	README.ORG
-	CHANGES
-	common.mk
-	[ GLOB builds : *.mk ]
-	[ GLOB builds/unix : *.in ]
-	builds/unix/configure
-	builds/unix/configure.ac
-	builds/unix/config.sub
-	builds/unix/config.guess
-	builds/unix/install-sh
-	builds/unix/mkinstalldirs
-	configure
-	;
+        Build.com Build.mpw Jam.html Jambase Jambase.html Jamfile
+        Jamfile.html Porting README RELNOTES builtins.c builtins.h
+        command.c command.h compile.c compile.h execcmd.h execmac.c
+        execnt.c execunix.c execvms.c expand.c expand.h filemac.c
+        filent.c fileos2.c filesys.h fileunix.c filevms.c glob.c
+        hash.c hash.h hdrmacro.c hdrmacro.h headers.c headers.h jam.c
+        jam.h jambase.c jambase.h jamgram.c jamgram.h jamgram.y
+        jamgram.yy jamgramt.h lists.c lists.h make.c make.h make1.c
+        mkjamb.c newstr.c newstr.h option.c option.h parse.c parse.h
+        pathmac.c pathsys.h pathunix.c pathvms.c regexp.c regexp.h
+        rules.c rules.h scan.c scan.h search.c search.h timestmp.c
+        timestmp.h variable.c variable.h yyacc.sh hdrmacro.c
+        INSTALL
+        README.ORG
+        CHANGES
+        common.mk
+        [ GLOB builds : *.mk ]
+        [ GLOB builds/unix : *.in ]
+        builds/unix/configure
+        builds/unix/configure.ac
+        builds/unix/config.sub
+        builds/unix/config.guess
+        builds/unix/install-sh
+        builds/unix/mkinstalldirs
+        configure
+        ;
 
 
 rule Binary
@@ -215,16 +214,16 @@ rule Binary
 
 rule Package
 {
-	NotFile package ;
-	Depends package : $(<) ;
+        NotFile package ;
+        Depends package : $(<) ;
 
-	DEPENDS $(<) : $(>) ;
+        DEPENDS $(<) : $(>) ;
 
-	switch $(<)
-	{
-	case *.tar  : { Tar-Gz  $(<) : $(>) ; Tar-Bz2 $(<) : $(>) ; }
-	case *.zip  :   Zip     $(<) : $(>) ;
-	}
+        switch $(<)
+        {
+        case *.tar  : { Tar-Gz  $(<) : $(>) ; Tar-Bz2 $(<) : $(>) ; }
+        case *.zip  :   Zip     $(<) : $(>) ;
+        }
 }
 
 

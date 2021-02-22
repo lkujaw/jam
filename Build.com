@@ -20,12 +20,12 @@ $ cxx /define=VMS regexp.c
 $ cxx /define=VMS rules.c
 $ cxx /define=VMS scan.c
 $ cxx /define=VMS search.c
-$ cxx /define=VMS timestamp.c
+$ cxx /define=VMS timestmp.c
 $ cxx /define=VMS variable.c
 $ cxx /define=VMS jam.c
 $ cxx /define=VMS jamgram.c
 $ cxxlink/exe=jam.exe command.obj, compile.obj, execvms.obj, expand.obj, -
     filevms.obj, glob.obj, hash.obj, headers.obj, lists.obj, make.obj, -
     make1.obj, newstr.obj, option.obj, parse.obj, pathvms.obj, regexp.obj, -
-    rules.obj, scan.obj, search.obj, timestamp.obj, variable.obj, jam.obj, -
+    rules.obj, scan.obj, search.obj, timestmp.obj, variable.obj, jam.obj, -
     jamgram.obj, jambase.obj, builtins.obj

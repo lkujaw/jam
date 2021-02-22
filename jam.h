@@ -42,7 +42,7 @@
  * VMS, OPENVMS
  */
 
-# ifdef VMS
+#if defined(VMS)
 
 # define unlink remove
 
@@ -71,13 +71,11 @@
 # define OSPLAT "OSPLAT=VAX"
 # endif
 
-# endif
-
 /*
  * Windows NT
  */
 
-# ifdef NT
+#elif defined(NT)
 
 # include <fcntl.h>
 # include <stdlib.h>
@@ -93,7 +91,7 @@
 # define OSMINOR "OS=NT"
 # define OS_NT
 # define SPLITPATH ';'
-# define MAXLINE 2046	/* longest 'together' actions */
+# define MAXLINE 2046   /* longest 'together' actions */
 # define USE_EXECUNIX
 # define USE_PATHUNIX
 # define PATH_DELIM '\\'
@@ -109,13 +107,11 @@
 # define OS_AS400
 # endif
 
-# endif
-
 /*
  * Windows MingW32
  */
 
-# ifdef MINGW
+#elif defined(MINGW)
 
 # include <fcntl.h>
 # include <stdlib.h>
@@ -131,19 +127,17 @@
 # define OSMINOR "OS=MINGW"
 # define OS_NT
 # define SPLITPATH ';'
-# define MAXLINE 996	/* longest 'together' actions */
+# define MAXLINE 996    /* longest 'together' actions */
 # define USE_EXECUNIX
 # define USE_PATHUNIX
 # define PATH_DELIM '\\'
 # define DOWNSHIFT_PATHS
 
-# endif
-
 /*
  * OS2
  */
 
-# ifdef __OS2__
+#elif defined(__OS2__)
 
 # include <fcntl.h>
 # include <stdlib.h>
@@ -158,19 +152,17 @@
 # define OSMINOR "OS=OS2"
 # define OS_OS2
 # define SPLITPATH ';'
-# define MAXLINE 996	/* longest 'together' actions */
+# define MAXLINE 996    /* longest 'together' actions */
 # define USE_EXECUNIX
 # define USE_PATHUNIX
 # define PATH_DELIM '\\'
 # define DOWNSHIFT_PATHS
 
-# endif
-
 /*
  * Macintosh MPW
  */
 
-# ifdef macintosh
+#elif defined(macintosh)
 
 # include <time.h>
 # include <stdlib.h>
@@ -184,13 +176,11 @@
 # define SPLITPATH ','
 # define DOWNSHIFT_PATHS
 
-# endif
-
 /*
  * God fearing UNIX
  */
 
-# ifndef OSMINOR
+#else
 
 # define OSMAJOR "UNIX=true"
 # define USE_EXECUNIX
@@ -202,7 +192,6 @@
 # define unix
 # define OSMINOR "OS=AIX"
 # define OS_AIX
-# define NO_VFORK
 # endif
 # ifdef AMIGA
 # define OSMINOR "OS=AMIGA"
@@ -212,7 +201,6 @@
 # define unix
 # define OSMINOR "OS=BEOS"
 # define OS_BEOS
-# define NO_VFORK
 # endif
 # ifdef __bsdi__
 # define OSMINOR "OS=BSDI"
@@ -221,7 +209,6 @@
 # if defined (COHERENT) && defined (_I386)
 # define OSMINOR "OS=COHERENT"
 # define OS_COHERENT
-# define NO_VFORK
 # endif
 # ifdef __cygwin__
 # define OSMINOR "OS=CYGWIN"
@@ -243,17 +230,14 @@
 # define unix
 # define OSMINOR "OS=INTERIX"
 # define OS_INTERIX
-# define NO_VFORK
 # endif
 # ifdef __sgi
 # define OSMINOR "OS=IRIX"
 # define OS_IRIX
-# define NO_VFORK
 # endif
 # ifdef __ISC
 # define OSMINOR "OS=ISC"
 # define OS_ISC
-# define NO_VFORK
 # endif
 # ifdef linux
 # define OSMINOR "OS=LINUX"
@@ -262,7 +246,6 @@
 # ifdef __Lynx__
 # define OSMINOR "OS=LYNX"
 # define OS_LYNX
-# define NO_VFORK
 # define unix
 # endif
 # ifdef __MACHTEN__
@@ -273,7 +256,6 @@
 # define unix
 # define OSMINOR "OS=MPEIX"
 # define OS_MPEIX
-# define NO_VFORK
 # endif
 # ifdef __MVS__
 # define unix
@@ -288,7 +270,6 @@
 # define unix
 # define OSMINOR "OS=NETBSD"
 # define OS_NETBSD
-# define NO_VFORK
 # endif
 # ifdef __QNX__
 # ifdef __QNXNTO__
@@ -298,7 +279,6 @@
 # define unix
 # define OSMINOR "OS=QNX"
 # define OS_QNX
-# define NO_VFORK
 # define MAXLINE 996
 # endif
 # endif
@@ -327,7 +307,6 @@
 # ifdef M_XENIX
 # define OSMINOR "OS=SCO"
 # define OS_SCO
-# define NO_VFORK
 # endif
 # ifdef sinix
 # define unix
@@ -361,39 +340,9 @@
 
 /* All the UNIX includes */
 
-# include <sys/types.h>
-# include <sys/stat.h>
+# include "FEATURE/jam"
 
-# ifndef OS_MPEIX
-# include <sys/file.h>
-# endif
-
-# include <fcntl.h>
-# include <stdio.h>
-# include <ctype.h>
-# include <signal.h>
-# include <string.h>
-# include <time.h>
-
-# ifndef OS_QNX
-# include <memory.h>
-# endif
-
-# ifndef OS_ULTRIX
-# include <stdlib.h>
-# endif
-
-# if !defined(OS_BSDI) && \
-     !defined(OS_FREEBSD) && \
-     !defined(OS_NEXT) && \
-     !defined(OS_MACHTEN) && \
-     !defined(OS_MACOSX) && \
-     !defined(OS_RHAPSODY) && \
-     !defined(OS_MVS)
-# include <malloc.h>
-# endif
-
-# endif
+# endif /* UNIX */
 
 /*
  * OSPLAT definitions - suppressed when it's a one-of-a-kind
@@ -458,7 +407,7 @@
  */
 
 # ifndef MAXLINE
-# define MAXLINE 10240	/* longest 'together' actions' */
+# define MAXLINE 10240  /* longest 'together' actions' */
 # endif
 
 # ifndef EXITOK
@@ -472,48 +421,48 @@
 
 /* You probably don't need to muck with these. */
 
-# define MAXSYM	1024	/* longest symbol in the environment */
-# define MAXJPATH 1024	/* longest filename */
+# define MAXSYM 1024    /* longest symbol in the environment */
+# define MAXJPATH 1024  /* longest filename */
 
-# define MAXJOBS 64	/* silently enforce -j limit */
-# define MAXARGC 32	/* words in $(JAMSHELL) */
+# define MAXJOBS 64     /* silently enforce -j limit */
+# define MAXARGC 32     /* words in $(JAMSHELL) */
 
 /* Jam private definitions below. */
 
-# define DEBUG_MAX	15
+# define DEBUG_MAX      15
 
 struct globs {
-	int	noexec;
-	int	jobs;
-	int	quitquick;
-	int	newestfirst;		/* build newest sources first */
-	char	debug[DEBUG_MAX];
-	FILE	*cmdout;		/* print cmds, not run them */
+        int     noexec;
+        int     jobs;
+        int     quitquick;
+        int     newestfirst;            /* build newest sources first */
+        char    debug[DEBUG_MAX];
+        FILE    *cmdout;                /* print cmds, not run them */
 } ;
 
 extern struct globs globs;
 
-# define DEBUG_MAKE	( globs.debug[ 1 ] )	/* -da show actions when executed */
-# define DEBUG_MAKEPROG	( globs.debug[ 3 ] )	/* -dm show progress of make0 */
+# define DEBUG_MAKE     ( globs.debug[ 1 ] )    /* -da show actions when executed */
+# define DEBUG_MAKEPROG ( globs.debug[ 3 ] )    /* -dm show progress of make0 */
 
-# define DEBUG_EXECCMD	( globs.debug[ 4 ] )	/* show execcmds()'s work */
+# define DEBUG_EXECCMD  ( globs.debug[ 4 ] )    /* show execcmds()'s work */
 
-# define DEBUG_COMPILE	( globs.debug[ 5 ] )	/* show rule invocations */
+# define DEBUG_COMPILE  ( globs.debug[ 5 ] )    /* show rule invocations */
 
-# define DEBUG_HEADER	( globs.debug[ 6 ] )	/* show result of header scan */
-# define DEBUG_BINDSCAN	( globs.debug[ 6 ] )	/* show result of dir scan */
-# define DEBUG_SEARCH	( globs.debug[ 6 ] )	/* show attempts at binding */
+# define DEBUG_HEADER   ( globs.debug[ 6 ] )    /* show result of header scan */
+# define DEBUG_BINDSCAN ( globs.debug[ 6 ] )    /* show result of dir scan */
+# define DEBUG_SEARCH   ( globs.debug[ 6 ] )    /* show attempts at binding */
 
-# define DEBUG_VARSET	( globs.debug[ 7 ] )	/* show variable settings */
-# define DEBUG_VARGET	( globs.debug[ 8 ] )	/* show variable fetches */
-# define DEBUG_VAREXP	( globs.debug[ 8 ] )	/* show variable expansions */
-# define DEBUG_IF	( globs.debug[ 8 ] )	/* show 'if' calculations */
-# define DEBUG_LISTS	( globs.debug[ 9 ] )	/* show list manipulation */
-# define DEBUG_SCAN	( globs.debug[ 9 ] )	/* show scanner tokens */
-# define DEBUG_MEM	( globs.debug[ 9 ] )	/* show memory use */
+# define DEBUG_VARSET   ( globs.debug[ 7 ] )    /* show variable settings */
+# define DEBUG_VARGET   ( globs.debug[ 8 ] )    /* show variable fetches */
+# define DEBUG_VAREXP   ( globs.debug[ 8 ] )    /* show variable expansions */
+# define DEBUG_IF       ( globs.debug[ 8 ] )    /* show 'if' calculations */
+# define DEBUG_LISTS    ( globs.debug[ 9 ] )    /* show list manipulation */
+# define DEBUG_SCAN     ( globs.debug[ 9 ] )    /* show scanner tokens */
+# define DEBUG_MEM      ( globs.debug[ 9 ] )    /* show memory use */
 
-# define DEBUG_MAKEQ	( globs.debug[ 11 ] )	/* -da show even quiet actions */
-# define DEBUG_EXEC	( globs.debug[ 12 ] )	/* -dx show text of actions */
-# define DEBUG_DEPENDS	( globs.debug[ 13 ] )	/* -dd show dependency graph */
-# define DEBUG_CAUSES	( globs.debug[ 14 ] )	/* -dc show dependency graph */
+# define DEBUG_MAKEQ    ( globs.debug[ 11 ] )   /* -da show even quiet actions */
+# define DEBUG_EXEC     ( globs.debug[ 12 ] )   /* -dx show text of actions */
+# define DEBUG_DEPENDS  ( globs.debug[ 13 ] )   /* -dd show dependency graph */
+# define DEBUG_CAUSES   ( globs.debug[ 14 ] )   /* -dc show dependency graph */
 

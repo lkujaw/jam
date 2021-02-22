@@ -9,16 +9,16 @@
  *
  * External routines:
  *
- * 	load_builtin() - define builtin rules
+ *      load_builtin() - define builtin rules
  *
  * Internal routines:
  *
- *	builtin_depends() - DEPENDS/INCLUDES rule
- *	builtin_echo() - ECHO rule
- *	builtin_exit() - EXIT rule
- *	builtin_flags() - NOCARE, NOTFILE, TEMPORARY rule
- *	builtin_glob() - GLOB rule
- *	builtin_match() - MATCH rule
+ *      builtin_depends() - DEPENDS/INCLUDES rule
+ *      builtin_echo() - ECHO rule
+ *      builtin_exit() - EXIT rule
+ *      builtin_flags() - NOCARE, NOTFILE, TEMPORARY rule
+ *      builtin_glob() - GLOB rule
+ *      builtin_match() - MATCH rule
  *  builtin_hdrmacro() - HDRMACRO rule
  *
  * 01/10/01 (seiwald) - split from compile.c
@@ -64,118 +64,118 @@ int glob( const char *s, const char *c );
 void
 load_builtins()
 {
-    bindrule( "Always" )->procedure = 
-    bindrule( "ALWAYS" )->procedure = 
-	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TOUCHED );
+    bindrule( "Always" )->procedure =
+    bindrule( "ALWAYS" )->procedure =
+        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TOUCHED );
 
-    bindrule( "Depends" )->procedure = 
-    bindrule( "DEPENDS" )->procedure = 
-	parse_make( builtin_depends, P0, P0, P0, C0, C0, 0 );
+    bindrule( "Depends" )->procedure =
+    bindrule( "DEPENDS" )->procedure =
+        parse_make( builtin_depends, P0, P0, P0, C0, C0, 0 );
 
-    bindrule( "echo" )->procedure = 
-    bindrule( "Echo" )->procedure = 
-    bindrule( "ECHO" )->procedure = 
-	parse_make( builtin_echo, P0, P0, P0, C0, C0, 0 );
+    bindrule( "echo" )->procedure =
+    bindrule( "Echo" )->procedure =
+    bindrule( "ECHO" )->procedure =
+        parse_make( builtin_echo, P0, P0, P0, C0, C0, 0 );
 
-    bindrule( "exit" )->procedure = 
-    bindrule( "Exit" )->procedure = 
-    bindrule( "EXIT" )->procedure = 
-	parse_make( builtin_exit, P0, P0, P0, C0, C0, 0 );
+    bindrule( "exit" )->procedure =
+    bindrule( "Exit" )->procedure =
+    bindrule( "EXIT" )->procedure =
+        parse_make( builtin_exit, P0, P0, P0, C0, C0, 0 );
 
-    bindrule( "Glob" )->procedure = 
-    bindrule( "GLOB" )->procedure = 
-	parse_make( builtin_glob, P0, P0, P0, C0, C0, 0 );
+    bindrule( "Glob" )->procedure =
+    bindrule( "GLOB" )->procedure =
+        parse_make( builtin_glob, P0, P0, P0, C0, C0, 0 );
 
-    bindrule( "Includes" )->procedure = 
-    bindrule( "INCLUDES" )->procedure = 
-	parse_make( builtin_depends, P0, P0, P0, C0, C0, 1 );
+    bindrule( "Includes" )->procedure =
+    bindrule( "INCLUDES" )->procedure =
+        parse_make( builtin_depends, P0, P0, P0, C0, C0, 1 );
 
-    bindrule( "Leaves" )->procedure = 
-    bindrule( "LEAVES" )->procedure = 
-	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_LEAVES );
+    bindrule( "Leaves" )->procedure =
+    bindrule( "LEAVES" )->procedure =
+        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_LEAVES );
 
-    bindrule( "Match" )->procedure = 
-    bindrule( "MATCH" )->procedure = 
-	parse_make( builtin_match, P0, P0, P0, C0, C0, 0 );
+    bindrule( "Match" )->procedure =
+    bindrule( "MATCH" )->procedure =
+        parse_make( builtin_match, P0, P0, P0, C0, C0, 0 );
 
-    bindrule( "NoCare" )->procedure = 
-    bindrule( "NOCARE" )->procedure = 
-	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOCARE );
+    bindrule( "NoCare" )->procedure =
+    bindrule( "NOCARE" )->procedure =
+        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOCARE );
 
-    bindrule( "NOTIME" )->procedure = 
-    bindrule( "NotFile" )->procedure = 
-    bindrule( "NOTFILE" )->procedure = 
-	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOTFILE );
+    bindrule( "NOTIME" )->procedure =
+    bindrule( "NotFile" )->procedure =
+    bindrule( "NOTFILE" )->procedure =
+        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOTFILE );
 
-    bindrule( "NoUpdate" )->procedure = 
-    bindrule( "NOUPDATE" )->procedure = 
-	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOUPDATE );
+    bindrule( "NoUpdate" )->procedure =
+    bindrule( "NOUPDATE" )->procedure =
+        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOUPDATE );
 
-    bindrule( "Temporary" )->procedure = 
-    bindrule( "TEMPORARY" )->procedure = 
-	parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TEMP );
+    bindrule( "Temporary" )->procedure =
+    bindrule( "TEMPORARY" )->procedure =
+        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TEMP );
 
-    bindrule( "HdrMacro" )->procedure = 
-    bindrule( "HDRMACRO" )->procedure = 
-	parse_make( builtin_hdrmacro, P0, P0, P0, C0, C0, 0 );
+    bindrule( "HdrMacro" )->procedure =
+    bindrule( "HDRMACRO" )->procedure =
+        parse_make( builtin_hdrmacro, P0, P0, P0, C0, C0, 0 );
 }
 
 /*
  * builtin_depends() - DEPENDS/INCLUDES rule
  *
- * The DEPENDS builtin rule appends each of the listed sources on the 
- * dependency list of each of the listed targets.  It binds both the 
+ * The DEPENDS builtin rule appends each of the listed sources on the
+ * dependency list of each of the listed targets.  It binds both the
  * targets and sources as TARGETs.
  */
 
 LIST *
 builtin_depends(
-	PARSE	*parse,
-	LOL	*args,
-	int	*jmp )
+        PARSE   *parse,
+        LOL     *args,
+        int     *jmp )
 {
-	LIST *targets = lol_get( args, 0 );
-	LIST *sources = lol_get( args, 1 );
-	int which = parse->num;
-	LIST *l;
+        LIST *targets = lol_get( args, 0 );
+        LIST *sources = lol_get( args, 1 );
+        int which = parse->num;
+        LIST *l;
 
-	for( l = targets; l; l = list_next( l ) )
-	{
-	    TARGET *t = bindtarget( l->string );
+        for( l = targets; l; l = list_next( l ) )
+        {
+            TARGET *t = bindtarget( l->string );
 
-	    /* If doing INCLUDES, switch to the TARGET's include */
-	    /* TARGET, creating it if needed.  The internal include */
-	    /* TARGET shares the name of its parent. */
+            /* If doing INCLUDES, switch to the TARGET's include */
+            /* TARGET, creating it if needed.  The internal include */
+            /* TARGET shares the name of its parent. */
 
-	    if( parse->num )
-	    {
-		if( !t->includes )
-		    t->includes = copytarget( t );
-		t = t->includes;
-	    }
+            if( parse->num )
+            {
+                if( !t->includes )
+                    t->includes = copytarget( t );
+                t = t->includes;
+            }
 
-	    t->depends = targetlist( t->depends, sources );
-	}
+            t->depends = targetlist( t->depends, sources );
+        }
 
-	return L0;
+        return L0;
 }
 
 /*
  * builtin_echo() - ECHO rule
  *
- * The ECHO builtin rule echoes the targets to the user.  No other 
+ * The ECHO builtin rule echoes the targets to the user.  No other
  * actions are taken.
  */
 
 LIST *
 builtin_echo(
-	PARSE	*parse,
-	LOL	*args,
-	int	*jmp )
+        PARSE   *parse,
+        LOL     *args,
+        int     *jmp )
 {
-	list_print( lol_get( args, 0 ) );
-	printf( "\n" );
-	return L0;
+        list_print( lol_get( args, 0 ) );
+        printf( "\n" );
+        return L0;
 }
 
 /*
@@ -187,14 +187,14 @@ builtin_echo(
 
 LIST *
 builtin_exit(
-	PARSE	*parse,
-	LOL	*args,
-	int	*jmp )
+        PARSE   *parse,
+        LOL     *args,
+        int     *jmp )
 {
-	list_print( lol_get( args, 0 ) );
-	printf( "\n" );
-	exit( EXITBAD ); /* yeech */
-	return L0;
+        list_print( lol_get( args, 0 ) );
+        printf( "\n" );
+        exit( EXITBAD ); /* yeech */
+        return L0;
 }
 
 /*
@@ -206,16 +206,16 @@ builtin_exit(
 
 LIST *
 builtin_flags(
-	PARSE	*parse,
-	LOL	*args,
-	int	*jmp )
+        PARSE   *parse,
+        LOL     *args,
+        int     *jmp )
 {
-	LIST *l = lol_get( args, 0 );
+        LIST *l = lol_get( args, 0 );
 
-	for( ; l; l = list_next( l ) )
-	    bindtarget( l->string )->flags |= parse->num;
+        for( ; l; l = list_next( l ) )
+            bindtarget( l->string )->flags |= parse->num;
 
-	return L0;
+        return L0;
 }
 
 /*
@@ -223,55 +223,55 @@ builtin_flags(
  */
 
 struct globbing {
-	LIST	*patterns;
-	LIST	*results;
+        LIST    *patterns;
+        LIST    *results;
 } ;
 
 static void
 builtin_glob_back(
-	void	*closure,
-	const char *file,
-	int	status,
-	time_t	time )
+        void    *closure,
+        const char *file,
+        int     status,
+        time_t  time )
 {
-	struct globbing *globbing = (struct globbing *)closure;
-	LIST		*l;
-	PATHNAME	f;
-	char		buf[ MAXJPATH ];
+        struct globbing *globbing = (struct globbing *)closure;
+        LIST            *l;
+        PATHNAME        f;
+        char            buf[ MAXJPATH ];
 
-	/* Null out directory for matching. */
-	/* We wish we had file_dirscan() pass up a PATHNAME. */
+        /* Null out directory for matching. */
+        /* We wish we had file_dirscan() pass up a PATHNAME. */
 
-	path_parse( file, &f );
-	f.f_dir.len = 0;
-	path_build( &f, buf, 0 );
+        path_parse( file, &f );
+        f.f_dir.len = 0;
+        path_build( &f, buf, 0 );
 
-	for( l = globbing->patterns; l; l = l->next )
-	    if( !glob( l->string, buf ) )
-	{
-	    globbing->results = list_new( globbing->results, file, 0 );
-	    break;
-	}
+        for( l = globbing->patterns; l; l = l->next )
+            if( !glob( l->string, buf ) )
+        {
+            globbing->results = list_new( globbing->results, file, 0 );
+            break;
+        }
 }
 
 LIST *
 builtin_glob(
-	PARSE	*parse,
-	LOL	*args,
-	int	*jmp )
+        PARSE   *parse,
+        LOL     *args,
+        int     *jmp )
 {
-	LIST *l = lol_get( args, 0 );
-	LIST *r = lol_get( args, 1 );
+        LIST *l = lol_get( args, 0 );
+        LIST *r = lol_get( args, 1 );
 
-	struct globbing globbing;
+        struct globbing globbing;
 
-	globbing.results = L0;
-	globbing.patterns = r;
+        globbing.results = L0;
+        globbing.patterns = r;
 
-	for( ; l; l = list_next( l ) )
-	    file_dirscan( l->string, builtin_glob_back, &globbing );
+        for( ; l; l = list_next( l ) )
+            file_dirscan( l->string, builtin_glob_back, &globbing );
 
-	return globbing.results;
+        return globbing.results;
 }
 
 /*
@@ -280,49 +280,49 @@ builtin_glob(
 
 LIST *
 builtin_match(
-	PARSE	*parse,
-	LOL	*args,
-	int	*jmp )
+        PARSE   *parse,
+        LOL     *args,
+        int     *jmp )
 {
-	LIST *l, *r;
-	LIST *result = 0;
+        LIST *l, *r;
+        LIST *result = 0;
 
-	/* For each pattern */
+        /* For each pattern */
 
-	for( l = lol_get( args, 0 ); l; l = l->next )
-	{
-	    regexp *re = regcomp( l->string );
+        for( l = lol_get( args, 0 ); l; l = l->next )
+        {
+            regexp *re = regcomp( l->string );
 
-	    /* For each string to match against */
+            /* For each string to match against */
 
-	    for( r = lol_get( args, 1 ); r; r = r->next )
-		if( regexec( re, r->string ) )
-	    {
-		int i, top;
+            for( r = lol_get( args, 1 ); r; r = r->next )
+                if( regexec( re, r->string ) )
+            {
+                int i, top;
 
-		/* Find highest parameter */
+                /* Find highest parameter */
 
-		for( top = NSUBEXP; top-- > 1; )
-		    if( re->startp[top] )
-			break;
+                for( top = NSUBEXP; top-- > 1; )
+                    if( re->startp[top] )
+                        break;
 
-		/* And add all parameters up to highest onto list. */
-		/* Must have parameters to have results! */
+                /* And add all parameters up to highest onto list. */
+                /* Must have parameters to have results! */
 
-		for( i = 1; i <= top; i++ )
-		{
-		    char buf[ MAXSYM ];
-		    int l = re->endp[i] - re->startp[i];
-		    memcpy( buf, re->startp[i], l );
-		    buf[ l ] = 0;
-		    result = list_new( result, buf, 0 );
-		}
-	    }
+                for( i = 1; i <= top; i++ )
+                {
+                    char buf[ MAXSYM ];
+                    int l = re->endp[i] - re->startp[i];
+                    memcpy( buf, re->startp[i], l );
+                    buf[ l ] = 0;
+                    result = list_new( result, buf, 0 );
+                }
+            }
 
-	    free( (char *)re );
-	}
+            free( (char *)re );
+        }
 
-	return result;
+        return result;
 }
 
 

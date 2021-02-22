@@ -1,0 +1,3 @@
+header  ctype.h fcntl.h malloc.h memory.h signal.h stdio.h stdlib.h string.h
+header  time.h unistd.h sys/file.h sys/stat.h sys/types.h
+lib     vfork

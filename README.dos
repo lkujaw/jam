@@ -1,0 +1,18 @@
+EXTRACTION
+==========
+All the text files (excluding this file) within the Jam distribution
+contain Unix end-of-line terminators (LF).
+
+For Jam to be usable under DOS, it is necessary to convert these line
+terminators to the DOS equivalent (CRLF). The easiest way to do this
+is to have the unzip program perform the conversion during extraction.
+Info-ZIP's unzip is a good choice as it is free software and only
+requires real mode. A copy may be downloaded via FTP from:
+
+ftp://ftp.info-zip.org/pub/infozip/msdos/unz552x3.exe
+
+Once unzip is extracted, run "unzip -a jam.zip" .
+The '-a' argument tells unzip to perform the end of line conversion.
+
+If you are using another publicly available unzipping program on DOS
+that provides this functionality, please inform the Jam maintainer.

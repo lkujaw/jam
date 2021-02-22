@@ -10,13 +10,18 @@
 # directory named "bin.unix"
 #
 
-CC      = gcc
-TARGET  = -o jam0
-CFLAGS  = -g -O2 
+.POSIX:
 
-all: jam0
+CC      = cc
+CFLAGS  =
+TARGET  = -o jam0
+
+all: FEATURES/jam.h jam0
 	chmod a+w jambase.c
 	./jam0
+
+FEATURES/jam.h: jam.iff
+	./iffe.sh -v jam.iff
 
 include common.mk
 
@@ -29,32 +34,25 @@ include common.mk
 # Note that for now, no documentation is installed with the executable
 #
 
-BUILD_DIR    := bin.unix
+BUILD_DIR    = bin.unix
 
+PREFIX       = /usr/local
+EXEC_PREFIX  = $(PREFIX)
+LIBDIR       = $(EXEC_PREFIX)/lib
+BINDIR       = $(EXEC_PRREFIX)/bin
+INCLUDEDIR   = $(PREFIX)/include
+DATADIR      = $(PREFIX)/share
 
-prefix       := /usr/local
-exec_prefix  := ${prefix}
-libdir       := ${exec_prefix}/lib
-bindir       := ${exec_prefix}/bin
-includedir   := ${prefix}/include
-datadir      := ${prefix}/share
-
-version_info := @version_info@
-
-DELETE       := rm -f
-DELDIR       := rmdir
+DELETE       = rm -f
 
 # The Jam executable name. This is 'jam' on Unix, except Cygwin where
-# it will be "jam.exe". Yuckk..
+# it will be "jam.exe".
 #
-JAMEXE       := jam
+JAMEXE           = jam
+INSTALL          = /usr/bin/install -c
+INSTALL_PROGRAM  = $(INSTALL)
+MKINSTALLDIRS    = builds/unix/mkinstalldirs
 
-INSTALL         := /usr/bin/install -c
-INSTALL_PROGRAM := ${INSTALL}
-MKINSTALLDIRS   := builds/unix/mkinstalldirs
-
-
-.PHONY: install uninstall check clean distclean
 
 # Unix installation and deinstallation targets.
 # Package managers can use the DESTDIR variable to force another
@@ -64,16 +62,14 @@ install: jam0
 	$(MKINSTALLDIRS) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(JAMEXE) $(DESTDIR)$(bindir)/$(JAMEXE)
 
-
 uninstall:
 	-$(DELETE) $(DESTDIR)$(bindir)/$(JAMEXE)
 
 clean:
-	-$(DELETE) $(BUILD_DIR)/*
-	-$(DELETE) jam0
-
-distclean: clean
-	-$(DELETE) config.log config.status Makefile
+	@-$(DELETE) $(BUILD_DIR)/*
+	@-$(DELETE) FEATURE/*
+	@-$(DELETE) jam0
+	@-$(DELETE) *.o
 
 check:
 	@echo There is no validation suite for this package.

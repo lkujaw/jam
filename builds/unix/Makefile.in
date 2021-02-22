@@ -15,8 +15,8 @@ TARGET  = -o jam0
 CFLAGS  = @CFLAGS@ @XX_CFLAGS@
 
 all: jam0
-	chmod a+w jambase.c
-	./jam0
+        chmod a+w jambase.c
+        ./jam0
 
 include common.mk
 
@@ -61,19 +61,19 @@ MKINSTALLDIRS   := builds/unix/mkinstalldirs
 # installation prefix
 #
 install: jam0
-	$(MKINSTALLDIRS) $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(JAMEXE) $(DESTDIR)$(bindir)/$(JAMEXE)
+        $(MKINSTALLDIRS) $(DESTDIR)$(bindir)
+        $(INSTALL_PROGRAM) $(BUILD_DIR)/$(JAMEXE) $(DESTDIR)$(bindir)/$(JAMEXE)
 
 
 uninstall:
-	-$(DELETE) $(DESTDIR)$(bindir)/$(JAMEXE)
+        -$(DELETE) $(DESTDIR)$(bindir)/$(JAMEXE)
 
 clean:
-	-$(DELETE) $(BUILD_DIR)/*
-	-$(DELETE) jam0@SUFEXE@
+        -$(DELETE) $(BUILD_DIR)/*
+        -$(DELETE) jam0@SUFEXE@
 
 distclean: clean
-	-$(DELETE) config.log config.status Makefile
+        -$(DELETE) config.log config.status Makefile
 
 check:
-	@echo There is no validation suite for this package.
+        @echo There is no validation suite for this package.

@@ -885,7 +885,7 @@ DC ?= dmd ;
     YACCFLAGS   ?= ;
 
     HDRPATTERN =
-            "^[ 	]*#[ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
+            "^[         ]*#[    ]*include[      ]*[<\"]([^\">]*)[\">].*$" ;
 
     OSFULL = $(OS)$(OSVER)$(OSPLAT) $(OS)$(OSPLAT) $(OS)$(OSVER) $(OS) ;
 

@@ -5,7 +5,7 @@
  */
 
 /*
- * search.h - find a target along $(SEARCH) or $(LOCATE) 
+ * search.h - find a target along $(SEARCH) or $(LOCATE)
  *
  * 11/04/02 (seiwald) - const-ing for string literals
  */

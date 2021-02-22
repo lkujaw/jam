@@ -20,11 +20,11 @@
  *              #include statements.
  *
  *  we look for lines like "#define MACRO  <....>" or '#define MACRO  "    "'
- *  in the target file. When found, we 
+ *  in the target file. When found, we
  *
  *  we then phony up a rule invocation like:
  *
- *	$(HDRRULE) <target> : <resolved included files> ;
+ *      $(HDRRULE) <target> : <resolved included files> ;
  *
  * External routines:
  *    headers1() - scan a target for "#include MACRO" lines and try
@@ -35,8 +35,8 @@
  *
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
  * 09/10/00 (seiwald) - replaced call to compile_rule with evaluate_rule,
- *		so that headers() doesn't have to mock up a parse structure
- *		just to invoke a rule.
+ *              so that headers() doesn't have to mock up a parse structure
+ *              just to invoke a rule.
  */
 
 static LIST *header_macros1( LIST *l, char *file, int rec, regexp *re[] );
@@ -46,9 +46,9 @@ typedef struct header_macro
 {
   const char*  symbol;
   const char*  filename;  /* we could maybe use a LIST here ?? */
-  
+
 } HEADER_MACRO;
- 
+
 static struct hash*   header_macros_hash = 0;
 
 /*
@@ -60,11 +60,11 @@ static struct hash*   header_macros_hash = 0;
 void
 macro_headers( TARGET *t )
 {
-	LIST	*hdrrule;
-	regexp	*re;
-	FILE	*f;
-	char	buf[ 1024 ];
-	int	i;
+        LIST    *hdrrule;
+        regexp  *re;
+        FILE    *f;
+        char    buf[ 1024 ];
+        int     i;
 
     if ( DEBUG_HEADER )
       printf( "macro header scan for %s\n", t->name );
@@ -73,29 +73,29 @@ macro_headers( TARGET *t )
     /* "#define  MACRO  <....>" or "#define  MACRO  "....."  */
     /* in the header macro files..                           */
     re = regcomp(
-       "^[ 	]*#[ 	]*define[ 	]*([A-Za-z][A-Za-z0-9_]*)[ 	]*"
+       "^[      ]*#[    ]*define[       ]*([A-Za-z][A-Za-z0-9_]*)[      ]*"
        "[<\"]([^\">]*)[\">].*$" );
 
-	if( ( f = fopen( t->boundname, "r" ) ) == 0 )
+        if( ( f = fopen( t->boundname, "r" ) ) == 0 )
           return;
 
-	while( fgets( buf, sizeof( buf ), f ) )
-	{
+        while( fgets( buf, sizeof( buf ), f ) )
+        {
       HEADER_MACRO  var, *v = &var;
-      
+
       if ( regexec( re, buf ) && re->startp[1] )
       {
         char  buf1[ MAXSYM ], buf2[ MAXSYM ];
         int   l1, l2;
-        
+
         l1 = re->endp[1] - re->startp[1];
         l2 = re->endp[2] - re->startp[2];
-        
+
         memcpy( buf1, re->startp[1], l1 );
         memcpy( buf2, re->startp[2], l2 );
         buf1[l1] = '\0';
         buf2[l2] = '\0';
-        
+
         /* we detected a line that looks like "#define  MACRO  filename */
         if ( DEBUG_HEADER )
           printf( "macro '%s' used to define filename '%s' in '%s'\n",
@@ -117,7 +117,7 @@ macro_headers( TARGET *t )
       }
     }
 
-	fclose( f );
+        fclose( f );
 
     free( re );
 }
@@ -136,6 +136,6 @@ macro_header_get( const char*  macro_name )
       printf( "### macro '%s' evaluated to '%s'\n", macro_name, v->filename );
     return (const char*) v->filename;
   }
-  return 0;  
+  return 0;
 }
 

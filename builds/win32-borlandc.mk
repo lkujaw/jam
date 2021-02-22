@@ -15,7 +15,7 @@ TARGET = -ejam0
 CFLAGS = /DNT -w- -q
 
 all: jam0
-	attrib -r jambase.c
-	jam0
+        attrib -r jambase.c
+        jam0
 
 !include common.mk

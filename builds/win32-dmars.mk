@@ -10,12 +10,12 @@
 # named "bin.ntx86"
 #
 CC        = dmc
-CFLAGS    = -DNT 
+CFLAGS    = -DNT
 TARGET    = -o jam0.exe
 #LINKLIBS = oldnames.lib kernel32.lib libc.lib
 
 all: jam0
-	attrib -r jambase.c
-	jam0
+        attrib -r jambase.c
+        jam0
 
 include common.mk
