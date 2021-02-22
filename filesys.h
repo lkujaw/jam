@@ -10,9 +10,12 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-typedef void (*scanback)( void *closure, const char *file, int found, time_t t );
+#include "ansi.h"
 
-void file_dirscan( const char *dir, scanback func, void *closure );
-void file_archscan( const char *arch, scanback func, void *closure );
+typedef void (*scanback)PROTO(( void *closure, const char *file,
+                                int found, time_t t ));
 
-int file_time( const char *filename, time_t *time );
+void file_dirscan  PROTO(( const char *dir, scanback func, void *closure ));
+void file_archscan PROTO(( const char *arch, scanback func, void *closure ));
+
+int file_time PROTO(( const char *filename, time_t *time ));

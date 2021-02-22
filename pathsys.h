@@ -22,6 +22,8 @@
  * (without a file), so that $(VAR:D) can climb to the parent.
  */
 
+#include "ansi.h"
+
 typedef struct _pathname PATHNAME;
 typedef struct _pathpart PATHPART;
 
@@ -45,7 +47,6 @@ struct _pathname {
 
 } ;
 
-void path_build( PATHNAME *f, char *file, int binding );
-void path_parse( const char *file, PATHNAME *f );
-void path_parent( PATHNAME *f );
-
+void path_build  PROTO(( PATHNAME *f, char *file, int binding ));
+void path_parse  PROTO(( const char *file, PATHNAME *f ));
+void path_parent PROTO(( PATHNAME *f ));

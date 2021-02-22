@@ -47,14 +47,13 @@ static struct hash *varhash = 0;
 typedef struct _variable VARIABLE ;
 
 struct _variable {
-        const char      *symbol;
-        LIST    *value;
+        const char *symbol;
+        LIST       *value;
 } ;
 
-static VARIABLE *var_enter( const char *symbol );
-static void var_dump( const char *symbol, LIST *value, const char *what );
-
-
+static VARIABLE *var_enter PROTO(( const char *symbol ));
+static void var_dump PROTO(( const char *symbol, LIST *value,
+                             const char *what ));
 
 /*
  * var_defines() - load a bunch of variable=value settings
@@ -64,7 +63,8 @@ static void var_dump( const char *symbol, LIST *value, const char *what );
  */
 
 void
-var_defines( const char **e )
+var_defines( e )
+    const char **e;
 {
         for( ; *e; e++ )
         {
@@ -143,11 +143,11 @@ var_defines( const char **e )
  */
 
 int
-var_string(
-        const char *in,
-        char    *out,
-        int     outsize,
-        LOL     *lol )
+var_string( in, out, outsize, lol )
+    const char  *in;
+          char  *out;
+          int    outsize;
+          LOL   *lol;
 {
         char    *out0 = out;
         char    *oute = out + outsize - 1;
@@ -226,7 +226,8 @@ var_string(
  */
 
 LIST *
-var_get( const char *symbol )
+var_get( symbol )
+    const char *symbol;
 {
         VARIABLE var, *v = &var;
 
@@ -254,10 +255,10 @@ var_get( const char *symbol )
  */
 
 void
-var_set(
-        const char *symbol,
-        LIST    *value,
-        int     flag )
+var_set( symbol, value, flag )
+    const char  *symbol;
+          LIST  *value;
+           int   flag;
 {
         VARIABLE *v = var_enter( symbol );
 
@@ -292,9 +293,9 @@ var_set(
  */
 
 LIST *
-var_swap(
-        const char *symbol,
-        LIST    *value )
+var_swap( symbol, value )
+    const char *symbol;
+          LIST *value;
 {
         VARIABLE *v = var_enter( symbol );
         LIST     *oldvalue = v->value;
@@ -314,7 +315,8 @@ var_swap(
  */
 
 static VARIABLE *
-var_enter( const char *symbol )
+var_enter( symbol )
+    const char *symbol;
 {
         VARIABLE var, *v = &var;
 
@@ -335,10 +337,10 @@ var_enter( const char *symbol )
  */
 
 static void
-var_dump(
-        const char      *symbol,
-        LIST    *value,
-        const char      *what )
+var_dump( symbol, value, what )
+    const char  *symbol;
+          LIST  *value;
+    const char  *what;
 {
         printf( "%s %s = ", what, symbol );
         list_print( value );
@@ -350,7 +352,7 @@ var_dump(
  */
 
 void
-var_done()
+var_done PROTO(( void ))
 {
         hashdone( varhash );
 }

@@ -10,13 +10,15 @@
  * 05/04/94 (seiwald) - async multiprocess interface
  */
 
-void execcmd(
+#include "ansi.h"
+
+void execcmd PROTO((
         const char *string,   /* command to execute */
         void (*func)( void *closure, int status ),
         void *closure,
-        LIST *shell );
+        LIST *shell ));
 
-int execwait();
+int execwait PROTO(( void ));
 
 # define EXEC_CMD_OK    0
 # define EXEC_CMD_FAIL  1

@@ -49,7 +49,7 @@ static struct include *incp = 0; /* current file; head of chain */
 
 static int scanmode = SCAN_NORMAL;
 static int anyerrors = 0;
-static char *symdump( YYSTYPE *s );
+static char *symdump PROTO(( YYSTYPE *s ));
 
 # define BIGGEST_TOKEN 10240    /* no single token can be larger */
 
@@ -58,13 +58,15 @@ static char *symdump( YYSTYPE *s );
  */
 
 void
-yymode( int n )
+yymode( n )
+    int n;
 {
         scanmode = n;
 }
 
 void
-yyerror( const char *s )
+yyerror( s )
+    const char *s;
 {
         if( incp )
             printf( "%s: line %d: ", incp->fname, incp->line );
@@ -75,13 +77,14 @@ yyerror( const char *s )
 }
 
 int
-yyanyerrors()
+yyanyerrors PROTO(( void ))
 {
         return anyerrors != 0;
 }
 
 void
-yyfparse( const char *s )
+yyfparse( s )
+    const char *s;
 {
         struct include *i = (struct include *)malloc( sizeof( *i ) );
 
@@ -109,7 +112,7 @@ yyfparse( const char *s )
  */
 
 int
-yyline()
+yyline PROTO(( void ))
 {
         struct include *i = incp;
 
@@ -191,7 +194,7 @@ yyline()
 # define yyprev() ( incp->string-- )
 
 int
-yylex()
+yylex PROTO(( void ))
 {
         int c;
         char buf[BIGGEST_TOKEN];
@@ -369,7 +372,8 @@ eof:
 }
 
 static char *
-symdump( YYSTYPE *s )
+symdump( s )
+    YYSTYPE *s;
 {
         static char buf[ BIGGEST_TOKEN + 20 ];
 

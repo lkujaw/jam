@@ -13,6 +13,8 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#include "ansi.h"
+
 typedef struct option
 {
         char    flag;           /* filled in by getoption() */
@@ -22,5 +24,6 @@ typedef struct option
 # define N_OPTS    256
 # define N_TARGETS 256
 
-int             getoptions( int argc, char **argv, const char *opts, option *optv, char** targets );
-const char *    getoptval( option *optv, char opt, int subopt );
+int         getoptions PROTO(( int argc, char **argv, const char *opts,
+                               option *optv, char** targets ));
+const char *getoptval  PROTO(( option *optv, int opt, int subopt ));

@@ -9,6 +9,8 @@
  *              #define MACRO  "filename" definitions
  */
 
-void   macro_headers( TARGET *t );
+#include "ansi.h"
 
-const char*  macro_header_get( const char*  macro_name );
+void macro_headers PROTO(( TARGET *t ));
+
+const char* macro_header_get PROTO(( const char*  macro_name ));

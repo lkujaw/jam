@@ -78,10 +78,10 @@ typedef struct {
         int     made;
 } COUNTS ;
 
-static void make0( TARGET *t, TARGET *p, int depth,
-                COUNTS *counts, int anyhow );
+static void make0 PROTO(( TARGET *t, TARGET *p, int depth,
+                          COUNTS *counts, int anyhow ));
 
-static TARGETS *make0sort( TARGETS *c );
+static TARGETS *make0sort PROTO(( TARGETS *c ));
 
 static const char *target_fate[] =
 {
@@ -116,10 +116,10 @@ static const char szSpaces[] =  "                ";
  */
 
 int
-make(
-        int     n_targets,
-        const char      **targets,
-        int     anyhow )
+make( n_targets, targets, anyhow )
+    int          n_targets;
+    const char **targets;
+    int          anyhow;
 {
         int i;
         COUNTS counts[1];
@@ -164,12 +164,12 @@ make(
  */
 
 static void
-make0(
-        TARGET  *t,
-        TARGET  *p,             /* parent */
-        int     depth,          /* for display purposes */
-        COUNTS  *counts,        /* for reporting */
-        int     anyhow )        /* forcibly touch all (real) targets */
+make0( t, p, depth, counts, anyhow )
+    TARGET  *t;
+    TARGET  *p;             /* parent */
+    int     depth;          /* for display purposes */
+    COUNTS  *counts;        /* for reporting */
+    int     anyhow;         /* forcibly touch all (real) targets */
 {
         TARGETS *c, *d, *incs;
         TARGET  *ptime = t;
@@ -497,7 +497,8 @@ make0(
  */
 
 static TARGETS *
-make0sort( TARGETS *chain )
+make0sort( chain )
+    TARGETS *chain;
 {
         TARGETS *result = 0;
 

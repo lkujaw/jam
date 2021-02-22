@@ -35,9 +35,9 @@ static LIST *freelist = 0;      /* junkpile for list_free() */
  */
 
 LIST *
-list_append(
-        LIST    *l,
-        LIST    *nl )
+list_append ( l, nl )
+    LIST *l;
+    LIST *nl;
 {
         if( !nl )
         {
@@ -62,10 +62,10 @@ list_append(
  */
 
 LIST *
-list_new(
-        LIST    *head,
-        const char *string,
-        int     copy )
+list_new( head, string, copy )
+    LIST       *head;
+    const char *string;
+    int         copy;
 {
         LIST *l;
 
@@ -110,9 +110,9 @@ list_new(
  */
 
 LIST *
-list_copy(
-        LIST    *l,
-        LIST    *nl )
+list_copy( l, nl )
+    LIST *l;
+    LIST *nl;
 {
         for( ; nl; nl = list_next( nl ) )
             l = list_new( l, nl->string, 1 );
@@ -125,10 +125,10 @@ list_copy(
  */
 
 LIST *
-list_sublist(
-        LIST    *l,
-        int     start,
-        int     count )
+list_sublist( l, start, count )
+    LIST    *l;
+    int     start;
+    int     count;
 {
         LIST    *nl = 0;
 
@@ -146,7 +146,8 @@ list_sublist(
  */
 
 void
-list_free( LIST *head )
+list_free( head )
+    LIST *head;
 {
         /* Just tack onto freelist. */
 
@@ -162,7 +163,8 @@ list_free( LIST *head )
  */
 
 void
-list_print( LIST *l )
+list_print( l )
+    LIST *l;
 {
         for( ; l; l = list_next( l ) )
             printf( "%s ", l->string );
@@ -173,7 +175,9 @@ list_print( LIST *l )
  */
 
 void
-list_printq( FILE *out, LIST *l )
+list_printq( out, l )
+    FILE *out;
+    LIST *l;
 {
         /* Dump each word, enclosed in "s */
         /* Suitable for Jambase use. */
@@ -211,7 +215,8 @@ list_printq( FILE *out, LIST *l )
  */
 
 int
-list_length( LIST *l )
+list_length( l )
+    LIST *l;
 {
         int n = 0;
 
@@ -226,7 +231,8 @@ list_length( LIST *l )
  */
 
 void
-lol_init( LOL *lol )
+lol_init( lol )
+    LOL *lol;
 {
         lol->count = 0;
 }
@@ -236,9 +242,9 @@ lol_init( LOL *lol )
  */
 
 void
-lol_add(
-        LOL     *lol,
-        LIST    *l )
+lol_add( lol, l )
+    LOL     *lol;
+    LIST    *l;
 {
         if( lol->count < LOL_MAX )
             lol->list[ lol->count++ ] = l;
@@ -249,7 +255,8 @@ lol_add(
  */
 
 void
-lol_free( LOL *lol )
+lol_free( lol )
+    LOL *lol;
 {
         int i;
 
@@ -264,9 +271,9 @@ lol_free( LOL *lol )
  */
 
 LIST *
-lol_get(
-        LOL     *lol,
-        int     i )
+lol_get( lol, i )
+    LOL     *lol;
+    int     i;
 {
         return i < lol->count ? lol->list[i] : 0;
 }
@@ -276,7 +283,8 @@ lol_get(
  */
 
 void
-lol_print( LOL *lol )
+lol_print( lol )
+    LOL *lol;
 {
         int i;
 

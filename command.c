@@ -25,12 +25,12 @@
  */
 
 CMD *
-cmd_new(
-        RULE    *rule,
-        LIST    *targets,
-        LIST    *sources,
-        LIST    *shell,
-        int     maxline )
+cmd_new( rule, targets, sources, shell, maxline )
+    RULE    *rule;
+    LIST    *targets;
+    LIST    *sources;
+    LIST    *shell;
+    int     maxline;
 {
         CMD *cmd = (CMD *)malloc( sizeof( CMD ) );
 
@@ -59,7 +59,8 @@ cmd_new(
  */
 
 void
-cmd_free( CMD *cmd )
+cmd_free( cmd )
+    CMD *cmd;
 {
         lol_free( &cmd->args );
         list_free( cmd->shell );

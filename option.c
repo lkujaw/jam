@@ -16,16 +16,16 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "option.h"
+#include "jam.h"
+#include "option.h"
 
 int
-getoptions(
-    int argc,
-    char **argv,
-    const char *opts,
-    option *optv,
-    char** targets )
+getoptions( argc, argv, opts, optv, targets )
+    int         argc;
+    char      **argv;
+    const char *opts;
+    option     *optv;
+    char      **targets;
 {
     int i, n;
     int optc = N_OPTS;
@@ -84,7 +84,7 @@ getoptions(
         }
         else
         {
-            /* something like VARNAME=.... is treated as an implicit '-s' flag */
+        /* something like VARNAME=.... is treated as an implicit '-s' flag */
             if ( argv[i][0] != '=' && strchr( argv[i],'=' ) )
             {
                 if ( !optc-- )
@@ -116,10 +116,10 @@ getoptions(
  */
 
 const char *
-getoptval(
-        option *optv,
-        char opt,
-        int subopt )
+getoptval( optv, opt, subopt )
+    option *optv;
+    int     opt;
+    int     subopt;
 {
         int i;
 

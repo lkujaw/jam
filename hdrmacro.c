@@ -39,8 +39,6 @@
  *              just to invoke a rule.
  */
 
-static LIST *header_macros1( LIST *l, char *file, int rec, regexp *re[] );
-
 /* this type is used to store a dictionary of file header macros */
 typedef struct header_macro
 {
@@ -58,13 +56,12 @@ static struct hash*   header_macros_hash = 0;
 # define MAXINC 10
 
 void
-macro_headers( TARGET *t )
+macro_headers( t )
+    TARGET *t;
 {
-        LIST    *hdrrule;
         regexp  *re;
         FILE    *f;
         char    buf[ 1024 ];
-        int     i;
 
     if ( DEBUG_HEADER )
       printf( "macro header scan for %s\n", t->name );
@@ -124,7 +121,8 @@ macro_headers( TARGET *t )
 
 
 const char*
-macro_header_get( const char*  macro_name )
+macro_header_get( macro_name )
+    const char*  macro_name;
 {
   HEADER_MACRO  var, *v = &var;
 
@@ -138,4 +136,3 @@ macro_header_get( const char*  macro_name )
   }
   return 0;
 }
-

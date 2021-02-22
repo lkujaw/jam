@@ -40,7 +40,7 @@
 # include "newstr.h"
 # include "hdrmacro.h"
 
-static LIST *headers1( const char *file, LIST *hdrscan );
+static LIST *headers1 PROTO(( const char *file, LIST *hdrscan ));
 
 /*
  * headers() - scan a target for include files and call HDRRULE
@@ -49,7 +49,8 @@ static LIST *headers1( const char *file, LIST *hdrscan );
 # define MAXINC 10
 
 void
-headers( TARGET *t )
+headers( t )
+    TARGET *t;
 {
         LIST    *hdrscan;
         LIST    *hdrrule;
@@ -84,9 +85,9 @@ headers( TARGET *t )
  */
 
 static LIST *
-headers1(
-        const char *file,
-        LIST *hdrscan )
+headers1( file, hdrscan )
+    const char *file;
+    LIST *hdrscan;
 {
         FILE    *f;
         int     i;

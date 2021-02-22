@@ -43,9 +43,9 @@
  */
 
 void
-path_parse(
-        const char *file,
-        PATHNAME *f )
+path_parse( file, f )
+    const char *file;
+    PATHNAME *f;
 {
         const char *p, *q;
         const char *end;
@@ -131,10 +131,10 @@ path_parse(
  */
 
 void
-path_build(
-        PATHNAME *f,
-        char    *file,
-        int     binding )
+path_build( f, file, binding )
+    PATHNAME *f;
+    char     *file;
+    int       binding;
 {
         /* Start with the grist.  If the current grist isn't */
         /* surrounded by <>'s, add them. */
@@ -219,7 +219,8 @@ path_build(
  */
 
 void
-path_parent( PATHNAME *f )
+path_parent( f )
+    PATHNAME *f;
 {
         /* just set everything else to nothing */
 

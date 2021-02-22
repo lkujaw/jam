@@ -7,6 +7,8 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#include "ansi.h"
+
 #define NSUBEXP  10
 typedef struct regexp {
         const char *startp[NSUBEXP];
@@ -18,9 +20,9 @@ typedef struct regexp {
         char program[1];        /* Unwarranted chumminess with compiler. */
 } regexp;
 
-regexp *regcomp( const char *exp );
-int regexec( regexp *prog, const char *string );
-void regerror( const char *s );
+regexp *regcomp PROTO(( const char *exp ));
+int regexec PROTO(( regexp *prog, const char *string ));
+void regerror PROTO(( const char *s ));
 
 /*
  * The first byte of the regexp internal "program" is actually this magic

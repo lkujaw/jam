@@ -24,7 +24,8 @@
 static PARSE *yypsave;
 
 void
-parse_file( const char *f )
+parse_file( f )
+    const char *f;
 {
         /* Suspend scan of current file */
         /* and push this new file in the stream */
@@ -63,20 +64,21 @@ parse_file( const char *f )
 }
 
 void
-parse_save( PARSE *p )
+parse_save( p )
+    PARSE *p;
 {
         yypsave = p;
 }
 
 PARSE *
-parse_make(
-        LIST            *(*func)( PARSE *p, LOL *args, int *jmp ),
-        PARSE   *left,
-        PARSE   *right,
-        PARSE   *third,
-        const char      *string,
-        const char      *string1,
-        int     num )
+parse_make( func, left, right, third, string, string1, num )
+        LIST       *(*func)PROTO(( PARSE *p, LOL *args, int *jmp ));
+        PARSE        *left;
+        PARSE        *right;
+        PARSE        *third;
+        const char   *string;
+        const char   *string1;
+        int           num;
 {
         PARSE   *p = (PARSE *)malloc( sizeof( PARSE ) );
 
@@ -93,13 +95,15 @@ parse_make(
 }
 
 void
-parse_refer( PARSE *p )
+parse_refer( p )
+    PARSE *p;
 {
         ++p->refs;
 }
 
 void
-parse_free( PARSE *p )
+parse_free( p )
+    PARSE *p;
 {
         if( --p->refs )
             return;

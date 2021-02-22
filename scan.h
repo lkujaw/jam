@@ -29,6 +29,8 @@
  * YYSTYPE - value of a lexical token
  */
 
+#include "ansi.h"
+
 # define YYSTYPE YYSYMBOL
 
 typedef struct _YYSTYPE {
@@ -41,13 +43,13 @@ typedef struct _YYSTYPE {
 
 extern YYSTYPE yylval;
 
-void yymode( int n );
-void yyerror( const char *s );
-int yyanyerrors();
-void yyfparse( const char *s );
-int yyline();
-int yylex();
-int yyparse();
+void yymode      PROTO(( int n ));
+void yyerror     PROTO(( const char *s ));
+int  yyanyerrors PROTO(( void ));
+void yyfparse    PROTO(( const char *s ));
+int  yyline      PROTO(( void ));
+int  yylex       PROTO(( void ));
+int  yyparse     PROTO(( void ));
 
 # define SCAN_NORMAL    0       /* normal parsing */
 # define SCAN_STRING    1       /* look only for matching } */

@@ -50,7 +50,8 @@ static struct hash *targethash = 0;
  */
 
 RULE *
-bindrule( const char *rulename )
+bindrule( rulename )
+    const char *rulename;
 {
         RULE rule, *r = &rule;
 
@@ -77,7 +78,8 @@ bindrule( const char *rulename )
  */
 
 TARGET *
-bindtarget( const char *targetname )
+bindtarget( targetname )
+    const char *targetname;
 {
         TARGET target, *t = &target;
 
@@ -103,7 +105,8 @@ bindtarget( const char *targetname )
  */
 
 TARGET *
-copytarget( const TARGET *ot )
+copytarget( ot )
+    const TARGET *ot;
 {
         TARGET *t;
 
@@ -122,7 +125,8 @@ copytarget( const TARGET *ot )
  */
 
 void
-touchtarget( const char *t )
+touchtarget( t )
+    const char *t;
 {
         bindtarget( t )->flags |= T_FLAG_TOUCHED;
 }
@@ -136,9 +140,9 @@ touchtarget( const char *t )
  */
 
 TARGETS *
-targetlist(
-        TARGETS *chain,
-        LIST    *targets )
+targetlist( chain, targets )
+    TARGETS *chain;
+    LIST    *targets;
 {
         for( ; targets; targets = list_next( targets ) )
             chain = targetentry( chain, bindtarget( targets->string ) );
@@ -155,9 +159,9 @@ targetlist(
  */
 
 TARGETS *
-targetentry(
-        TARGETS *chain,
-        TARGET  *target )
+targetentry( chain, target )
+    TARGETS *chain;
+    TARGET  *target;
 {
         TARGETS *c;
 
@@ -181,9 +185,9 @@ targetentry(
  */
 
 TARGETS *
-targetchain(
-        TARGETS *chain,
-        TARGETS *targets )
+targetchain( chain, targets )
+    TARGETS *chain;
+    TARGETS *targets;
 {
         TARGETS *c;
 
@@ -203,9 +207,9 @@ targetchain(
  */
 
 ACTIONS *
-actionlist(
-        ACTIONS *chain,
-        ACTION  *action )
+actionlist( chain, action )
+    ACTIONS *chain;
+    ACTION  *action;
 {
         ACTIONS *actions = (ACTIONS *)malloc( sizeof( ACTIONS ) );
 
@@ -229,11 +233,11 @@ actionlist(
  */
 
 SETTINGS *
-addsettings(
-        SETTINGS *head,
-        int     setflag,
-        const char *symbol,
-        LIST    *value )
+addsettings( head, setflag, symbol, value )
+    SETTINGS   *head;
+    int         setflag;
+    const char *symbol;
+    LIST       *value;
 {
         SETTINGS *v;
 
@@ -295,7 +299,8 @@ addsettings(
  */
 
 SETTINGS *
-copysettings( SETTINGS *from )
+copysettings( from )
+    SETTINGS *from;
 {
         SETTINGS *head = 0, *v;
 
@@ -316,7 +321,8 @@ copysettings( SETTINGS *from )
  */
 
 void
-pushsettings( SETTINGS *v )
+pushsettings( v )
+    SETTINGS *v;
 {
         for( ; v; v = v->next )
             v->value = var_swap( v->symbol, v->value );
@@ -327,7 +333,8 @@ pushsettings( SETTINGS *v )
  */
 
 void
-popsettings( SETTINGS *v )
+popsettings( v )
+    SETTINGS *v;
 {
         pushsettings( v );      /* just swap again */
 }
@@ -337,7 +344,8 @@ popsettings( SETTINGS *v )
  */
 
 void
-freesettings( SETTINGS *v )
+freesettings( v )
+    SETTINGS *v;
 {
         while( v )
         {

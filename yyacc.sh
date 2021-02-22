@@ -9,7 +9,7 @@
 #       yyacc.sh file.y filetab.h file.yy
 #
 # inputs:
-#       file.yy         yacc grammar with ` literals
+#       file.yy        yacc grammar with ` literals
 #
 # outputs:
 #       file.y          yacc grammar
@@ -25,7 +25,7 @@
 outy=${1?}
 outh=${2?}
 in=${3?}
-out=`basename $in .yy`
+out=`basename "$in" .yy`
 
 T=/tmp/yy$$
 trap 'rm -f $T.*' 0
@@ -41,7 +41,7 @@ sed '
                 b 1
         }
         d
-' $in | sort -u | sed '
+' "$in" | sort -u | sed '
         h
         y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/
         s/:/_COLON/
@@ -68,21 +68,21 @@ sed '
         s/.*/&_t/
         G
         s/\n/ /
-' > $T.1
+' > "$T.1"
 
 sed '
         s:^\(.*\) \(.*\)$:s/`\2`/\1/g:
         s:\.:\\.:g
         s:\[:\\[:g
-' $T.1 > $T.s
+' "$T.1" > "$T.s"
 
-rm -f $outy $outh
+rm -f "$outy" "$outh"
 
 (
         sed 's:^\(.*\) \(.*\)$:%token \1:' $T.1
-        sed -f $T.s $in
-) > $outy
+        sed -f $T.s "$in"
+) > "$outy"
 
 (
         sed 's:^\(.*\) \(.*\)$: { "\2", \1 },:' $T.1
-) > $outh
+) > "$outh"

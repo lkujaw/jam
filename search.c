@@ -19,9 +19,9 @@
 # include "newstr.h"
 
 const char *
-search(
-        const char *target,
-        time_t  *time )
+search( target, time )
+    const char *target;
+    time_t     *time;
 {
         PATHNAME f[1];
         LIST    *varlist;

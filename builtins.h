@@ -10,5 +10,6 @@
  * 01/10/01 (seiwald) - split from compile.h
  */
 
-void load_builtins();
+#include "ansi.h"
 
+void load_builtins PROTO((void));

@@ -40,7 +40,8 @@ static int strtotal = 0;
  */
 
 const char *
-newstr( const char *string )
+newstr( string )
+    const char *string;
 {
         STRING str, *s = &str;
 
@@ -70,7 +71,8 @@ newstr( const char *string )
  */
 
 const char *
-copystr( const char *s )
+copystr( s )
+    const char *s;
 {
         return s;
 }
@@ -80,7 +82,8 @@ copystr( const char *s )
  */
 
 void
-freestr( const char *s )
+freestr( s )
+    const char *s;
 {
 }
 
@@ -89,7 +92,7 @@ freestr( const char *s )
  */
 
 void
-donestr()
+donestr PROTO(( void ))
 {
         hashdone( strhash );
 

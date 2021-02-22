@@ -10,4 +10,6 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-const char *search( const char *target, time_t *time );
+#include "ansi.h"
+
+const char *search PROTO(( const char *target, time_t *time ));

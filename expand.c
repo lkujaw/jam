@@ -49,10 +49,11 @@ typedef struct {
         PATHPART        join;           /* :J -- join list with char */
 } VAR_EDITS ;
 
-static void var_edit_parse( const char *mods, VAR_EDITS *edits );
-static void var_edit_file( const char *in, char *out, VAR_EDITS *edits );
-static void var_edit_shift( char *out, VAR_EDITS *edits );
-static void var_edit_quote( char*  out );
+static void var_edit_parse PROTO(( const char *mods, VAR_EDITS *edits ));
+static void var_edit_file  PROTO(( const char *in, char *out,
+                                   VAR_EDITS *edits ));
+static void var_edit_shift PROTO(( char *out, VAR_EDITS *edits ));
+static void var_edit_quote PROTO(( char*  out ));
 
 # define MAGIC_COLON    '\001'
 # define MAGIC_LEFT     '\002'
@@ -71,12 +72,12 @@ static void var_edit_quote( char*  out );
  */
 
 LIST *
-var_expand(
-        LIST    *l,
-        const char      *in,
-        const char      *end,
-        LOL     *lol,
-        int     cancopyin )
+var_expand( l, in, end, lol, cancopyin )
+    LIST        *l;
+    const char  *in;
+    const char  *end;
+    LOL         *lol;
+        int     cancopyin;
 {
         char out_buf[ MAXSYM ];
         char *out = out_buf;
@@ -395,9 +396,9 @@ var_expand(
  */
 
 static void
-var_edit_parse(
-        const char      *mods,
-        VAR_EDITS       *edits )
+var_edit_parse( mods, edits )
+    const char      *mods;
+    VAR_EDITS       *edits;
 {
         int havezeroed = 0;
         memset( (char *)edits, 0, sizeof( *edits ) );
@@ -479,10 +480,10 @@ var_edit_parse(
  */
 
 static void
-var_edit_file(
-        const char *in,
-        char    *out,
-        VAR_EDITS *edits )
+var_edit_file( in, out, edits )
+    const char *in;
+    char       *out;
+    VAR_EDITS  *edits;
 {
         PATHNAME pathname;
 
@@ -525,9 +526,9 @@ var_edit_file(
  */
 
 static void
-var_edit_shift(
-        char    *out,
-        VAR_EDITS *edits )
+var_edit_shift( out, edits )
+    char      *out;
+    VAR_EDITS *edits;
 {
         /* Handle upshifting, downshifting now */
 
@@ -545,7 +546,8 @@ var_edit_shift(
 
 
 static void
-var_edit_quote( char  *out )
+var_edit_quote( out )
+    char  *out;
 {
   /* Handle quoting now */
   int    count, len;

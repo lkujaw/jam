@@ -10,7 +10,9 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-const char *newstr( const char *string );
-const char *copystr( const char *s );
-void freestr( const char *s );
-void donestr();
+#include "ansi.h"
+
+const char *newstr PROTO(( const char *string ));
+const char *copystr PROTO(( const char *s ));
+void freestr PROTO(( const char *s ));
+void donestr PROTO(( void ));

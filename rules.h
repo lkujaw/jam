@@ -36,6 +36,8 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
+#include "ansi.h"
+
 typedef struct _rule RULE;
 typedef struct _target TARGET;
 typedef struct _targets TARGETS;
@@ -164,17 +166,18 @@ struct _target {
         char    *cmds;                  /* type-punned command list */
 } ;
 
-RULE    *bindrule( const char *rulename );
-TARGET *bindtarget( const char *targetname );
-TARGET *copytarget( const TARGET *t );
-void    touchtarget( const char *t );
-TARGETS *targetlist( TARGETS *chain, LIST  *targets );
-TARGETS *targetentry( TARGETS *chain, TARGET *target );
-TARGETS *targetchain( TARGETS *chain, TARGETS *targets );
-ACTIONS *actionlist( ACTIONS *chain, ACTION *action );
-SETTINGS *addsettings( SETTINGS *v, int setflag, const char *sym, LIST *val );
-SETTINGS *copysettings( SETTINGS *v );
-void    pushsettings( SETTINGS *v );
-void    popsettings( SETTINGS *v );
-void    freesettings( SETTINGS *v );
-void    donerules();
+RULE         *bindrule PROTO(( const char *rulename ));
+TARGET     *bindtarget PROTO(( const char *targetname ));
+TARGET     *copytarget PROTO(( const TARGET *t ));
+void       touchtarget PROTO(( const char *t ));
+TARGETS    *targetlist PROTO(( TARGETS *chain, LIST  *targets ));
+TARGETS   *targetentry PROTO(( TARGETS *chain, TARGET *target ));
+TARGETS   *targetchain PROTO(( TARGETS *chain, TARGETS *targets ));
+ACTIONS    *actionlist PROTO(( ACTIONS *chain, ACTION *action ));
+SETTINGS  *addsettings PROTO(( SETTINGS *v, int setflag,
+                               const char *sym, LIST *val ));
+SETTINGS *copysettings PROTO(( SETTINGS *v ));
+void      pushsettings PROTO(( SETTINGS *v ));
+void       popsettings PROTO(( SETTINGS *v ));
+void      freesettings PROTO(( SETTINGS *v ));
+void         donerules PROTO(( void ));

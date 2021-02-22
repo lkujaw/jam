@@ -43,7 +43,7 @@ struct _binding {
 } ;
 
 static struct hash *bindhash = 0;
-static void time_enter( void *, const char *, int , time_t  );
+static void time_enter PROTO(( void *, const char *, int , time_t ));
 
 static const char *time_progress[] =
 {
@@ -60,9 +60,9 @@ static const char *time_progress[] =
  */
 
 void
-timestamp(
-        char    *target,
-        time_t  *time )
+timestamp( target, time )
+    char    *target;
+    time_t  *time;
 {
         PATHNAME f1, f2;
         BINDING binding, *b = &binding;
@@ -162,11 +162,11 @@ timestamp(
 }
 
 static void
-time_enter(
-        void    *closure,
-        const char      *target,
-        int     found,
-        time_t  time )
+time_enter( closure, target, found, time )
+    void        *closure;
+    const char  *target;
+    int          found;
+    time_t       time;
 {
         BINDING binding, *b = &binding;
         struct hash *bindhash = (struct hash *)closure;
@@ -199,7 +199,7 @@ time_enter(
  */
 
 void
-donestamps()
+donestamps PROTO(( void ))
 {
         hashdone( bindhash );
 }

@@ -51,18 +51,18 @@
 # define P0 (PARSE *)0
 # define C0 (char *)0
 
-LIST *builtin_depends( PARSE *parse, LOL *args, int *jmp );
-LIST *builtin_echo( PARSE *parse, LOL *args, int *jmp );
-LIST *builtin_exit( PARSE *parse, LOL *args, int *jmp );
-LIST *builtin_flags( PARSE *parse, LOL *args, int *jmp );
-LIST *builtin_glob( PARSE *parse, LOL *args, int *jmp );
-LIST *builtin_match( PARSE *parse, LOL *args, int *jmp );
-LIST *builtin_hdrmacro( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_depends PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_echo PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_exit PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_flags PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_glob PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_match PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_hdrmacro PROTO(( PARSE *parse, LOL *args, int *jmp ));
 
-int glob( const char *s, const char *c );
+int glob PROTO(( const char *s, const char *c ));
 
 void
-load_builtins()
+load_builtins PROTO((void))
 {
     bindrule( "Always" )->procedure =
     bindrule( "ALWAYS" )->procedure =
@@ -129,14 +129,13 @@ load_builtins()
  */
 
 LIST *
-builtin_depends(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+builtin_depends( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *targets = lol_get( args, 0 );
         LIST *sources = lol_get( args, 1 );
-        int which = parse->num;
         LIST *l;
 
         for( l = targets; l; l = list_next( l ) )
@@ -168,10 +167,10 @@ builtin_depends(
  */
 
 LIST *
-builtin_echo(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+builtin_echo( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         list_print( lol_get( args, 0 ) );
         printf( "\n" );
@@ -186,10 +185,10 @@ builtin_echo(
  */
 
 LIST *
-builtin_exit(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+builtin_exit( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         list_print( lol_get( args, 0 ) );
         printf( "\n" );
@@ -205,10 +204,10 @@ builtin_exit(
  */
 
 LIST *
-builtin_flags(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+builtin_flags( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *l = lol_get( args, 0 );
 
@@ -228,11 +227,11 @@ struct globbing {
 } ;
 
 static void
-builtin_glob_back(
-        void    *closure,
-        const char *file,
-        int     status,
-        time_t  time )
+builtin_glob_back( closure, file, status, time )
+    void       *closure;
+    const char *file;
+    int         status;
+    time_t      time;
 {
         struct globbing *globbing = (struct globbing *)closure;
         LIST            *l;
@@ -255,10 +254,10 @@ builtin_glob_back(
 }
 
 LIST *
-builtin_glob(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+builtin_glob( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *l = lol_get( args, 0 );
         LIST *r = lol_get( args, 1 );
@@ -279,10 +278,10 @@ builtin_glob(
  */
 
 LIST *
-builtin_match(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+builtin_match( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *l, *r;
         LIST *result = 0;
@@ -327,10 +326,10 @@ builtin_match(
 
 
 LIST *
-builtin_hdrmacro(
-    PARSE    *parse,
-    LOL      *args,
-    int      *jmp )
+builtin_hdrmacro( parse, args, jmp )
+    PARSE    *parse;
+    LOL      *args;
+    int      *jmp;
 {
   LIST*  l = lol_get( args, 0 );
 

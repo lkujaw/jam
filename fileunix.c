@@ -109,10 +109,10 @@ struct ar_hdr           /* archive file member header - printable ascii */
  */
 
 void
-file_dirscan(
-        const char *dir,
-        scanback func,
-        void *closure )
+file_dirscan( dir, func, closure )
+    const char *dir;
+    scanback func;
+    void *closure;
 {
         PATHNAME f;
         DIR *d;
@@ -164,9 +164,9 @@ file_dirscan(
  */
 
 int
-file_time(
-        const char *filename,
-        time_t  *time )
+file_time( filename, time )
+    const char *filename;
+    time_t  *time;
 {
         struct stat statbuf;
 
@@ -187,10 +187,10 @@ file_time(
 # define SARHDR sizeof( struct ar_hdr )
 
 void
-file_archscan(
-        const char *archive,
-        scanback func,
-        void *closure )
+file_archscan( archive, func, closure )
+    const char *archive;
+    scanback func;
+    void *closure;
 {
 # ifndef NO_AR
         struct ar_hdr ar_hdr;
@@ -320,10 +320,10 @@ file_archscan(
 # else /* AIAMAG - RS6000 AIX */
 
 void
-file_archscan(
-        const char *archive,
-        scanback func,
-        void *closure )
+file_archscan( archive, func, closure )
+    const char *archive;
+    scanback func;
+    void *closure;
 {
         struct fl_hdr fl_hdr;
 
@@ -394,4 +394,3 @@ file_archscan(
 # endif /* AIAMAG - RS6000 AIX */
 
 # endif /* USE_FILEUNIX */
-

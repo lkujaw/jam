@@ -35,6 +35,8 @@
  * CMD - an action, ready to be formatted into a buffer and executed
  */
 
+#include "ansi.h"
+
 typedef struct _cmd CMD;
 
 struct _cmd
@@ -47,13 +49,13 @@ struct _cmd
         char    buf[ MAXLINE ]; /* actual commands */
 } ;
 
-CMD *cmd_new(
+CMD *cmd_new PROTO((
         RULE    *rule,          /* rule (referenced) */
         LIST    *targets,       /* $(<) (freed) */
         LIST    *sources,       /* $(>) (freed) */
         LIST    *shell,         /* $(SHELL) (freed) */
-        int     maxline );      /* max line length */
+        int     maxline ));     /* max line length */
 
-void cmd_free( CMD *cmd );
+void cmd_free PROTO(( CMD *cmd ));
 
 # define cmd_next( c ) ((c)->next)

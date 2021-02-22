@@ -80,10 +80,8 @@
 # include "search.h"
 
 static const char *set_names[] = { "=", "+=", "?=" };
-static void debug_compile( int which, const char *s );
-int glob( const char *s, const char *c );
-
-
+static void debug_compile PROTO(( int which, const char *s ));
+int glob PROTO(( const char *s, const char *c ));
 
 /*
  * compile_append() - append list results of two statements
@@ -93,10 +91,10 @@ int glob( const char *s, const char *c );
  */
 
 LIST *
-compile_append(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_append( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         /* Append right to left. */
 
@@ -113,10 +111,10 @@ compile_append(
  */
 
 LIST *
-compile_break(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_break( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *lv = (*parse->left->func)( parse->left, args, jmp );
         *jmp = parse->num;
@@ -132,7 +130,9 @@ compile_break(
  */
 
 static int
-lcmp( LIST *t, LIST *s )
+lcmp( t, s )
+    LIST *t;
+    LIST *s;
 {
         int status = 0;
 
@@ -151,10 +151,10 @@ lcmp( LIST *t, LIST *s )
 }
 
 LIST *
-compile_eval(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_eval( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *ll, *lr, *s, *t;
         int status = 0;
@@ -251,10 +251,10 @@ compile_eval(
  */
 
 LIST *
-compile_foreach(
-        PARSE   *p,
-        LOL     *args,
-        int     *jmp )
+compile_foreach( p, args, jmp )
+    PARSE   *p;
+    LOL     *args;
+    int     *jmp;
 {
         LIST    *nv = (*p->left->func)( p->left, args, jmp );
         LIST    *result = 0;
@@ -300,10 +300,10 @@ compile_foreach(
  */
 
 LIST *
-compile_if(
-        PARSE   *p,
-        LOL     *args,
-        int     *jmp )
+compile_if( p, args, jmp )
+    PARSE   *p;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *l = (*p->left->func)( p->left, args, jmp );
 
@@ -321,10 +321,10 @@ compile_if(
  */
 
 LIST *
-compile_include(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_include( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST    *nt = (*parse->left->func)( parse->left, args, jmp );
 
@@ -366,10 +366,10 @@ compile_include(
  */
 
 LIST *
-compile_list(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_list( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         /* voodoo 1 means: s is a copyable string */
         const char *s = parse->string;
@@ -385,10 +385,10 @@ compile_list(
  */
 
 LIST *
-compile_local(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_local( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *l;
         SETTINGS *s = 0;
@@ -429,10 +429,10 @@ compile_local(
  */
 
 LIST *
-compile_null(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_null( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         return L0;
 }
@@ -445,10 +445,10 @@ compile_null(
  */
 
 LIST *
-compile_on(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_on( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST    *nt = (*parse->left->func)( parse->left, args, jmp );
         LIST    *result = 0;
@@ -491,10 +491,10 @@ compile_on(
  */
 
 LIST *
-compile_rule(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_rule( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LOL     nargs[1];
         LIST    *result = 0;
@@ -528,10 +528,10 @@ compile_rule(
  */
 
 LIST *
-evaluate_rule(
-        const char *rulename,
-        LOL     *args,
-        LIST    *result )
+evaluate_rule( rulename, args, result )
+    const char *rulename;
+    LOL        *args;
+    LIST       *result;
 {
         RULE    *rule = bindrule( rulename );
 
@@ -614,10 +614,10 @@ evaluate_rule(
  */
 
 LIST *
-compile_rules(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_rules( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         /* Ignore result from first statement; return the 2nd. */
         /* Optimize recursion on the right by looping. */
@@ -649,10 +649,10 @@ compile_rules(
  */
 
 LIST *
-compile_set(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_set( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST    *nt = (*parse->left->func)( parse->left, args, jmp );
         LIST    *ns = (*parse->right->func)( parse->right, args, jmp );
@@ -687,10 +687,10 @@ compile_set(
  */
 
 LIST *
-compile_setcomp(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_setcomp( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         RULE    *rule = bindrule( parse->string );
         LIST    *params = 0;
@@ -741,10 +741,10 @@ compile_setcomp(
  */
 
 LIST *
-compile_setexec(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_setexec( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         RULE    *rule = bindrule( parse->string );
         LIST    *bindlist = (*parse->left->func)( parse->left, args, jmp );
@@ -774,10 +774,10 @@ compile_setexec(
  */
 
 LIST *
-compile_settings(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_settings( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST    *nt = (*parse->left->func)( parse->left, args, jmp );
         LIST    *ns = (*parse->third->func)( parse->third, args, jmp );
@@ -829,10 +829,10 @@ compile_settings(
  */
 
 LIST *
-compile_switch(
-        PARSE   *parse,
-        LOL     *args,
-        int     *jmp )
+compile_switch( parse, args, jmp )
+    PARSE   *parse;
+    LOL     *args;
+    int     *jmp;
 {
         LIST    *nt = (*parse->left->func)( parse->left, args, jmp );
         LIST    *result = 0;
@@ -870,10 +870,10 @@ compile_switch(
  */
 
 LIST *
-compile_while(
-        PARSE   *p,
-        LOL     *args,
-        int     *jmp )
+compile_while( p, args, jmp )
+    PARSE   *p;
+    LOL     *args;
+    int     *jmp;
 {
         LIST *result = 0;
         LIST *l;
@@ -913,7 +913,9 @@ compile_while(
  */
 
 static void
-debug_compile( int which, const char *s )
+debug_compile( which, s )
+    int which;
+    const char *s;
 {
         static int level = 0;
         static char indent[36] = ">>>>|>>>>|>>>>|>>>>|>>>>|>>>>|>>>>|";

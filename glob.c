@@ -26,21 +26,22 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
+#include "ansi.h"
+#include "jam.h"
 
 # define CHECK_BIT( tab, bit ) ( tab[ (bit)/8 ] & (1<<( (bit)%8 )) )
 # define BITLISTSIZE 16 /* bytes used for [chars] in compiled expr */
 
-static void globchars( const char *s, const char *e, char *b );
+static void globchars PROTO(( const char *s, const char *e, char *b ));
 
 /*
  * glob() - match a string against a simple pattern
  */
 
 int
-glob(
-        const char *c,
-        const char *s )
+glob( c, s )
+    const char *c;
+    const char *s;
 {
         char bitlist[ BITLISTSIZE ];
         const char *here;
@@ -119,10 +120,10 @@ glob(
  */
 
 static void
-globchars(
-        const char *s,
-        const char *e,
-        char *b )
+globchars( s, e, b )
+    const char *s;
+    const char *e;
+    char *b;
 {
         int neg = 0;
 

@@ -62,15 +62,15 @@
 # include "command.h"
 # include "execcmd.h"
 
-static void make1a( TARGET *t, TARGET *parent );
-static void make1b( TARGET *t );
-static void make1c( TARGET *t );
-static void make1d( void *closure, int status );
+static void make1a PROTO(( TARGET *t, TARGET *parent ));
+static void make1b PROTO(( TARGET *t ));
+static void make1c PROTO(( TARGET *t ));
+static void make1d PROTO(( void *closure, int status ));
 
-static CMD *make1cmds( ACTIONS *a0 );
-static LIST *make1list( LIST *l, TARGETS *targets, int flags );
-static SETTINGS *make1settings( LIST *vars );
-static void make1bind( TARGET *t, int warn );
+static CMD *make1cmds PROTO(( ACTIONS *a0 ));
+static LIST *make1list PROTO(( LIST *l, TARGETS *targets, int flags ));
+static SETTINGS *make1settings PROTO(( LIST *vars ));
+static void make1bind PROTO(( TARGET *t, int warn ));
 
 /* Ugly static - it's too hard to carry it through the callbacks. */
 
@@ -88,7 +88,8 @@ static struct {
 static int intr = 0;
 
 int
-make1( TARGET *t )
+make1( t )
+    TARGET *t;
 {
         memset( (char *)counts, 0, sizeof( *counts ) );
 
@@ -120,9 +121,9 @@ make1( TARGET *t )
  */
 
 static void
-make1a(
-        TARGET  *t,
-        TARGET  *parent )
+make1a( t, parent )
+    TARGET  *t;
+    TARGET  *parent;
 {
         TARGETS *c;
 
@@ -172,7 +173,8 @@ make1a(
  */
 
 static void
-make1b( TARGET *t )
+make1b( t )
+    TARGET *t;
 {
         TARGETS *c;
         const char *failed = "dependents";
@@ -264,7 +266,8 @@ make1b( TARGET *t )
  */
 
 static void
-make1c( TARGET *t )
+make1c( t )
+    TARGET *t;
 {
         CMD     *cmd = (CMD *)t->cmds;
 
@@ -344,9 +347,9 @@ make1c( TARGET *t )
  */
 
 static void
-make1d(
-        void    *closure,
-        int     status )
+make1d( closure, status )
+    void *closure;
+    int   status;
 {
         TARGET  *t = (TARGET *)closure;
         CMD     *cmd = (CMD *)t->cmds;
@@ -411,7 +414,8 @@ make1d(
  */
 
 static CMD *
-make1cmds( ACTIONS *a0 )
+make1cmds( a0 )
+    ACTIONS *a0;
 {
         CMD *cmds = 0;
         LIST *shell = var_get( "JAMSHELL" );    /* shell is per-target */
@@ -547,10 +551,10 @@ make1cmds( ACTIONS *a0 )
  */
 
 static LIST *
-make1list(
-        LIST    *l,
-        TARGETS *targets,
-        int     flags )
+make1list( l, targets, flags )
+    LIST    *l;
+    TARGETS *targets;
+    int      flags;
 {
     for( ; targets; targets = targets->next )
     {
@@ -597,7 +601,8 @@ make1list(
  */
 
 static SETTINGS *
-make1settings( LIST *vars )
+make1settings( vars )
+    LIST *vars;
 {
         SETTINGS *settings = 0;
 
@@ -637,9 +642,9 @@ make1settings( LIST *vars )
  */
 
 static void
-make1bind(
-        TARGET  *t,
-        int     warn )
+make1bind( t, warn )
+    TARGET *t;
+    int     warn;
 {
         if( t->flags & T_FLAG_NOTFILE )
             return;

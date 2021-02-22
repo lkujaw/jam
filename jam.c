@@ -167,7 +167,10 @@ extern char **environ;
 # endif
 
 int
-main( int argc, char **argv, char **arg_environ )
+main( argc, argv, arg_environ )
+    int    argc;
+    char **argv;
+    char **arg_environ;
 {
         int             n, num_targets;
         const char      *s;

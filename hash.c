@@ -81,18 +81,18 @@ struct hash
         const char *name;       /* just for hashstats() */
 } ;
 
-static void hashrehash( struct hash *hp );
-static void hashstat( struct hash *hp );
+static void hashrehash PROTO(( struct hash *hp ));
+static void hashstat   PROTO(( struct hash *hp ));
 
 /*
  * hashitem() - find a record in the table, and optionally enter a new one
  */
 
 int
-hashitem(
-        register struct hash *hp,
-        HASHDATA **data,
-        int enter )
+hashitem( hp, data, enter )
+    register struct hash *hp;
+    HASHDATA **data;
+    int enter;
 {
         ITEM **base;
         register ITEM *i;
@@ -139,7 +139,8 @@ hashitem(
  * hashrehash() - resize and rebuild hp->tab, the hash table
  */
 
-static void hashrehash( register struct hash *hp )
+static void hashrehash( hp )
+    register struct hash *hp;
 {
         int i = ++hp->items.list;
 
@@ -183,9 +184,9 @@ static void hashrehash( register struct hash *hp )
  */
 
 struct hash *
-hashinit(
-        int datalen,
-        const char *name )
+hashinit( datalen, name )
+    int         datalen;
+    const char *name;
 {
         struct hash *hp = (struct hash *)malloc( sizeof( *hp ) );
 
@@ -208,7 +209,8 @@ hashinit(
  */
 
 void
-hashdone( struct hash *hp )
+hashdone( hp )
+    struct hash *hp;
 {
         int i;
 
@@ -228,7 +230,8 @@ hashdone( struct hash *hp )
 /* ---- */
 
 static void
-hashstat( struct hash *hp )
+hashstat( hp )
+    struct hash *hp;
 {
         ITEM **tab = hp->tab.base;
         int nel = hp->tab.nel;

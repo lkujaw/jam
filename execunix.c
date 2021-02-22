@@ -38,6 +38,7 @@
  * 12/27/02 (seiwald) - grist .bat file with pid for system uniqueness
  */
 
+#
 #include <assert.h>
 #include <errno.h>
 #include "jam.h"
@@ -59,18 +60,18 @@
 # define USE_MYWAIT
 # if !defined( __BORLANDC__ )
 # define wait my_wait
-static int my_wait( int *status );
+static int my_wait PROTO(( int *status ));
 # endif
 # endif
 
 static int intr = 0;
 static int cmdsrunning = 0;
-static void (*istat)( int );
+static void (*istat)PROTO(( int ));
 
 static struct
 {
         int     pid; /* on win32, a real process handle */
-        void    (*func)( void *closure, int status );
+        void    (*func)PROTO(( void *closure, int status ));
         void    *closure;
 
 # ifdef USE_EXECNT
@@ -84,7 +85,8 @@ static struct
  */
 
 void
-onintr( int disp )
+onintr( disp )
+    int disp;
 {
         intr++;
         printf( "...interrupted\n" );
@@ -95,11 +97,11 @@ onintr( int disp )
  */
 
 void
-execcmd(
-        const char *string,
-        void (*func)( void *closure, int status ),
-        void *closure,
-        LIST *shell )
+execcmd( string, func, closure, shell )
+    const char *string;
+    void (*func)PROTO(( void *closure, int status ));
+    void *closure;
+    LIST *shell;
 {
         int pid;
         int slot;
@@ -261,7 +263,7 @@ execcmd(
  */
 
 int
-execwait()
+execwait PROTO((void))
 {
         int i;
         int status, w;
@@ -324,7 +326,8 @@ execwait()
 # ifdef USE_MYWAIT
 
 static int
-my_wait( int *status )
+my_wait( status )
+    int *status;
 {
         int i, num_active = 0;
         DWORD exitcode, waitcode;

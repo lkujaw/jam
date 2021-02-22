@@ -8,4 +8,6 @@
  * headers.h - handle #includes in source files
  */
 
-void headers( TARGET *t );
+#include "ansi.h"
+
+void headers PROTO((TARGET *t ));
