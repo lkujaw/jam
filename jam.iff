@@ -11,6 +11,7 @@ header  unistd.h
 header  sys/file.h
 header  sys/stat.h
 header  sys/types.h
+header  sys/wait.h
 
 header  assert.h
 mac     assert assert.h
