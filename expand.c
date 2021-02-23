@@ -213,7 +213,8 @@ var_expand( l, in, end, lol, cancopyin )
                 /* Look for a : modifier in the variable name */
                 /* Must copy into varname so we can modify it */
 
-                strcpy( varname, vars->string );
+                (void)strncpy( varname, vars->string, sizeof(varname)-1);
+                varname[sizeof(varname)-1] = '\0';
 
                 if(( colon = strchr( varname, MAGIC_COLON ) ))
                 {

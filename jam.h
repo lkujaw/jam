@@ -419,6 +419,14 @@
 # define SPLITPATH ':'
 # endif
 
+#if !_mac_assert
+# define assert(ignore)
+#endif
+
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
 /* You probably don't need to muck with these. */
 
 # define MAXSYM 1024    /* longest symbol in the environment */

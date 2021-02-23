@@ -155,9 +155,9 @@ static void hashrehash( hp )
                 free( (char *)hp->tab.base );
 
         hp->tab.nel = hp->items.nel * hp->bloat;
-        hp->tab.base = (ITEM **)malloc( hp->tab.nel * sizeof(ITEM **) );
+        hp->tab.base = (ITEM **)malloc( hp->tab.nel * sizeof(ITEM *) );
 
-        memset( (char *)hp->tab.base, '\0', hp->tab.nel * sizeof( ITEM * ) );
+        memset( (char *)hp->tab.base, '\0', hp->tab.nel * sizeof( ITEM *) );
 
         for( i = 0; i < hp->items.list; i++ )
         {
@@ -256,5 +256,5 @@ hashstat( hp )
                 hp->tab.nel,
                 hp->items.nel * hp->items.size / 1024,
                 hp->tab.nel * (int)sizeof( ITEM ** ) / 1024,
-                (float)count / (float)sets );
+                sets > 0 ? (float)count / (float)sets : -1 );
 }

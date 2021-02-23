@@ -90,7 +90,9 @@ set_is_win95( void )
 
 
 static char**
-string_to_args( const char*  string, int*  pcount )
+string_to_args( string, pcount )
+    const char *string;
+    int        *pcount
 {
   int    total    = strlen( string );
   int    in_quote = 0, num_args;
@@ -168,7 +170,8 @@ string_to_args( const char*  string, int*  pcount )
 }
 
 static void
-free_args( char** args )
+free_args( args )
+    char** args;
 {
   free( args[-1] );
   free( args-1 );
@@ -177,7 +180,8 @@ free_args( char** args )
 
 /* process a "del" or "erase" command under Windows 95/98 */
 static int
-process_del( char*  command )
+process_del( command )
+    char*  command;
 {
   char** arg;
   char*  p = command, *q;
@@ -282,7 +286,8 @@ process_del( char*  command )
  */
 
 void
-onintr( int disp )
+onintr( disp )
+    int disp;
 {
         intr++;
         printf( "...interrupted\n" );
@@ -293,11 +298,11 @@ onintr( int disp )
  */
 
 void
-execcmd(
-        char *string,
-        void (*func)( void *closure, int status ),
-        void *closure,
-        LIST *shell )
+execcmd( string, func, closure, shell )
+    char *string;
+    void (*func)( void *closure, int status );
+    void *closure;
+    LIST *shell;
 {
         int pid;
         int slot;
@@ -504,7 +509,7 @@ execcmd(
  */
 
 int
-execwait()
+execwait( void )
 {
         int i;
         int status, w;
@@ -564,7 +569,8 @@ execwait()
 # if !defined( __BORLANDC__ )
 
 static int
-my_wait( int *status )
+my_wait( status )
+    int *status;
 {
         int i, num_active = 0;
         DWORD exitcode, waitcode;

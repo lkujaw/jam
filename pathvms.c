@@ -37,9 +37,9 @@
  */
 
 void
-path_parse(
-        const char *file,
-        PATHNAME *f )
+path_parse( file, f )
+    const char *file;
+    PATHNAME   *f;
 {
         const char *p, *q;
         const char *end;
@@ -166,10 +166,10 @@ struct dirinf {
 } ;
 
 static char *
-strnchr(
-        char    *buf,
-        int     c,
-        int     len )
+strnchr( buf, c, len )
+    char *buf;
+    int   c;
+    int   len;
 {
         while( len-- )
             if( *buf && *buf++ == c )
@@ -179,10 +179,10 @@ strnchr(
 }
 
 static void
-dir_flags(
-        const char *buf,
-        int     len,
-        struct dirinf *i )
+dir_flags( buf, len, i )
+    const char    *buf;
+    int            len;
+    struct dirinf *i;
 {
         const char *p;
 
@@ -230,10 +230,10 @@ dir_flags(
  */
 
 void
-path_build(
-        PATHNAME *f,
-        char    *file,
-        int     binding )
+path_build( f, file, binding )
+    PATHNAME *f;
+    char     *file;
+    int       binding;
 {
         char *ofile = file;
         struct dirinf root, dir;
@@ -410,7 +410,8 @@ path_build(
  */
 
 void
-path_parent( PATHNAME *f )
+path_parent( f )
+    PATHNAME *f;
 {
         if( f->f_base.len )
         {

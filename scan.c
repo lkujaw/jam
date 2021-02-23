@@ -19,13 +19,13 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "scan.h"
-# include "jamgram.h"
-# include "jambase.h"
-# include "newstr.h"
+#include "jam.h"
+#include "lists.h"
+#include "parse.h"
+#include "scan.h"
+#include "jamgram.h"
+#include "jambase.h"
+#include "newstr.h"
 
 struct keyword {
         const char *word;
@@ -51,7 +51,7 @@ static int scanmode = SCAN_NORMAL;
 static int anyerrors = 0;
 static char *symdump PROTO(( YYSTYPE *s ));
 
-# define BIGGEST_TOKEN 10240    /* no single token can be larger */
+#define BIGGEST_TOKEN 10240    /* no single token can be larger */
 
 /*
  * Set parser mode: normal, string, or keyword

@@ -1,3 +1,28 @@
-header  ctype.h fcntl.h malloc.h memory.h signal.h stdio.h stdlib.h string.h
-header  time.h unistd.h sys/file.h sys/stat.h sys/types.h
-lib     vfork
+header  ctype.h
+header  fcntl.h
+header  malloc.h
+header  memory.h
+header  signal.h
+header  stdio.h
+header  stdlib.h
+header  string.h
+header  time.h
+header  unistd.h
+header  sys/file.h
+header  sys/stat.h
+header  sys/types.h
+
+header  assert.h
+mac     assert assert.h
+
+hdr     vfork
+sys     vfork
+tst     run{
+        if      test "$_hdr_vfork" = 1
+        then    echo "#include <vfork.h>"
+        elif    test "$_sys_vfork" = 1
+        then    echo "#include <sys/vfork.h>"
+        else    echo '#include <unistd.h>' > $tmp.c
+                $cc -E $tmp.c | grep vfork
+        fi
+}end

@@ -46,13 +46,12 @@
  */
 
 void
-execcmd(
-        char *string,
-        void (*func)( void *closure, int status ),
-        void *closure,
-        LIST *shell )
+execcmd( string, func, closure, shell )
+    char *string;
+    void (*func)( void *closure, int status );
+    void *closure;
+    LIST *shell;
 {
-
         printf( "%s", string );
         (*func)( closure, EXEC_CMD_OK );
 }
@@ -62,7 +61,7 @@ execcmd(
  */
 
 int
-execwait()
+execwait( void )
 {
         return 0;
 }

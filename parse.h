@@ -18,14 +18,14 @@
 typedef struct _PARSE PARSE;
 
 struct _PARSE {
-        LIST            *(*func)PROTO(( PARSE *p, LOL *args, int *jmp ));
-        PARSE   *left;
-        PARSE   *right;
-        PARSE   *third;
-        const char      *string;
-        const char      *string1;
-        int     num;
-        int     refs;
+        LIST       *(*func)PROTO(( PARSE *p, LOL *args, int *jmp ));
+        PARSE        *left;
+        PARSE        *right;
+        PARSE        *third;
+        const char   *string;
+        const char   *string1;
+        int           num;
+        int           refs;
 } ;
 
 void    parse_file PROTO(( const char *f ));

@@ -12,12 +12,12 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "hash.h"
-# include "filesys.h"
-# include "pathsys.h"
-# include "timestmp.h"
-# include "newstr.h"
+#include "jam.h"
+#include "hash.h"
+#include "filesys.h"
+#include "pathsys.h"
+#include "timestmp.h"
+#include "newstr.h"
 
 /*
  * BINDING - all known files
@@ -29,15 +29,15 @@ struct _binding {
         const char      *name;
         short   flags;
 
-# define BIND_SCANNED   0x01    /* if directory or arch, has been scanned */
+#define BIND_SCANNED   0x01    /* if directory or arch, has been scanned */
 
         short   progress;
 
-# define BIND_INIT      0       /* never seen */
-# define BIND_NOENTRY   1       /* timestamp requested but file never found */
-# define BIND_SPOTTED   2       /* file found but not timed yet */
-# define BIND_MISSING   3       /* file found but can't get timestamp */
-# define BIND_FOUND     4       /* file found and time stamped */
+#define BIND_INIT      0       /* never seen */
+#define BIND_NOENTRY   1       /* timestamp requested but file never found */
+#define BIND_SPOTTED   2       /* file found but not timed yet */
+#define BIND_MISSING   3       /* file found but can't get timestamp */
+#define BIND_FOUND     4       /* file found and time stamped */
 
         time_t  time;           /* update time - 0 if not exist */
 } ;
@@ -54,7 +54,7 @@ static const char *time_progress[] =
         "FOUND"
 } ;
 
-
+
 /*
  * timestamp() - return timestamp on a file, if present
  */

@@ -31,7 +31,7 @@
 
 #include "ansi.h"
 
-# define YYSTYPE YYSYMBOL
+#define YYSTYPE YYSYMBOL
 
 typedef struct _YYSTYPE {
         int             type;
@@ -51,6 +51,6 @@ int  yyline      PROTO(( void ));
 int  yylex       PROTO(( void ));
 int  yyparse     PROTO(( void ));
 
-# define SCAN_NORMAL    0       /* normal parsing */
-# define SCAN_STRING    1       /* look only for matching } */
-# define SCAN_PUNCT     2       /* only punctuation keywords */
+#define SCAN_NORMAL    0       /* normal parsing */
+#define SCAN_STRING    1       /* look only for matching } */
+#define SCAN_PUNCT     2       /* only punctuation keywords */

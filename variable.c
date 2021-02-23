@@ -30,13 +30,13 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "expand.h"
-# include "hash.h"
-# include "newstr.h"
+#include "jam.h"
+#include "lists.h"
+#include "parse.h"
+#include "variable.h"
+#include "expand.h"
+#include "hash.h"
+#include "newstr.h"
 
 static struct hash *varhash = 0;
 
@@ -82,22 +82,22 @@ var_defines( e )
             if( ( val = strchr( *e, '=' ) ) && val[1] == '(' && val[2] == ')' )
                 continue;
 
-# ifdef OS_MAC
+#ifdef OS_MAC
             /* On the mac (MPW), the var=val is actually var\0val */
             /* Think different. */
 
             if(( val = strchr( *e, '=' )) || ( val = *e + strlen( *e ) ) )
-# else
+#else
             if(( val = strchr( *e, '=' ) ))
-# endif
+#endif
             {
                 LIST *l = L0;
                 const char *pp, *p;
-# ifdef OS_MAC
+#ifdef OS_MAC
                 char split = ',';
-# else
+#else
                 char split = ' ';
-# endif
+#endif
                 char buf[ MAXSYM ];
 
                 /* Split *PATH at :'s, not spaces */
@@ -146,8 +146,8 @@ int
 var_string( in, out, outsize, lol )
     const char  *in;
           char  *out;
-          int    outsize;
-          LOL   *lol;
+           int   outsize;
+           LOL  *lol;
 {
         char    *out0 = out;
         char    *oute = out + outsize - 1;

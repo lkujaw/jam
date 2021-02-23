@@ -284,9 +284,11 @@ file_archscan( archive, func, closure )
 
             if( !strcmp( lar_name, "#1" ) )
             {
-                int len = atoi( ar_hdr.ar_name + 3 );
-                if( read( fd, lar_name, len ) != len )
+                const int len = MIN(sizeof(lar_name) - 1,
+                                    atoi(ar_hdr.ar_name + 3));
+                if( read( fd, lar_name, len ) != len ) {
                     printf("error reading archive entry\n");
+                }
                 lar_name[len] = 0;
             }
 

@@ -10,13 +10,13 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "search.h"
-# include "timestmp.h"
-# include "pathsys.h"
-# include "variable.h"
-# include "newstr.h"
+#include "jam.h"
+#include "lists.h"
+#include "search.h"
+#include "timestmp.h"
+#include "pathsys.h"
+#include "variable.h"
+#include "newstr.h"
 
 const char *
 search( target, time )

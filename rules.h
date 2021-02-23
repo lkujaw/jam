@@ -55,13 +55,13 @@ struct _rule {
         LIST            *params;        /* bind args to local vars */
         int     flags;                  /* modifiers on ACTIONS */
 
-# define        RULE_UPDATED    0x01    /* $(>) is updated sources only */
-# define        RULE_TOGETHER   0x02    /* combine actions on single target */
-# define        RULE_IGNORE     0x04    /* ignore return status of executes */
-# define        RULE_QUIETLY    0x08    /* don't mention it unless verbose */
-# define        RULE_PIECEMEAL  0x10    /* split exec so each $(>) is small */
-# define        RULE_EXISTING   0x20    /* $(>) is pre-exisitng sources only */
-# define        RULE_MAXLINE    0x40    /* cmd specific maxline (last) */
+#define        RULE_UPDATED    0x01    /* $(>) is updated sources only */
+#define        RULE_TOGETHER   0x02    /* combine actions on single target */
+#define        RULE_IGNORE     0x04    /* ignore return status of executes */
+#define        RULE_QUIETLY    0x08    /* don't mention it unless verbose */
+#define        RULE_PIECEMEAL  0x10    /* split exec so each $(>) is small */
+#define        RULE_EXISTING   0x20    /* $(>) is pre-exisitng sources only */
+#define        RULE_MAXLINE    0x40    /* cmd specific maxline (last) */
 
 } ;
 
@@ -109,20 +109,20 @@ struct _target {
 
         char    flags;                  /* status info */
 
-# define        T_FLAG_TEMP     0x01    /* TEMPORARY applied */
-# define        T_FLAG_NOCARE   0x02    /* NOCARE applied */
-# define        T_FLAG_NOTFILE  0x04    /* NOTFILE applied */
-# define        T_FLAG_TOUCHED  0x08    /* ALWAYS applied or -t target */
-# define        T_FLAG_LEAVES   0x10    /* LEAVES applied */
-# define        T_FLAG_NOUPDATE 0x20    /* NOUPDATE applied */
-# define        T_FLAG_INTERNAL 0x40    /* internal INCLUDES node */
+#define        T_FLAG_TEMP     0x01    /* TEMPORARY applied */
+#define        T_FLAG_NOCARE   0x02    /* NOCARE applied */
+#define        T_FLAG_NOTFILE  0x04    /* NOTFILE applied */
+#define        T_FLAG_TOUCHED  0x08    /* ALWAYS applied or -t target */
+#define        T_FLAG_LEAVES   0x10    /* LEAVES applied */
+#define        T_FLAG_NOUPDATE 0x20    /* NOUPDATE applied */
+#define        T_FLAG_INTERNAL 0x40    /* internal INCLUDES node */
 
         char    binding;                /* how target relates to real file */
 
-# define        T_BIND_UNBOUND  0       /* a disembodied name */
-# define        T_BIND_MISSING  1       /* couldn't find real file */
-# define        T_BIND_PARENTS  2       /* using parent's timestamp */
-# define        T_BIND_EXISTS   3       /* real file, timestamp valid */
+#define        T_BIND_UNBOUND  0       /* a disembodied name */
+#define        T_BIND_MISSING  1       /* couldn't find real file */
+#define        T_BIND_PARENTS  2       /* using parent's timestamp */
+#define        T_BIND_EXISTS   3       /* real file, timestamp valid */
 
         TARGETS         *depends;       /* dependencies */
         TARGET          *includes;      /* includes */
@@ -131,33 +131,33 @@ struct _target {
         time_t  leaf;                   /* update time of leaf sources */
         char    fate;                   /* make0()'s diagnosis */
 
-# define        T_FATE_INIT     0       /* nothing done to target */
-# define        T_FATE_MAKING   1       /* make0(target) on stack */
+#define        T_FATE_INIT     0       /* nothing done to target */
+#define        T_FATE_MAKING   1       /* make0(target) on stack */
 
-# define        T_FATE_STABLE   2       /* target didn't need updating */
-# define        T_FATE_NEWER    3       /* target newer than parent */
+#define        T_FATE_STABLE   2       /* target didn't need updating */
+#define        T_FATE_NEWER    3       /* target newer than parent */
 
-# define        T_FATE_SPOIL    4       /* >= SPOIL rebuilds parents */
-# define        T_FATE_ISTMP    4       /* unneeded temp target oddly present */
+#define        T_FATE_SPOIL    4       /* >= SPOIL rebuilds parents */
+#define        T_FATE_ISTMP    4       /* unneeded temp target oddly present */
 
-# define        T_FATE_BUILD    5       /* >= BUILD rebuilds target */
-# define        T_FATE_TOUCHED  5       /* manually touched with -t */
-# define        T_FATE_MISSING  6       /* is missing, needs updating */
-# define        T_FATE_NEEDTMP  7       /* missing temp that must be rebuild */
-# define        T_FATE_OUTDATED 8       /* is out of date, needs updating */
-# define        T_FATE_UPDATE   9       /* deps updated, needs updating */
+#define        T_FATE_BUILD    5       /* >= BUILD rebuilds target */
+#define        T_FATE_TOUCHED  5       /* manually touched with -t */
+#define        T_FATE_MISSING  6       /* is missing, needs updating */
+#define        T_FATE_NEEDTMP  7       /* missing temp that must be rebuild */
+#define        T_FATE_OUTDATED 8       /* is out of date, needs updating */
+#define        T_FATE_UPDATE   9       /* deps updated, needs updating */
 
-# define        T_FATE_BROKEN   10      /* >= BROKEN ruins parents */
-# define        T_FATE_CANTFIND 10      /* no rules to make missing target */
-# define        T_FATE_CANTMAKE 11      /* can't find dependents */
+#define        T_FATE_BROKEN   10      /* >= BROKEN ruins parents */
+#define        T_FATE_CANTFIND 10      /* no rules to make missing target */
+#define        T_FATE_CANTMAKE 11      /* can't find dependents */
 
         char    progress;               /* tracks make1() progress */
 
-# define        T_MAKE_INIT     0       /* make1(target) not yet called */
-# define        T_MAKE_ONSTACK  1       /* make1(target) on stack */
-# define        T_MAKE_ACTIVE   2       /* make1(target) in make1b() */
-# define        T_MAKE_RUNNING  3       /* make1(target) running commands */
-# define        T_MAKE_DONE     4       /* make1(target) done */
+#define        T_MAKE_INIT     0       /* make1(target) not yet called */
+#define        T_MAKE_ONSTACK  1       /* make1(target) on stack */
+#define        T_MAKE_ACTIVE   2       /* make1(target) in make1b() */
+#define        T_MAKE_RUNNING  3       /* make1(target) running commands */
+#define        T_MAKE_DONE     4       /* make1(target) done */
 
         char    status;                 /* execcmd() result */
 

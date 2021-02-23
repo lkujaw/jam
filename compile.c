@@ -68,16 +68,16 @@
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
-# include "jam.h"
+#include "jam.h"
 
-# include "lists.h"
-# include "parse.h"
-# include "compile.h"
-# include "variable.h"
-# include "expand.h"
-# include "rules.h"
-# include "newstr.h"
-# include "search.h"
+#include "lists.h"
+#include "parse.h"
+#include "compile.h"
+#include "variable.h"
+#include "expand.h"
+#include "rules.h"
+#include "newstr.h"
+#include "search.h"
 
 static const char *set_names[] = { "=", "+=", "?=" };
 static void debug_compile PROTO(( int which, const char *s ));
@@ -552,17 +552,20 @@ evaluate_rule( rulename, args, result )
 
         if( rule->actions )
         {
-            TARGETS     *t;
-            ACTION      *action;
+            TARGETS  *t;
+            ACTION   *action;
 
             /* The action is associated with this instance of this rule */
 
             action = (ACTION *)malloc( sizeof( ACTION ) );
             memset( (char *)action, '\0', sizeof( *action ) );
 
-            action->rule = rule;
+            action->rule    = rule;
             action->targets = targetlist( (TARGETS *)0, lol_get( args, 0 ) );
             action->sources = targetlist( (TARGETS *)0, lol_get( args, 1 ) );
+
+            /* There should be at least one target of a rule */
+            assert(action->targets);
 
             /* Append this action to the actions of each target */
 
