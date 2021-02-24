@@ -734,7 +734,7 @@ else if $(UNIX)
     RANLIB      ?= "" ;
 
     case INTERIX :
-    CC          ?= gcc ;
+    AR          ?= ar r ;
     JAMSHELL    ?= sh -c ;
     RANLIB      ?= "" ;
 

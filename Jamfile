@@ -130,16 +130,6 @@ Main            jam : jam.c jambase.c ;
 LinkLibraries   jam : libjam.a ;
 GenFile             jambase.c : mkjamb Jambase ;
 
-if $(UNIX)
-{
-  actions Strip
-  {
-    strip $(1)
-  }
-
-  Strip jam ;
-}
-
 Library         libjam.a :
                     builtins.c command.c compile.c $(code) expand.c
                     glob.c hash.c headers.c lists.c make.c make1.c
@@ -305,4 +295,3 @@ else if $(UNIX)
   Package $(VERSION).tar : $(ALLSOURCE) ;
   Package $(VERSION).zip : $(ALLSOURCE) ;
 }
-

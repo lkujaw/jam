@@ -220,10 +220,10 @@ file_archscan( archive, func, closure )
         while( read( fd, &ar_hdr, SARHDR ) == SARHDR &&
                !memcmp( ar_hdr.ar_fmag, ARFMAG, SARFMAG ) )
         {
-            long    lar_date;
-            long    lar_size;
-            char    lar_name[256];
-            char    *dst = lar_name;
+            long   lar_date;
+            long   lar_size;
+            char   lar_name[256];
+            char  *dst = lar_name;
 
             /* solaris sscanf() does strlen first, so terminate somewhere */
 

@@ -60,6 +60,9 @@ LIST *builtin_glob     PROTO(( PARSE *parse, LOL *args, int *jmp ));
 LIST *builtin_match    PROTO(( PARSE *parse, LOL *args, int *jmp ));
 LIST *builtin_hdrmacro PROTO(( PARSE *parse, LOL *args, int *jmp ));
 
+static void builtin_glob_back PROTO(( void *closure, const char *file,
+                                      int status, time_t time ));
+
 void
 load_builtins PROTO((void))
 {

@@ -20,7 +20,7 @@ TARGET = -o jam0.exe
 CFLAGS = -D__cygwin__
 
 all: jam0
-        attrib -r jambase.c
-        jam0
+	attrib -r jambase.c
+	jam0
 
 include common.mk

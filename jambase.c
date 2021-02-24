@@ -503,7 +503,7 @@ char *jambase[] = {
 "case HPUX :\n",
 "RANLIB      ?= \"\" ;\n",
 "case INTERIX :\n",
-"CC          ?= gcc ;\n",
+"AR          ?= ar r ;\n",
 "JAMSHELL    ?= sh -c ;\n",
 "RANLIB      ?= \"\" ;\n",
 "case IRIX :\n",
