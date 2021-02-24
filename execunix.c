@@ -39,33 +39,33 @@
  */
 
 #
-#include <assert.h>
 #include <errno.h>
 #include "jam.h"
 #include "lists.h"
 #include "execcmd.h"
 
-# ifdef USE_EXECUNIX
+#ifdef USE_EXECUNIX
 
-# ifdef OS_OS2
+#ifdef OS_OS2
 # define USE_EXECNT
 # include <process.h>
-# endif
+#endif
 
-# ifdef OS_NT
+#ifdef OS_NT
 # define USE_EXECNT
 # include <process.h>
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>           /* do the ugly deed */
 # define USE_MYWAIT
 # if !defined( __BORLANDC__ )
-# define wait my_wait
+#  define wait my_wait
 static int my_wait PROTO(( int *status ));
 # endif
-# endif
+#endif
 
 static int intr = 0;
 static int cmdsrunning = 0;
+static void onintr PROTO(( int ));
 static void (*istat)PROTO(( int ));
 
 static struct
@@ -136,7 +136,7 @@ execcmd( string, func, closure, shell )
 
             /* +32 is room for \jamXXXXXtSS.bat (at least) */
 
-            cmdtab[ slot ].tempfile = malloc( strlen( tempdir ) + 32 );
+            cmdtab[ slot ].tempfile = xmalloc( strlen( tempdir ) + 32 );
 
             sprintf( cmdtab[ slot ].tempfile, "%s\\jam%dt%d.bat",
                                 tempdir, GetCurrentProcessId(), slot );
@@ -333,8 +333,9 @@ my_wait( status )
         DWORD exitcode, waitcode;
         static HANDLE *active_handles = 0;
 
-        if (!active_handles)
-            active_handles = (HANDLE *)malloc(globs.jobs * sizeof(HANDLE) );
+        if (!active_handles) {
+            active_handles = (HANDLE *)xmalloc(globs.jobs * sizeof(HANDLE) );
+        }
 
         /* first see if any non-waited-for processes are dead,
          * and return if so.

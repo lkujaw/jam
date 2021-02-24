@@ -33,9 +33,10 @@
  * 12/30/02 (seiwald) - skip solaris' empty archive member names (/, //xxx)
  */
 
-# include "jam.h"
-# include "filesys.h"
-# include "pathsys.h"
+#include "filesys.h"
+#include "jam.h"
+#include "memory.h"
+#include "pathsys.h"
 
 # ifdef USE_FILEUNIX
 
@@ -75,7 +76,7 @@
 #define SARMAG  8
 #define ARFMAG  "`\n"
 
-struct ar_hdr           /* archive file member header - printable ascii */
+struct ar_hdr           /* archive file member header - printable ASCII */
 {
         char    ar_name[16];    /* file member name - `/' terminated */
         char    ar_date[12];    /* file member date - decimal */
@@ -166,25 +167,25 @@ file_dirscan( dir, func, closure )
 int
 file_time( filename, time )
     const char *filename;
-    time_t  *time;
+    time_t     *time;
 {
-        struct stat statbuf;
+    struct stat statbuf;
 
-        if( stat( filename, &statbuf ) < 0 )
-            return -1;
+    if( stat( filename, &statbuf ) < 0 )
+        return -1;
 
-        *time = statbuf.st_mtime;
-        return 0;
+    *time = statbuf.st_mtime;
+    return 0;
 }
 
 /*
  * file_archscan() - scan an archive for files
  */
 
-# ifndef AIAMAG /* God-fearing UNIX */
+#ifndef AIAMAG /* God-fearing UNIX */
 
-# define SARFMAG 2
-# define SARHDR sizeof( struct ar_hdr )
+#define SARFMAG 2
+#define SARHDR sizeof( struct ar_hdr )
 
 void
 file_archscan( archive, func, closure )
@@ -194,13 +195,14 @@ file_archscan( archive, func, closure )
 {
 # ifndef NO_AR
         struct ar_hdr ar_hdr;
-        char buf[ MAXJPATH ];
-        long offset;
-        char    *string_table = 0;
-        int fd;
+        char  buf[ MAXJPATH ];
+        long  offset;
+        char *string_table = NULL;
+        int   fd;
 
-        if( ( fd = open( archive, O_RDONLY, 0 ) ) < 0 )
+        if( ( fd = open( archive, O_RDONLY, 0 ) ) < 0 ) {
             return;
+        }
 
         if( read( fd, buf, SARMAG ) != SARMAG ||
             strncmp( ARMAG, buf, SARMAG ) )
@@ -211,8 +213,9 @@ file_archscan( archive, func, closure )
 
         offset = SARMAG;
 
-        if( DEBUG_BINDSCAN )
+        if( DEBUG_BINDSCAN ) {
             printf( "scan archive %s\n", archive );
+        }
 
         while( read( fd, &ar_hdr, SARHDR ) == SARHDR &&
                !memcmp( ar_hdr.ar_fmag, ARFMAG, SARFMAG ) )
@@ -247,32 +250,30 @@ file_archscan( archive, func, closure )
 
                 while( src < e && *src && *src != ' ' && *src != '/' )
                     *dst++ = *src++;
-            }
-            else if( ar_hdr.ar_name[1] == '/' )
+            } else if( ar_hdr.ar_name[1] == '/' ) {
+                /* This is the "string table" entry of the symbol table,
+                ** which holds strings of filenames that are longer than
+                ** 15 characters (i.e. don't fit into a ar_name).
+                */
+                assert(lar_size > 0 && lar_size < INT_MAX);
+                assert(string_table == NULL);
+                string_table = (char *)xmalloc(lar_size);
+
+                if( lseek(fd, offset + SARHDR, 0) == -1 ||
+                    read(fd, string_table, lar_size) != lar_size )
                 {
-                    /* this is the "string table" entry of the symbol table,
-                    ** which holds strings of filenames that are longer than
-                ** 15 characters (ie. don't fit into a ar_name)
-                    */
-
-                    string_table = (char *)malloc(lar_size);
-
-                    lseek(fd, offset + SARHDR, 0);
-                if( read(fd, string_table, lar_size) != lar_size )
-                    printf( "error reading string table\n" );
+                    fprintf( stderr, "error reading string table\n" );
                 }
-            else if( string_table && ar_hdr.ar_name[1] != ' ' )
-                {
-                    /* Long filenames are recognized by "/nnnn" where nnnn is
-                    ** the offset of the string in the string table represented
-                    ** in ASCII decimals.
-                    */
-
+            } else if( string_table && ar_hdr.ar_name[1] != ' ' ) {
+                /* Long filenames are recognized by "/nnnn" where nnnn
+                ** is the offset of the string in the string table
+                ** represented in ASCII decimals.
+                */
                 char *src = string_table + atoi( ar_hdr.ar_name + 1 );
 
                 while( *src != '/' )
                     *dst++ = *src++;
-                }
+            }
 
             /* Terminate lar_name */
 
@@ -286,6 +287,7 @@ file_archscan( archive, func, closure )
             {
                 const int len = MIN(sizeof(lar_name) - 1,
                                     atoi(ar_hdr.ar_name + 3));
+                assert(len < sizeof(lar_name));
                 if( read( fd, lar_name, len ) != len ) {
                     printf("error reading archive entry\n");
                 }
@@ -310,9 +312,7 @@ file_archscan( archive, func, closure )
             lseek( fd, offset, 0 );
         }
 
-        if (string_table)
-            free(string_table);
-
+        xfree( string_table );
         close( fd );
 
 # endif /* NO_AR */

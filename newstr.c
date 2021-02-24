@@ -26,9 +26,10 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "newstr.h"
-# include "hash.h"
+#include "hash.h"
+#include "jam.h"
+#include "memory.h"
+#include "newstr.h"
 
 typedef const char *STRING;
 
@@ -53,7 +54,7 @@ newstr( string )
         if( hashenter( strhash, (HASHDATA **)&s ) )
         {
             int l = strlen( string );
-            char *m = (char *)malloc( l + 1 );
+            char *m = (char *)xmalloc( l + 1 );
 
             if (DEBUG_MEM)
                     printf("newstr: allocating %d bytes\n", l + 1 );

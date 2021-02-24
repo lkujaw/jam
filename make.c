@@ -171,7 +171,7 @@ make0( t, p, depth, counts, anyhow )
     COUNTS  *counts;        /* for reporting */
     int     anyhow;         /* forcibly touch all (real) targets */
 {
-        TARGETS *c, *d, *incs;
+        TARGETS *c, *incs;
         TARGET  *ptime = t;
         time_t  last, leaf, hlast;
         int     fate;

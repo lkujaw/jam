@@ -10,6 +10,9 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#ifndef HASH_H
+#define HASH_H
+
 #include "ansi.h"
 
 typedef struct hashdata HASHDATA;
@@ -20,3 +23,5 @@ void         hashdone PROTO(( struct hash *hp ));
 
 # define        hashenter( hp, data ) !hashitem( hp, data, !0 )
 # define        hashcheck( hp, data ) hashitem( hp, data, 0 )
+
+#endif /* HASH_H */

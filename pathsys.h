@@ -22,14 +22,17 @@
  * (without a file), so that $(VAR:D) can climb to the parent.
  */
 
+#ifndef PATHSYS
+#define PATHSYS
+
 #include "ansi.h"
 
 typedef struct _pathname PATHNAME;
 typedef struct _pathpart PATHPART;
 
 struct _pathpart {
-        const char *ptr;
-        int     len;
+    const char *ptr;
+    int         len;
 };
 
 struct _pathname {
@@ -50,3 +53,5 @@ struct _pathname {
 void path_build  PROTO(( PATHNAME *f, char *file, int binding ));
 void path_parse  PROTO(( const char *file, PATHNAME *f ));
 void path_parent PROTO(( PATHNAME *f ));
+
+#endif /* PATHSYS_H */

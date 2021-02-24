@@ -116,7 +116,7 @@ string_to_args( string, pcount )
   }
 
   /* first of all, copy the input string */
-  line    = (char*)malloc( total+2 );
+  line    = (char*)xmalloc( total+2 );
   if (!line)
     return 0;
 
@@ -149,10 +149,10 @@ string_to_args( string, pcount )
       num_args++;
 
   /* allocate the args array */
-  args = (char**)malloc( num_args*sizeof(char*)+2 );
+  args = (char**)xmalloc( num_args*sizeof(char*)+2 );
   if (!args)
   {
-    free( line );
+    xfree( line );
     return 0;
   }
 
@@ -173,8 +173,8 @@ static void
 free_args( args )
     char** args;
 {
-  free( args[-1] );
-  free( args-1 );
+  xfree( args[-1] );
+  xfree( args-1 );
 }
 
 
@@ -251,7 +251,7 @@ process_del( command )
               if ( len <= 0 )
                 return 1;
 
-              line = (char*)malloc( len+4+1 );
+              line = (char*)xmalloc( len+4+1 );
               if (!line)
                 return 1;
 
@@ -264,7 +264,7 @@ process_del( command )
               else
                 result = !DeleteFile( line+4 );
 
-              free( line );
+              xfree( line );
               if (result)
                 return 1;
 
@@ -339,7 +339,7 @@ execcmd( string, func, closure, shell )
                   !( tempdir = getenv( "TMP" ) ) )
                       tempdir = "\\temp";
 
-              cmdtab[ slot ].tempfile = malloc( strlen( tempdir ) + 14 );
+              cmdtab[ slot ].tempfile = xmalloc( strlen( tempdir ) + 14 );
 
               sprintf( cmdtab[ slot ].tempfile, "%s\\jamtmp%02d.bat",
                                   tempdir, slot );
@@ -577,7 +577,7 @@ my_wait( status )
         static HANDLE *active_handles = 0;
 
         if (!active_handles)
-            active_handles = (HANDLE *)malloc(globs.jobs * sizeof(HANDLE) );
+            active_handles = (HANDLE *)xmalloc(globs.jobs * sizeof(HANDLE) );
 
         /* first see if any non-waited-for processes are dead,
          * and return if so.

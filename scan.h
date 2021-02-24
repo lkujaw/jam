@@ -29,6 +29,9 @@
  * YYSTYPE - value of a lexical token
  */
 
+#ifndef SCAN_H
+#define SCAN_H
+
 #include "ansi.h"
 
 #define YYSTYPE YYSYMBOL
@@ -54,3 +57,5 @@ int  yyparse     PROTO(( void ));
 #define SCAN_NORMAL    0       /* normal parsing */
 #define SCAN_STRING    1       /* look only for matching } */
 #define SCAN_PUNCT     2       /* only punctuation keywords */
+
+#endif /* SCAN_H */

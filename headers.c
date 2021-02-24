@@ -29,16 +29,17 @@
  * 12/09/02 (seiwald) - push regexp creation down to headers1().
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "compile.h"
-# include "rules.h"
-# include "variable.h"
-# include "regexp.h"
-# include "headers.h"
-# include "newstr.h"
-# include "hdrmacro.h"
+#include "compile.h"
+#include "hdrmacro.h"
+#include "headers.h"
+#include "jam.h"
+#include "lists.h"
+#include "memory.h"
+#include "newstr.h"
+#include "parse.h"
+#include "regexp.h"
+#include "rules.h"
+#include "variable.h"
 
 static LIST *headers1 PROTO(( const char *file, LIST *hdrscan ));
 
@@ -54,7 +55,6 @@ headers( t )
 {
         LIST    *hdrscan;
         LIST    *hdrrule;
-        LIST    *hdrcache;
         LOL     lol;
 
         if( !( hdrscan = var_get( "HDRSCAN" ) ) ||
@@ -117,11 +117,14 @@ headers1( file, hdrscan )
                 if( regexec( re[i], buf ) && re[i]->startp[1] )
             {
                 /* Copy and terminate extracted string. */
-
                 char buf2[ MAXSYM ];
-                int l = re[i]->endp[1] - re[i]->startp[1];
+                int l;
+
+                assert(   re[i]->endp[1] - re[i]->startp[1] < MAXSYM   );
+                l = (int)(re[i]->endp[1] - re[i]->startp[1]);
                 memcpy( buf2, re[i]->startp[1], l );
-                buf2[ l ] = 0;
+                buf2[l] = '\0';
+
                 result = list_new( result, buf2, 0 );
 
                 if( DEBUG_HEADER )
@@ -153,10 +156,11 @@ headers1( file, hdrscan )
             }
         }
 
-        free( re_macros );
+        xfree( re_macros );
 
-        while( rec )
-            free( (char*)re[--rec] );
+        while( rec ) {
+            xfree( (char*)re[--rec] );
+        }
 
         fclose( f );
 

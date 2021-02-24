@@ -10,6 +10,9 @@
  * 05/04/94 (seiwald) - async multiprocess interface
  */
 
+#ifndef EXECCMD_H
+#define EXECCMD_H
+
 #include "ansi.h"
 
 void execcmd PROTO((
@@ -23,3 +26,5 @@ int execwait PROTO(( void ));
 # define EXEC_CMD_OK    0
 # define EXEC_CMD_FAIL  1
 # define EXEC_CMD_INTR  2
+
+#endif /* EXECCMD_H */

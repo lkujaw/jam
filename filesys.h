@@ -10,7 +10,11 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#ifndef FILESYS_H
+#define FILESYS_H
+
 #include "ansi.h"
+#include "jam.h"
 
 typedef void (*scanback)PROTO(( void *closure, const char *file,
                                 int found, time_t t ));
@@ -19,3 +23,5 @@ void file_dirscan  PROTO(( const char *dir, scanback func, void *closure ));
 void file_archscan PROTO(( const char *arch, scanback func, void *closure ));
 
 int file_time PROTO(( const char *filename, time_t *time ));
+
+#endif /* FILESYS_H */

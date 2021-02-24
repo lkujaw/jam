@@ -22,8 +22,9 @@
  * 01/31/02 (seiwald) - keyval now unsigned (cray-ziness)
  */
 
-# include "jam.h"
-# include "hash.h"
+#include "hash.h"
+#include "jam.h"
+#include "memory.h"
 
 /* Header attached to all data items entered into a hash table. */
 
@@ -145,17 +146,16 @@ static void hashrehash( hp )
         int i = ++hp->items.list;
 
         hp->items.more = i ? 2 * hp->items.nel : hp->inel;
-        hp->items.next = (char *)malloc( hp->items.more * hp->items.size );
+        hp->items.next = (char *)xmalloc( hp->items.more * hp->items.size );
 
         hp->items.lists[i].nel = hp->items.more;
         hp->items.lists[i].base = hp->items.next;
         hp->items.nel += hp->items.more;
 
-        if( hp->tab.base )
-                free( (char *)hp->tab.base );
+        xfree( (char *)hp->tab.base );
 
         hp->tab.nel = hp->items.nel * hp->bloat;
-        hp->tab.base = (ITEM **)malloc( hp->tab.nel * sizeof(ITEM *) );
+        hp->tab.base = (ITEM **)xmalloc( hp->tab.nel * sizeof(ITEM *) );
 
         memset( (char *)hp->tab.base, '\0', hp->tab.nel * sizeof( ITEM *) );
 
@@ -188,7 +188,7 @@ hashinit( datalen, name )
     int         datalen;
     const char *name;
 {
-        struct hash *hp = (struct hash *)malloc( sizeof( *hp ) );
+        struct hash *hp = (struct hash *)xmalloc( sizeof( *hp ) );
 
         hp->bloat = 3;
         hp->tab.nel = 0;

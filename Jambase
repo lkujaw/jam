@@ -662,17 +662,17 @@ else if $(MAC)
 }
 else if $(OS) = BEOS && $(OSPLAT) = PPC
 {
-    AR      ?= mwld -xml -o ;
+    AR          ?= mwld -xml -o ;
     BINDIR      ?= /boot/home/config/bin ;
-    CC      ?= mwcc ;
+    CC          ?= mwcc ;
     CCFLAGS     ?= -nosyspath ;
-    C++     ?= $(CC) ;
+    C++         ?= $(CC) ;
     C++FLAGS    ?= -nosyspath ;
     CHMOD       ?= chmod ;
     CHGRP       ?= chgrp ;
     CHOWN       ?= chown ;
     FORTRAN     ?= "" ;
-    LEX     ?= flex ;
+    LEX         ?= flex ;
     LIBDIR      ?= /boot/home/config/lib ;
     LINK        ?= mwld ;
     LINKFLAGS   ?= "" ;
@@ -688,13 +688,13 @@ else if $(OS) = BEOS && $(OSPLAT) = PPC
 else if $(OS) = BEOS
 {
     BINDIR      ?= /boot/home/config/bin ;
-    CC      ?= gcc ;
-    C++     ?= $(CC) ;
+    CC          ?= gcc ;
+    C++         ?= $(CC) ;
     CHMOD       ?= chmod ;
     CHGRP       ?= chgrp ;
     CHOWN       ?= chown ;
     FORTRAN     ?= "" ;
-    LEX     ?= flex ;
+    LEX         ?= flex ;
     LIBDIR      ?= /boot/home/config/lib ;
     LINK        ?= gcc ;
     MANDIR      ?= /boot/home/config/man ;
@@ -714,13 +714,13 @@ else if $(UNIX)
     LINKLIBS    ?= -lbsd ;
 
     case AMIGA :
-    CC      ?= gcc ;
+    CC          ?= gcc ;
     YACC        ?= bison -y ;
 
     case CYGWIN :
-    CC      ?= gcc ;
+    CC          ?= gcc ;
     CCFLAGS     += -D__cygwin__ ;
-    LEX     ?= flex ;
+    LEX         ?= flex ;
     JAMSHELL    ?= sh -c ;
     RANLIB      ?= "" ;
     SUFEXE      ?= .exe ;
@@ -734,7 +734,7 @@ else if $(UNIX)
     RANLIB      ?= "" ;
 
     case INTERIX :
-    CC      ?= gcc ;
+    CC          ?= gcc ;
     JAMSHELL    ?= sh -c ;
     RANLIB      ?= "" ;
 
@@ -742,8 +742,8 @@ else if $(UNIX)
     RANLIB      ?= "" ;
 
     case MPEIX :
-    CC      ?= gcc ;
-    C++     ?= gcc ;
+    CC          ?= gcc ;
+    C++         ?= gcc ;
     CCFLAGS     += -D_POSIX_SOURCE ;
     HDRS        += /usr/include ;
     RANLIB      ?= "" ;
@@ -754,11 +754,11 @@ else if $(UNIX)
     RANLIB      ?= "" ;
 
     case NEXT :
-    AR      ?= libtool -o ;
+    AR          ?= libtool -o ;
     RANLIB      ?= "" ;
 
     case MACOSX :
-    C++     ?= c++ ;
+    C++         ?= c++ ;
     MANDIR      ?= /usr/local/share/man ;
 
     case NCR :
@@ -768,10 +768,10 @@ else if $(UNIX)
     RANLIB      ?= "" ;
 
     case QNX :
-    AR      ?= wlib ;
-    CC      ?= cc ;
+    AR          ?= wlib ;
+    CC          ?= cc ;
     CCFLAGS     ?= -Q ; # quiet
-    C++     ?= $(CC) ;
+    C++         ?= $(CC) ;
     C++FLAGS    ?= -Q ; # quiet
     LINK        ?= $(CC) ;
     LINKFLAGS   ?= -Q ; # quiet
@@ -787,7 +787,7 @@ else if $(UNIX)
 
     case SOLARIS :
     RANLIB      ?= "" ;
-    AR      ?= "/usr/ccs/bin/ar ru" ;
+    AR          ?= "/usr/ccs/bin/ar ru" ;
 
     case UNICOS :
     NOARSCAN    ?= true ;

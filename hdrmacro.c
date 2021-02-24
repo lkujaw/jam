@@ -59,9 +59,9 @@ void
 macro_headers( t )
     TARGET *t;
 {
-        regexp  *re;
-        FILE    *f;
-        char    buf[ 1024 ];
+    regexp  *re;
+    FILE    *f;
+    char    buf[ 1024 ];
 
     if ( DEBUG_HEADER )
       printf( "macro header scan for %s\n", t->name );
@@ -85,8 +85,11 @@ macro_headers( t )
         char  buf1[ MAXSYM ], buf2[ MAXSYM ];
         int   l1, l2;
 
-        l1 = re->endp[1] - re->startp[1];
-        l2 = re->endp[2] - re->startp[2];
+        assert(re->endp[1] - re->startp[1] < MAXSYM);
+        assert(re->endp[2] - re->startp[2] < MAXSYM);
+
+        l1 = (int)(re->endp[1] - re->startp[1]);
+        l2 = (int)(re->endp[2] - re->startp[2]);
 
         memcpy( buf1, re->startp[1], l1 );
         memcpy( buf2, re->startp[2], l2 );

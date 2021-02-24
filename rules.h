@@ -36,7 +36,13 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
+#ifndef RULES_H
+#define RULES_H
+
 #include "ansi.h"
+#include "jam.h"
+#include "lists.h"
+#include "parse.h"
 
 typedef struct _rule RULE;
 typedef struct _target TARGET;
@@ -48,66 +54,65 @@ typedef struct _settings SETTINGS ;
 /* RULE - a generic jam rule, the product of RULE and ACTIONS */
 
 struct _rule {
-        const char      *name;
-        PARSE   *procedure;             /* parse tree from RULE */
-        const char      *actions;       /* command string from ACTIONS */
-        LIST    *bindlist;              /* variable to bind for actions */
-        LIST            *params;        /* bind args to local vars */
-        int     flags;                  /* modifiers on ACTIONS */
+    const char  *name;
+    PARSE       *procedure;     /* parse tree from RULE */
+    const char  *actions;       /* command string from ACTIONS */
+    LIST        *bindlist;      /* variable to bind for actions */
+    LIST        *params;        /* bind args to local vars */
+    int          flags;         /* modifiers on ACTIONS */
 
-#define        RULE_UPDATED    0x01    /* $(>) is updated sources only */
-#define        RULE_TOGETHER   0x02    /* combine actions on single target */
-#define        RULE_IGNORE     0x04    /* ignore return status of executes */
-#define        RULE_QUIETLY    0x08    /* don't mention it unless verbose */
-#define        RULE_PIECEMEAL  0x10    /* split exec so each $(>) is small */
-#define        RULE_EXISTING   0x20    /* $(>) is pre-exisitng sources only */
-#define        RULE_MAXLINE    0x40    /* cmd specific maxline (last) */
+#define         RULE_UPDATED    0x01    /* $(>) is updated sources only */
+#define         RULE_TOGETHER   0x02    /* combine actions on single target */
+#define         RULE_IGNORE     0x04    /* ignore return status of executes */
+#define         RULE_QUIETLY    0x08    /* don't mention it unless verbose */
+#define         RULE_PIECEMEAL  0x10    /* split exec so each $(>) is small */
+#define         RULE_EXISTING   0x20    /* $(>) is pre-exisitng sources only */
+#define         RULE_MAXLINE    0x40    /* cmd specific maxline (last) */
 
 } ;
 
 /* ACTIONS - a chain of ACTIONs */
 
 struct _actions {
-        ACTIONS *next;
-        ACTIONS *tail;                  /* valid only for head */
-        ACTION  *action;
+    ACTIONS  *next;
+    ACTIONS  *tail;                  /* valid only for head */
+    ACTION   *action;
 } ;
 
 /* ACTION - a RULE instance with targets and sources */
 
 struct _action {
-        RULE    *rule;
-        TARGETS *targets;
-        TARGETS *sources;               /* aka $(>) */
-        char    running;                /* has been started */
-        char    status;                 /* see TARGET status */
+    RULE     *rule;
+    TARGETS  *targets;
+    TARGETS  *sources;               /* aka $(>) */
+    char      running;               /* has been started */
+    char      status;                /* see TARGET status */
 } ;
 
 /* SETTINGS - variables to set when executing a TARGET's ACTIONS */
 
 struct _settings {
-        SETTINGS *next;
-        const char      *symbol;        /* symbol name for var_set() */
-        LIST    *value;                 /* symbol value for var_set() */
+    SETTINGS    *next;
+    const char  *symbol;        /* symbol name for var_set() */
+    LIST        *value;         /* symbol value for var_set() */
 } ;
 
 /* TARGETS - a chain of TARGETs */
 
 struct _targets {
-        TARGETS *next;
-        TARGETS *tail;                  /* valid only for head */
-        TARGET  *target;
+    TARGETS  *next;
+    TARGETS  *tail;             /* valid only for head */
+    TARGET   *target;
 } ;
 
 /* TARGET - a file or "thing" that can be built */
 
 struct _target {
-        const char      *name;
-        const char      *boundname;     /* if search() relocates target */
-        ACTIONS *actions;               /* rules to execute, if any */
-        SETTINGS *settings;             /* variables to define */
-
-        char    flags;                  /* status info */
+    const char  *name;
+    const char  *boundname;     /* if search() relocates target */
+    ACTIONS     *actions;       /* rules to execute, if any */
+    SETTINGS    *settings;      /* variables to define */
+    char         flags;         /* status info */
 
 #define        T_FLAG_TEMP     0x01    /* TEMPORARY applied */
 #define        T_FLAG_NOCARE   0x02    /* NOCARE applied */
@@ -181,3 +186,5 @@ void      pushsettings PROTO(( SETTINGS *v ));
 void       popsettings PROTO(( SETTINGS *v ));
 void      freesettings PROTO(( SETTINGS *v ));
 void         donerules PROTO(( void ));
+
+#endif /* RULES_H */

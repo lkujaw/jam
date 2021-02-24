@@ -33,13 +33,14 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "rules.h"
-# include "newstr.h"
-# include "hash.h"
+#include "hash.h"
+#include "jam.h"
+#include "lists.h"
+#include "memory.h"
+#include "newstr.h"
+#include "parse.h"
+#include "rules.h"
+#include "variable.h"
 
 static struct hash *rulehash = 0;
 static struct hash *targethash = 0;
@@ -110,7 +111,7 @@ copytarget( ot )
 {
         TARGET *t;
 
-        t = (TARGET *)malloc( sizeof( *t ) );
+        t = (TARGET *)xmalloc( sizeof( *t ) );
         memset( (char *)t, '\0', sizeof( *t ) );
         t->name = copystr( ot->name );
         t->boundname = t->name;
@@ -165,7 +166,7 @@ targetentry( chain, target )
 {
         TARGETS *c;
 
-        c = (TARGETS *)malloc( sizeof( TARGETS ) );
+        c = (TARGETS *)xmalloc( sizeof( TARGETS ) );
         c->target = target;
 
         if( !chain ) chain = c;
@@ -189,8 +190,6 @@ targetchain( chain, targets )
     TARGETS *chain;
     TARGETS *targets;
 {
-        TARGETS *c;
-
         if( !targets )
             return chain;
         else if( !chain )
@@ -211,7 +210,7 @@ actionlist( chain, action )
     ACTIONS *chain;
     ACTION  *action;
 {
-        ACTIONS *actions = (ACTIONS *)malloc( sizeof( ACTIONS ) );
+        ACTIONS *actions = (ACTIONS *)xmalloc( sizeof( ACTIONS ) );
 
         actions->action = action;
 
@@ -253,7 +252,7 @@ addsettings( head, setflag, symbol, value )
 
         if( !v )
         {
-            v = (SETTINGS *)malloc( sizeof( *v ) );
+            v = (SETTINGS *)xmalloc( sizeof( *v ) );
             v->symbol = newstr( symbol );
             v->value = value;
             v->next = head;
@@ -306,7 +305,7 @@ copysettings( from )
 
         for( ; from; from = from->next )
         {
-            SETTINGS *v = (SETTINGS *)malloc( sizeof( *v ) );
+            v = (SETTINGS *)xmalloc( sizeof( *v ) );
             v->symbol = copystr( from->symbol );
             v->value = list_copy( 0, from->value );
             v->next = head;
@@ -347,16 +346,17 @@ void
 freesettings( v )
     SETTINGS *v;
 {
-        while( v )
-        {
-            SETTINGS *n = v->next;
+    SETTINGS *n = NULL;
 
-            freestr( v->symbol );
-            list_free( v->value );
-            free( (char *)v );
+    while( v != NULL ) {
+        n = v->next;
 
-            v = n;
-        }
+        freestr( v->symbol );
+        list_free( v->value );
+        xfree( (char *)v );
+
+        v = n;
+    }
 }
 
 /*

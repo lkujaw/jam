@@ -20,12 +20,13 @@
  */
 
 #include "jam.h"
+#include "jambase.h"
+#include "jamgram.h"
 #include "lists.h"
+#include "memory.h"
+#include "newstr.h"
 #include "parse.h"
 #include "scan.h"
-#include "jamgram.h"
-#include "jambase.h"
-#include "newstr.h"
 
 struct keyword {
         const char *word;
@@ -86,7 +87,7 @@ void
 yyfparse( s )
     const char *s;
 {
-        struct include *i = (struct include *)malloc( sizeof( *i ) );
+        struct include *i = (struct include *)xmalloc( sizeof( *i ) );
 
         /* Push this onto the incp chain. */
 
@@ -173,7 +174,7 @@ yyline PROTO(( void ))
         if( i->file && i->file != stdin )
             fclose( i->file );
         freestr( i->fname );
-        free( (char *)i );
+        xfree( (char *)i );
 
         return EOF;
 }

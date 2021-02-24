@@ -44,6 +44,9 @@
  * LIST - list of strings
  */
 
+#ifndef LISTS_H
+#define LISTS_H
+
 #include "ansi.h"
 
 typedef struct _list LIST;
@@ -84,3 +87,5 @@ void    lol_init PROTO(( LOL *lol ));
 void    lol_free PROTO(( LOL *lol ));
 LIST *  lol_get  PROTO(( LOL *lol, int i ));
 void    lol_print PROTO(( LOL *lol ));
+
+#endif /* LISTS_H */

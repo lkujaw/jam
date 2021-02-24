@@ -10,6 +10,9 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#ifndef VARIABLE_H
+#define VARIABLE_H
+
 #include "ansi.h"
 
 void    var_defines PROTO(( const char **e ));
@@ -26,3 +29,5 @@ void    var_done    PROTO(( void ));
 #define VAR_SET        0       /* override previous value */
 #define VAR_APPEND     1       /* append to previous value */
 #define VAR_DEFAULT    2       /* set only if no previous value */
+
+#endif /* VARIABLE_H */

@@ -24,11 +24,12 @@
  * 12/09/02 (seiwald) - new list_printq() for writing lists to Jambase
  */
 
-# include "jam.h"
-# include "newstr.h"
-# include "lists.h"
+#include "jam.h"
+#include "lists.h"
+#include "memory.h"
+#include "newstr.h"
 
-static LIST *freelist = 0;      /* junkpile for list_free() */
+static LIST *freelist = NULL;      /* junkpile for list_free() */
 
 /*
  * list_append() - append a list onto another one, returning total
@@ -88,7 +89,7 @@ list_new( head, string, copy )
         }
         else
         {
-            l = (LIST *)malloc( sizeof( *l ) );
+            l = (LIST *)xmalloc( sizeof( *l ) );
         }
 
         /* If first on chain, head points here. */
@@ -168,46 +169,6 @@ list_print( l )
 {
         for( ; l; l = list_next( l ) )
             printf( "%s ", l->string );
-}
-
-/*
- * list_printq() - print a list of safely quoted strings to a file
- */
-
-void
-list_printq( out, l )
-    FILE *out;
-    LIST *l;
-{
-        /* Dump each word, enclosed in "s */
-        /* Suitable for Jambase use. */
-
-        for( ; l; l = list_next( l ) )
-        {
-            const char *p = l->string;
-            const char *ep = p + strlen( p );
-            const char *op = p;
-
-            fputc( '\n', out );
-            fputc( '\t', out );
-            fputc( '"', out );
-
-            /* Any embedded "'s?  Escape them */
-
-            while(( p = (char *)memchr( op, '"',  ep - op ) ))
-            {
-                fwrite( op, p - op, 1, out );
-                fputc( '\\', out );
-                fputc( '"', out );
-                op = p + 1;
-            }
-
-            /* Write remainder */
-
-            fwrite( op, ep - op, 1, out );
-            fputc( '"', out );
-            fputc( ' ', out );
-        }
 }
 
 /*

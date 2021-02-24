@@ -8,7 +8,12 @@
  * timestmp.h - get the timestamp of a file or archive member
  */
 
+#ifndef TIMESTMP_H
+#define TIMESTMP_H
+
 #include "ansi.h"
 
 void timestamp  PROTO(( char *target, time_t *time ));
 void donestamps PROTO(( void ));
+
+#endif /* TIMESTMP_H */

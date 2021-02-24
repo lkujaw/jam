@@ -15,7 +15,12 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#ifndef COMPILE_H
+#define COMPILE_H
+
 #include "ansi.h"
+#include "lists.h"
+#include "parse.h"
 
 void compile_builtins  PROTO(( void ));
 
@@ -61,3 +66,5 @@ LIST *evaluate_rule PROTO(( const char *rulename, LOL *args, LIST *result ));
 # define JMP_BREAK      1       /* break out of loop */
 # define JMP_CONTINUE   2       /* step to end of loop */
 # define JMP_RETURN     3       /* return from rule */
+
+#endif /* COMPILE_H */

@@ -35,27 +35,36 @@
  * CMD - an action, ready to be formatted into a buffer and executed
  */
 
+#ifndef COMMAND_H
+#define COMMAND_H
+
 #include "ansi.h"
+#include "lists.h"
+#include "rules.h"
 
 typedef struct _cmd CMD;
 
 struct _cmd
 {
-        CMD     *next;
-        CMD     *tail;          /* valid on in head */
-        RULE    *rule;          /* rule->actions contains shell script */
-        LIST    *shell;         /* $(SHELL) value */
-        LOL     args;           /* LISTs for $(<), $(>) */
-        char    buf[ MAXLINE ]; /* actual commands */
+    CMD     *next;
+    CMD     *tail;            /* valid on in head */
+    RULE    *rule;            /* rule->actions contains shell script */
+    LIST    *shell;           /* $(SHELL) value */
+    LOL      args;            /* LISTs for $(<), $(>) */
+    char     buf[ MAXLINE ];  /* actual commands */
 } ;
 
-CMD *cmd_new PROTO((
-        RULE    *rule,          /* rule (referenced) */
-        LIST    *targets,       /* $(<) (freed) */
-        LIST    *sources,       /* $(>) (freed) */
-        LIST    *shell,         /* $(SHELL) (freed) */
-        int     maxline ));     /* max line length */
+CMD *cmd_new PROTO
+((
+    RULE    *rule,            /* rule (referenced) */
+    LIST    *targets,         /* $(<) (freed) */
+    LIST    *sources,         /* $(>) (freed) */
+    LIST    *shell,           /* $(SHELL) (freed) */
+    int      maxline          /* max line length */
+));
 
 void cmd_free PROTO(( CMD *cmd ));
 
 # define cmd_next( c ) ((c)->next)
+
+#endif /* COMMAND_H */

@@ -10,7 +10,11 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#ifndef EXPAND_H
+#define EXPAND_H
+
 #include "ansi.h"
+#include "lists.h"
 
 LIST *var_expand PROTO((
         LIST         *l,
@@ -18,3 +22,5 @@ LIST *var_expand PROTO((
         const char   *end,
         LOL          *lol,
         int           cancopyin ));
+
+#endif /* EXPAND_H */

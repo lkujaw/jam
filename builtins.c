@@ -32,17 +32,18 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
-# include "jam.h"
-
-# include "lists.h"
-# include "parse.h"
-# include "builtins.h"
-# include "rules.h"
-# include "filesys.h"
-# include "newstr.h"
-# include "regexp.h"
-# include "pathsys.h"
-# include "hdrmacro.h"
+#include "builtins.h"
+#include "filesys.h"
+#include "glob.h"
+#include "hdrmacro.h"
+#include "jam.h"
+#include "lists.h"
+#include "memory.h"
+#include "newstr.h"
+#include "parse.h"
+#include "pathsys.h"
+#include "regexp.h"
+#include "rules.h"
 
 /*
  * compile_builtin() - define builtin rules
@@ -51,15 +52,13 @@
 # define P0 (PARSE *)0
 # define C0 (char *)0
 
-LIST *builtin_depends PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_echo PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_exit PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_flags PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_glob PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_match PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_depends  PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_echo     PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_exit     PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_flags    PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_glob     PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_match    PROTO(( PARSE *parse, LOL *args, int *jmp ));
 LIST *builtin_hdrmacro PROTO(( PARSE *parse, LOL *args, int *jmp ));
-
-int glob PROTO(( const char *s, const char *c ));
 
 void
 load_builtins PROTO((void))
@@ -318,7 +317,7 @@ builtin_match( parse, args, jmp )
                 }
             }
 
-            free( (char *)re );
+            xfree( (char *)re );
         }
 
         return result;

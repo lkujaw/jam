@@ -11,14 +11,13 @@
  * 09/08/00 (seiwald) - bulletproof PIECEMEAL size computation
  */
 
-# include "jam.h"
-
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "rules.h"
-
-# include "command.h"
+#include "command.h"
+#include "jam.h"
+#include "lists.h"
+#include "memory.h"
+#include "parse.h"
+#include "rules.h"
+#include "variable.h"
 
 /*
  * cmd_new() - return a new CMD or 0 if too many args
@@ -32,7 +31,7 @@ cmd_new( rule, targets, sources, shell, maxline )
     LIST    *shell;
     int     maxline;
 {
-        CMD *cmd = (CMD *)malloc( sizeof( CMD ) );
+        CMD *cmd = (CMD *)xmalloc( sizeof( CMD ) );
 
         cmd->rule = rule;
         cmd->shell = shell;
@@ -64,5 +63,5 @@ cmd_free( cmd )
 {
         lol_free( &cmd->args );
         list_free( cmd->shell );
-        free( (char *)cmd );
+        xfree( (char *)cmd );
 }

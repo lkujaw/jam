@@ -43,13 +43,15 @@
  * precedence is structured in regular expressions.  Serious changes in
  * regular-expression syntax might require a total rethink.
  */
-#include "regexp.h"
 #include <stdio.h>
 #include <ctype.h>
 #ifndef ultrix
 #include <stdlib.h>
 #endif
 #include <string.h>
+#include "memory.h"
+#include "regexp.h"
+
 
 /*
  * The "internal use only" fields in regexp.h are present to pass info from
@@ -241,17 +243,17 @@ regcomp( exp )
                 FAIL("regexp too big");
 
         /* Allocate space. */
-        r = (regexp *)malloc(sizeof(regexp) + (unsigned)regsize);
-        if (r == NULL)
-                FAIL("out of space");
+        r = (regexp *)xmalloc(sizeof(regexp) + (unsigned)regsize);
 
         /* Second pass: emit code. */
         regparse = (char *)exp;
         regnpar = 1;
         regcode = r->program;
         regc(MAGIC);
-        if (reg(0, &flags) == NULL)
-                return(NULL);
+        if (reg(0, &flags) == NULL) {
+            xfree(r);
+            return NULL;
+        }
 
         /* Dig out information for optimizations. */
         r->regstart = '\0';     /* Worst-case defaults. */

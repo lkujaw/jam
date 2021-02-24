@@ -29,14 +29,12 @@
  * 12/30/02 (armstrong) - fix out-of-bounds access in var_expand()
  */
 
-#include <assert.h>
-#include <limits.h>
 #include "jam.h"
-#include "lists.h"
-#include "variable.h"
+
 #include "expand.h"
-#include "pathsys.h"
 #include "newstr.h"
+#include "pathsys.h"
+#include "variable.h"
 
 typedef struct {
         PATHNAME        f;              /* :GDBSMR -- pieces */
@@ -551,7 +549,7 @@ var_edit_quote( out )
     char  *out;
 {
   /* Handle quoting now */
-  int    count, len;
+  int    count;
   char*  p = out;
   char*  q;
 

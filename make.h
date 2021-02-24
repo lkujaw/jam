@@ -10,7 +10,12 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#ifndef MAKE_H
+#define MAKE_H
+
 #include "ansi.h"
 
 int make  PROTO(( int n_targets, const char **targets, int anyhow ));
 int make1 PROTO(( TARGET *t ));
+
+#endif /* MAKE_H */

@@ -15,6 +15,9 @@
  * parse tree node
  */
 
+#ifndef PARSE_H
+#define PARSE_H
+
 typedef struct _PARSE PARSE;
 
 struct _PARSE {
@@ -42,3 +45,5 @@ PARSE * parse_make PROTO((
 
 void    parse_refer PROTO(( PARSE *p ));
 void    parse_free  PROTO(( PARSE *p ));
+
+#endif /* PARSE_H */

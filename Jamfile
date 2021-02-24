@@ -143,10 +143,9 @@ if $(UNIX)
 Library         libjam.a :
                     builtins.c command.c compile.c $(code) expand.c
                     glob.c hash.c headers.c lists.c make.c make1.c
-                    newstr.c option.c parse.c regexp.c rules.c scan.c
-                    search.c timestmp.c variable.c
-                    hdrmacro.c
-                    ;
+                    memory.c newstr.c option.c parse.c regexp.c
+                    rules.c scan.c search.c timestmp.c variable.c
+                    hdrmacro.c ;
 
 # Strip the Jam executable on Mingw
 #
@@ -176,10 +175,11 @@ ALLSOURCE =
         hash.c hash.h hdrmacro.c hdrmacro.h headers.c headers.h jam.c
         jam.h jambase.c jambase.h jamgram.c jamgram.h jamgram.y
         jamgram.yy jamgramt.h lists.c lists.h make.c make.h make1.c
-        mkjamb.c newstr.c newstr.h option.c option.h parse.c parse.h
-        pathmac.c pathsys.h pathunix.c pathvms.c regexp.c regexp.h
-        rules.c rules.h scan.c scan.h search.c search.h timestmp.c
-        timestmp.h variable.c variable.h yyacc.sh hdrmacro.c
+        memory.c memory.h mkjamb.c newstr.c newstr.h option.c option.h
+        parse.c parse.h pathmac.c pathsys.h pathunix.c pathvms.c
+        regexp.c regexp.h rules.c rules.h scan.c scan.h search.c
+        search.h timestmp.c timestmp.h variable.c variable.h yyacc.sh
+        hdrmacro.c
         INSTALL
         README.ORG
         CHANGES

@@ -68,16 +68,15 @@
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
-#include "jam.h"
-
-#include "lists.h"
-#include "parse.h"
 #include "compile.h"
-#include "variable.h"
 #include "expand.h"
-#include "rules.h"
+#include "jam.h"
+#include "memory.h"
 #include "newstr.h"
+#include "parse.h"
+#include "rules.h"
 #include "search.h"
+#include "variable.h"
 
 static const char *set_names[] = { "=", "+=", "?=" };
 static void debug_compile PROTO(( int which, const char *s ));
@@ -557,7 +556,7 @@ evaluate_rule( rulename, args, result )
 
             /* The action is associated with this instance of this rule */
 
-            action = (ACTION *)malloc( sizeof( ACTION ) );
+            action = (ACTION *)xmalloc( sizeof( ACTION ) );
             memset( (char *)action, '\0', sizeof( *action ) );
 
             action->rule    = rule;

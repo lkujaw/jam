@@ -15,11 +15,12 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "scan.h"
-# include "newstr.h"
+#include "jam.h"
+#include "lists.h"
+#include "memory.h"
+#include "newstr.h"
+#include "parse.h"
+#include "scan.h"
 
 static PARSE *yypsave;
 
@@ -80,7 +81,7 @@ parse_make( func, left, right, third, string, string1, num )
         const char   *string1;
         int           num;
 {
-        PARSE   *p = (PARSE *)malloc( sizeof( PARSE ) );
+        PARSE   *p = (PARSE *)xmalloc( sizeof( PARSE ) );
 
         p->func = func;
         p->left = left;

@@ -426,12 +426,11 @@ make1cmds( a0 )
 
         for( ; a0; a0 = a0->next )
         {
-            RULE    *rule = a0->action->rule;
+            RULE     *rule = a0->action->rule;
             SETTINGS *boundvars;
-            LIST    *nt, *ns;
-            ACTIONS *a1;
-            CMD     *cmd;
-            int     start, chunk, length, maxline;
+            LIST     *nt, *ns;
+            ACTIONS  *a1;
+            int       start, chunk, length, maxline;
 
             /* Only do rules with commands to execute. */
             /* If this action has already been executed, use saved status */

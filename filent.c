@@ -226,7 +226,7 @@ file_archscan(
                   ** which holds strings of filenames that are longer than
                   ** 15 characters (ie. don't fit into a ar_name
                   */
-                  string_table = malloc(lar_size);
+                  string_table = xmalloc(lar_size);
                   if (read(fd, string_table, lar_size) != lar_size)
                     printf("error reading string table\n");
 

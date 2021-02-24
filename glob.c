@@ -27,6 +27,7 @@
  */
 
 #include "ansi.h"
+#include "glob.h"
 #include "jam.h"
 
 # define CHECK_BIT( tab, bit ) ( tab[ (bit)/8 ] & (1<<( (bit)%8 )) )

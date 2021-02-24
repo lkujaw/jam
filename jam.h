@@ -38,6 +38,9 @@
  * 11/05/02 (seiwald) - OSPLAT now set to sparc on solaris.
  */
 
+#ifndef JAM_H
+#define JAM_H
+
 /*
  * VMS, OPENVMS
  */
@@ -474,3 +477,4 @@ extern struct globs globs;
 # define DEBUG_DEPENDS  ( globs.debug[ 13 ] )   /* -dd show dependency graph */
 # define DEBUG_CAUSES   ( globs.debug[ 14 ] )   /* -dc show dependency graph */
 
+#endif /* JAM_H */
