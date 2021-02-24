@@ -21,7 +21,7 @@ all: FEATURES/jam.h jam0
 	./jam0
 
 FEATURES/jam.h: jam.iff
-	./iffe.sh -v jam.iff
+	sh iffe.sh --cc=$(CC) -v jam.iff
 
 include common.mk
 
