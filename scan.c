@@ -21,12 +21,13 @@
 
 #include "jam.h"
 #include "jambase.h"
-#include "jamgram.h"
 #include "lists.h"
 #include "memory.h"
 #include "newstr.h"
 #include "parse.h"
 #include "scan.h"
+
+#include "jamgram.h"
 
 struct keyword {
         const char *word;
