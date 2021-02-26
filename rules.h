@@ -36,11 +36,12 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
-#ifndef RULES_H
-#define RULES_H
+#ifndef JAM_RULES_H
+#define JAM_RULES_H 1
+
+#include "jam.h"  /* Includes system headers */
 
 #include "ansi.h"
-#include "jam.h"
 #include "lists.h"
 #include "parse.h"
 
@@ -60,7 +61,6 @@ struct _rule {
     LIST        *bindlist;      /* variable to bind for actions */
     LIST        *params;        /* bind args to local vars */
     int          flags;         /* modifiers on ACTIONS */
-
 #define         RULE_UPDATED    0x01    /* $(>) is updated sources only */
 #define         RULE_TOGETHER   0x02    /* combine actions on single target */
 #define         RULE_IGNORE     0x04    /* ignore return status of executes */
@@ -68,7 +68,6 @@ struct _rule {
 #define         RULE_PIECEMEAL  0x10    /* split exec so each $(>) is small */
 #define         RULE_EXISTING   0x20    /* $(>) is pre-exisitng sources only */
 #define         RULE_MAXLINE    0x40    /* cmd specific maxline (last) */
-
 } ;
 
 /* ACTIONS - a chain of ACTIONs */
@@ -171,20 +170,24 @@ struct _target {
         char    *cmds;                  /* type-punned command list */
 } ;
 
-RULE         *bindrule PROTO(( const char *rulename ));
-TARGET     *bindtarget PROTO(( const char *targetname ));
-TARGET     *copytarget PROTO(( const TARGET *t ));
-void       touchtarget PROTO(( const char *t ));
-TARGETS    *targetlist PROTO(( TARGETS *chain, LIST  *targets ));
-TARGETS   *targetentry PROTO(( TARGETS *chain, TARGET *target ));
-TARGETS   *targetchain PROTO(( TARGETS *chain, TARGETS *targets ));
-ACTIONS    *actionlist PROTO(( ACTIONS *chain, ACTION *action ));
-SETTINGS  *addsettings PROTO(( SETTINGS *v, int setflag,
-                               const char *sym, LIST *val ));
-SETTINGS *copysettings PROTO(( SETTINGS *v ));
-void      pushsettings PROTO(( SETTINGS *v ));
-void       popsettings PROTO(( SETTINGS *v ));
-void      freesettings PROTO(( SETTINGS *v ));
-void         donerules PROTO(( void ));
+_BEGIN_EXTERNS_
 
-#endif /* RULES_H */
+RULE         *bindrule _ARG_(( const char *rulename ));
+TARGET     *bindtarget _ARG_(( const char *targetname ));
+TARGET     *copytarget _ARG_(( const TARGET *t ));
+void       touchtarget _ARG_(( const char *t ));
+TARGETS    *targetlist _ARG_(( TARGETS *chain, LIST  *targets ));
+TARGETS   *targetentry _ARG_(( TARGETS *chain, TARGET *target ));
+TARGETS   *targetchain _ARG_(( TARGETS *chain, TARGETS *targets ));
+ACTIONS    *actionlist _ARG_(( ACTIONS *chain, ACTION *action ));
+SETTINGS  *addsettings _ARG_(( SETTINGS *v, int setflag,
+                               const char *sym, LIST *val ));
+SETTINGS *copysettings _ARG_(( SETTINGS *v ));
+void      pushsettings _ARG_(( SETTINGS *v ));
+void       popsettings _ARG_(( SETTINGS *v ));
+void      freesettings _ARG_(( SETTINGS *v ));
+void         donerules _ARG_(( void ));
+
+_END_EXTERNS_
+
+#endif /* JAM_RULES_H */

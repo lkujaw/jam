@@ -44,18 +44,22 @@
  * LIST - list of strings
  */
 
-#ifndef LISTS_H
-#define LISTS_H
+#ifndef JAM_LISTS_H
+#define JAM_LISTS_H 1
 
 #include "ansi.h"
+
+#define LOL_MAX 9
+#define list_next( l ) ((l)->next)
+#define L0 ((LIST *)0)
 
 typedef struct _list LIST;
 
 struct _list {
-        LIST    *next;
-        LIST    *tail;          /* only valid in head node */
-        const char      *string;        /* private copy */
-} ;
+    LIST        *next;
+    LIST        *tail;          /* only valid in head node */
+    const char  *string;        /* private copy */
+};
 
 /*
  * LOL - list of LISTs
@@ -63,29 +67,27 @@ struct _list {
 
 typedef struct _lol LOL;
 
-# define LOL_MAX 9
-
 struct _lol {
-        int     count;
-        LIST    *list[ LOL_MAX ];
-} ;
+    int    count;
+    LIST  *list[LOL_MAX];
+};
 
-LIST *  list_append PROTO(( LIST *l, LIST *nl ));
-LIST *  list_copy PROTO(( LIST *l, LIST  *nl ));
-void    list_free PROTO(( LIST *head ));
-LIST *  list_new PROTO(( LIST *head, const char *string, int copy ));
-void    list_print PROTO(( LIST *l ));
-int     list_length PROTO(( LIST *l ));
-LIST *  list_sublist PROTO(( LIST *l, int start, int count ));
+_BEGIN_EXTERNS_
 
-# define list_next( l ) ((l)->next)
+LIST *  list_append   _ARG_(( LIST *l, LIST *nl ));
+LIST *  list_copy     _ARG_(( LIST *l, LIST  *nl ));
+void    list_free     _ARG_(( LIST *head ));
+LIST *  list_new      _ARG_(( LIST *head, const char *string, int copy ));
+void    list_print    _ARG_(( LIST *l ));
+int     list_length   _ARG_(( LIST *l ));
+LIST *  list_sublist  _ARG_(( LIST *l, int start, int count ));
 
-# define L0 ((LIST *)0)
+void    lol_add    _ARG_(( LOL *lol, LIST *l ));
+void    lol_init   _ARG_(( LOL *lol ));
+void    lol_free   _ARG_(( LOL *lol ));
+LIST *  lol_get    _ARG_(( LOL *lol, int i ));
+void    lol_print  _ARG_(( LOL *lol ));
 
-void    lol_add PROTO(( LOL *lol, LIST *l ));
-void    lol_init PROTO(( LOL *lol ));
-void    lol_free PROTO(( LOL *lol ));
-LIST *  lol_get  PROTO(( LOL *lol, int i ));
-void    lol_print PROTO(( LOL *lol ));
+_END_EXTERNS_
 
-#endif /* LISTS_H */
+#endif /* JAM_LISTS_H */

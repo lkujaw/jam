@@ -15,27 +15,29 @@
  * parse tree node
  */
 
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef JAM_PARSE_H
+#define JAM_PARSE_H 1
 
 typedef struct _PARSE PARSE;
 
 struct _PARSE {
-        LIST       *(*func)PROTO(( PARSE *p, LOL *args, int *jmp ));
-        PARSE        *left;
-        PARSE        *right;
-        PARSE        *third;
-        const char   *string;
-        const char   *string1;
-        int           num;
-        int           refs;
-} ;
+    LIST       *(*func)_ARG_((PARSE *p, LOL *args, int *jmp));
+    PARSE        *left;
+    PARSE        *right;
+    PARSE        *third;
+    const char   *string;
+    const char   *string1;
+    int           num;
+    int           refs;
+};
 
-void    parse_file PROTO(( const char *f ));
-void    parse_save PROTO(( PARSE *p ));
+_BEGIN_EXTERNS_
 
-PARSE * parse_make PROTO((
-        LIST            *(*func)PROTO(( PARSE *p, LOL *args, int *jmp )),
+void    parse_file _ARG_((const char *f));
+void    parse_save _ARG_((PARSE *p));
+
+PARSE * parse_make _ARG_((
+        LIST            *(*func)_ARG_((PARSE *p, LOL *args, int *jmp)),
         PARSE           *left,
         PARSE           *right,
         PARSE           *third,
@@ -43,7 +45,9 @@ PARSE * parse_make PROTO((
         const char      *string1,
         int              num ));
 
-void    parse_refer PROTO(( PARSE *p ));
-void    parse_free  PROTO(( PARSE *p ));
+void    parse_refer _ARG_((PARSE *p));
+void    parse_free  _ARG_((PARSE *p));
 
-#endif /* PARSE_H */
+_END_EXTERNS_
+
+#endif /* JAM_PARSE_H */

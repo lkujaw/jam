@@ -29,10 +29,11 @@
  * 12/09/02 (seiwald) - push regexp creation down to headers1().
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "compile.h"
 #include "hdrmacro.h"
 #include "headers.h"
-#include "jam.h"
 #include "lists.h"
 #include "memory.h"
 #include "newstr.h"
@@ -41,7 +42,7 @@
 #include "rules.h"
 #include "variable.h"
 
-static LIST *headers1 PROTO(( const char *file, LIST *hdrscan ));
+static LIST *headers1 _ARG_(( const char *file, LIST *hdrscan ));
 
 /*
  * headers() - scan a target for include files and call HDRRULE

@@ -38,8 +38,8 @@
  * 11/05/02 (seiwald) - OSPLAT now set to sparc on solaris.
  */
 
-#ifndef JAM_H
-#define JAM_H
+#ifndef JAM_JAM_H
+#define JAM_JAM_H 1
 
 /*
  * VMS, OPENVMS
@@ -70,9 +70,11 @@
 # define DOWNSHIFT_PATHS
 
 /* Do any of these work? */
+#ifndef OSPLAT
 # if defined( VAX ) || defined( __VAX ) || defined( vax )
-# define OSPLAT "OSPLAT=VAX"
+#  define OSPLAT "OSPLAT=VAX"
 # endif
+#endif
 
 /*
  * Windows NT
@@ -345,65 +347,68 @@
 
 # include "FEATURE/jam"
 
-# endif /* UNIX */
+#endif /* UNIX */
 
 /*
  * OSPLAT definitions - suppressed when it's a one-of-a-kind
  */
 
-# if defined( _M_PPC ) || \
-     defined( PPC ) || \
-     defined( ppc ) || \
-     defined( __powerpc__ ) || \
-     defined( __POWERPC__ ) || \
-     defined( __ppc__ )
-# define OSPLAT "OSPLAT=PPC"
+#ifndef OSPLAT
+#if defined(_i386_)   || \
+    defined(__i386__) || \
+    defined(_M_IX86 )
+# if !defined( OS_OS2 )
+#  define OSPLAT "OSPLAT=I386"
 # endif
 
-# if defined( _ALPHA_ ) || \
-     defined( __alpha__ )
+#elif defined(_amd64_)    || \
+      defined(__amd64__)  || \
+      defined(_x86_64_)   || \
+      defined(__x86_64__)
+# define OSPLAT "OSPLAT=I386-64"
+
+#elif defined(alpha) || \
+      defined(_ALPHA_) || \
+      defined(__alpha__)
 # define OSPLAT "OSPLAT=AXP"
-# endif
 
-# if defined( _i386_ ) || \
-     defined( __i386__ ) || \
-     defined( _M_IX86 )
-# if !defined( OS_FREEBSD ) && \
-     !defined( OS_OS2 ) && \
-     !defined( OS_AS400 )
-# define OSPLAT "OSPLAT=X86"
-# endif
-# endif
+#elif defined(hppa)     || \
+      defined(__hppa__)
+# define OSPLAT "OSPLAT=HPPA"
 
-# ifdef __sparc__
+#elif defined(_M_PPC)      || \
+      defined(PPC)         || \
+      defined(ppc)         || \
+      defined(__powerpc__) || \
+      defined(__POWERPC__) || \
+      defined(__ppc__)
+# define OSPLAT "OSPLAT=PPC"
+
+#elif defined(__sparc__)
 # if !defined( OS_SUNOS )
-# define OSPLAT "OSPLAT=SPARC"
-# endif
+#  define OSPLAT "OSPLAT=SPARC"
 # endif
 
-# ifdef __mips__
+#elif defined(__mips__)
 # if !defined( OS_SGI )
-# define OSPLAT "OSPLAT=MIPS"
-# endif
+#  define OSPLAT "OSPLAT=MIPS"
 # endif
 
-# ifdef __arm__
+#elif defined(__arm__)
 # define OSPLAT "OSPLAT=ARM"
-# endif
 
-# if defined( __ia64__ ) || \
-     defined( __IA64__ ) || \
-     defined( _M_IA64 )
+#elif defined( __ia64__ ) || \
+      defined( __IA64__ ) || \
+      defined( _M_IA64 )
 # define OSPLAT "OSPLAT=IA64"
-# endif
 
-# ifdef __s390__
+#elif defined(__s390__)
 # define OSPLAT "OSPLAT=390"
-# endif
 
-# ifndef OSPLAT
+#else
 # define OSPLAT ""
-# endif
+#endif
+#endif /* !defined(OSPLAT) */
 
 /*
  * Jam implementation misc.
@@ -428,6 +433,10 @@
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
 #endif
 
 /* You probably don't need to muck with these. */
@@ -477,4 +486,4 @@ extern struct globs globs;
 # define DEBUG_DEPENDS  ( globs.debug[ 13 ] )   /* -dd show dependency graph */
 # define DEBUG_CAUSES   ( globs.debug[ 14 ] )   /* -dc show dependency graph */
 
-#endif /* JAM_H */
+#endif /* JAM_JAM_H */

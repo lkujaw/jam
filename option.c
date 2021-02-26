@@ -16,7 +16,8 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#include "jam.h"
+#include "jam.h"  /* Includes system headers */
+
 #include "option.h"
 
 int

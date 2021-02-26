@@ -19,7 +19,8 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#include "jam.h"
+#include "jam.h"  /* Includes system headers */
+
 #include "jambase.h"
 #include "lists.h"
 #include "memory.h"
@@ -54,7 +55,7 @@ static struct include *incp = 0; /* current file; head of chain */
 
 static int scanmode = SCAN_NORMAL;
 static int anyerrors = 0;
-static char *symdump PROTO(( YYSTYPE *s ));
+static char *symdump _ARG_(( YYSTYPE *s ));
 
 #define BIGGEST_TOKEN 10240    /* no single token can be larger */
 
@@ -82,7 +83,7 @@ yyerror( s )
 }
 
 int
-yyanyerrors PROTO(( void ))
+yyanyerrors _ARG_(( void ))
 {
         return anyerrors != 0;
 }
@@ -117,7 +118,7 @@ yyfparse( s )
  */
 
 int
-yyline PROTO(( void ))
+yyline _ARG_(( void ))
 {
         struct include *i = incp;
 
@@ -199,7 +200,7 @@ yyline PROTO(( void ))
 # define yyprev() ( incp->string-- )
 
 int
-yylex PROTO(( void ))
+yylex _ARG_(( void ))
 {
         int c;
         char buf[BIGGEST_TOKEN];

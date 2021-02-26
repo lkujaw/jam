@@ -4,16 +4,17 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "compile.h"
-# include "rules.h"
-# include "variable.h"
-# include "regexp.h"
-# include "hdrmacro.h"
-# include "hash.h"
-# include "newstr.h"
+#include "jam.h"  /* Includes system headers */
+
+#include "lists.h"
+#include "parse.h"
+#include "compile.h"
+#include "rules.h"
+#include "variable.h"
+#include "regexp.h"
+#include "hdrmacro.h"
+#include "hash.h"
+#include "newstr.h"
 
 /*
  * hdrmacro.c - handle header files that define macros used in
@@ -63,63 +64,69 @@ macro_headers( t )
     FILE    *f;
     char    buf[ 1024 ];
 
-    if ( DEBUG_HEADER )
-      printf( "macro header scan for %s\n", t->name );
-
-    /* this regexp is used to detect lines of the form       */
-    /* "#define  MACRO  <....>" or "#define  MACRO  "....."  */
-    /* in the header macro files..                           */
-    re = regcomp(
-       "^[      ]*#[    ]*define[       ]*([A-Za-z][A-Za-z0-9_]*)[      ]*"
-       "[<\"]([^\">]*)[\">].*$" );
-
-        if( ( f = fopen( t->boundname, "r" ) ) == 0 )
-          return;
-
-        while( fgets( buf, sizeof( buf ), f ) )
-        {
-      HEADER_MACRO  var, *v = &var;
-
-      if ( regexec( re, buf ) && re->startp[1] )
-      {
-        char  buf1[ MAXSYM ], buf2[ MAXSYM ];
-        int   l1, l2;
-
-        assert(re->endp[1] - re->startp[1] < MAXSYM);
-        assert(re->endp[2] - re->startp[2] < MAXSYM);
-
-        l1 = (int)(re->endp[1] - re->startp[1]);
-        l2 = (int)(re->endp[2] - re->startp[2]);
-
-        memcpy( buf1, re->startp[1], l1 );
-        memcpy( buf2, re->startp[2], l2 );
-        buf1[l1] = '\0';
-        buf2[l2] = '\0';
-
-        /* we detected a line that looks like "#define  MACRO  filename */
-        if ( DEBUG_HEADER )
-          printf( "macro '%s' used to define filename '%s' in '%s'\n",
-                   buf1, buf2, t->boundname );
-
-        /* add macro definition to hash table */
-        if ( !header_macros_hash )
-          header_macros_hash = hashinit( sizeof( HEADER_MACRO ), "hdrmacros" );
-
-        v->symbol   = (const char*)buf1;
-        v->filename = 0;
-        if ( hashenter( header_macros_hash, (HASHDATA **)&v ) )
-        {
-          v->symbol   = newstr( buf1 );  /* never freed */
-          v->filename = newstr( buf2 );  /* never freed */
-        }
-        /* XXXX: FOR NOW, WE IGNORE MULTIPLE MACRO DEFINITIONS !! */
-        /*       WE MIGHT AS WELL USE A LIST TO STORE THEM..      */
-      }
+    if ( DEBUG_HEADER ) {
+        printf( "macro header scan for %s\n", t->name );
     }
 
-        fclose( f );
+    /* This regexp is used to detect lines of the form       */
+    /* "#define  MACRO  <....>" or "#define  MACRO  "....."  */
+    /* in the header macro files..                           */
+    /* Ultrix's K&R compiler cannot handle string literal concatenation. */
+    re = regcomp("\
+^[      ]*#[    ]*define[       ]*([A-Za-z][A-Za-z0-9_]*)[      ]*\
+[<\"]([^\">]*)[\">].*$\
+");
 
-    free( re );
+    if( ( f = fopen( t->boundname, "r" ) ) == 0 ) {
+        return;
+    }
+
+    while( fgets( buf, sizeof( buf ), f ) )
+    {
+        HEADER_MACRO  var, *v = &var;
+
+        if ( regexec( re, buf ) && re->startp[1] )
+        {
+            char  buf1[ MAXSYM ], buf2[ MAXSYM ];
+            int   l1, l2;
+
+            assert(re->endp[1] - re->startp[1] < MAXSYM);
+            assert(re->endp[2] - re->startp[2] < MAXSYM);
+
+            l1 = (int)(re->endp[1] - re->startp[1]);
+            l2 = (int)(re->endp[2] - re->startp[2]);
+
+            memcpy( buf1, re->startp[1], l1 );
+            memcpy( buf2, re->startp[2], l2 );
+            buf1[l1] = '\0';
+            buf2[l2] = '\0';
+
+            /* we detected a line that looks like "#define  MACRO  filename */
+            if ( DEBUG_HEADER ) {
+                printf( "macro '%s' used to define filename '%s' in '%s'\n",
+                        buf1, buf2, t->boundname );
+            }
+
+            /* add macro definition to hash table */
+            if ( !header_macros_hash ) {
+                header_macros_hash = hashinit( sizeof( HEADER_MACRO ),
+                                               "hdrmacros" );
+            }
+
+            v->symbol   = (const char*)buf1;
+            v->filename = 0;
+            if ( hashenter( header_macros_hash, (HASHDATA **)&v ) )
+            {
+                v->symbol   = newstr( buf1 );  /* never freed */
+                v->filename = newstr( buf2 );  /* never freed */
+            }
+            /* XXXX: FOR NOW, WE IGNORE MULTIPLE MACRO DEFINITIONS !! */
+            /*       WE MIGHT AS WELL USE A LIST TO STORE THEM..      */
+        }
+    }
+
+    fclose(f);
+    free(re);
 }
 
 

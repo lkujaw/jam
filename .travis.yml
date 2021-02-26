@@ -10,15 +10,11 @@ arch:
 os:
   - linux
   - osx
-  - windows
-env:
-  - NMAKE_PATH="/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin/amd64/"
-  - RC_PATH="/c/Program Files (x86)/Windows Kits/10/bin/x64/"
 script:
 - |-
     case $TRAVIS_OS_NAME in
       windows)
-        nmake -f builds\win32-visualc.mk
+        nmake -f bld\w32-vcc.mk
       ;;
       *)
         make

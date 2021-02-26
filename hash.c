@@ -22,8 +22,9 @@
  * 01/31/02 (seiwald) - keyval now unsigned (cray-ziness)
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "hash.h"
-#include "jam.h"
 #include "memory.h"
 
 /* Header attached to all data items entered into a hash table. */
@@ -82,8 +83,8 @@ struct hash
         const char *name;       /* just for hashstats() */
 } ;
 
-static void hashrehash PROTO(( struct hash *hp ));
-static void hashstat   PROTO(( struct hash *hp ));
+static void hashrehash _ARG_(( struct hash *hp ));
+static void hashstat   _ARG_(( struct hash *hp ));
 
 /*
  * hashitem() - find a record in the table, and optionally enter a new one

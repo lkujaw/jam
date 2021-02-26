@@ -24,9 +24,10 @@
  * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "execcmd.h"
+#include "jam.h"  /* Includes system headers */
+
+#include "lists.h"
+#include "execcmd.h"
 
 # ifdef OS_VMS
 

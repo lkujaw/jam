@@ -21,8 +21,8 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include <stdio.h>
-# include <string.h>
+#include <stdio.h>
+#include <string.h>
 
 int main( argc, argv, envp )
     int    argc;

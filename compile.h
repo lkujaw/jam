@@ -15,56 +15,60 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#ifndef COMPILE_H
-#define COMPILE_H
+#ifndef JAM_COMPILE_H
+#define JAM_COMPILE_H 1
 
 #include "ansi.h"
 #include "lists.h"
 #include "parse.h"
 
-void compile_builtins  PROTO(( void ));
-
-LIST *compile_append   PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_break    PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_foreach  PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_if       PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_eval     PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_include  PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_list     PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_local    PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_null     PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_on       PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_rule     PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_rules    PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_set      PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_setcomp  PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_setexec  PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_settings PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_switch   PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_while    PROTO(( PARSE *parse, LOL *args, int *jmp ));
-
-LIST *evaluate_rule PROTO(( const char *rulename, LOL *args, LIST *result ));
-
 /* Conditions for compile_if() */
 
-# define EXPR_NOT       0       /* ! cond */
-# define EXPR_AND       1       /* cond && cond */
-# define EXPR_OR        2       /* cond || cond */
+#define EXPR_NOT       0       /* ! cond */
+#define EXPR_AND       1       /* cond && cond */
+#define EXPR_OR        2       /* cond || cond */
 
-# define EXPR_EXISTS    3       /* arg */
-# define EXPR_EQUALS    4       /* arg = arg */
-# define EXPR_NOTEQ     5       /* arg != arg */
-# define EXPR_LESS      6       /* arg < arg  */
-# define EXPR_LESSEQ    7       /* arg <= arg */
-# define EXPR_MORE      8       /* arg > arg  */
-# define EXPR_MOREEQ    9       /* arg >= arg */
-# define EXPR_IN        10      /* arg in arg */
+#define EXPR_EXISTS    3       /* arg */
+#define EXPR_EQUALS    4       /* arg = arg */
+#define EXPR_NOTEQ     5       /* arg != arg */
+#define EXPR_LESS      6       /* arg < arg  */
+#define EXPR_LESSEQ    7       /* arg <= arg */
+#define EXPR_MORE      8       /* arg > arg  */
+#define EXPR_MOREEQ    9       /* arg >= arg */
+#define EXPR_IN        10      /* arg in arg */
 
 /* Flags for compile_return */
 
-# define JMP_NONE       0       /* flow continues */
-# define JMP_BREAK      1       /* break out of loop */
-# define JMP_CONTINUE   2       /* step to end of loop */
-# define JMP_RETURN     3       /* return from rule */
+#define JMP_NONE       0       /* flow continues */
+#define JMP_BREAK      1       /* break out of loop */
+#define JMP_CONTINUE   2       /* step to end of loop */
+#define JMP_RETURN     3       /* return from rule */
 
-#endif /* COMPILE_H */
+_BEGIN_EXTERNS_
+
+void compile_builtins _ARG_((void));
+
+LIST *compile_append   _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_break    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_foreach  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_if       _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_eval     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_include  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_list     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_local    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_null     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_on       _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_rule     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_rules    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_set      _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_setcomp  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_setexec  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_settings _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_switch   _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_while    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+
+LIST *evaluate_rule _ARG_(( const char *rulename, LOL *args, LIST *result ));
+
+_END_EXTERNS_
+
+#endif /* JAM_COMPILE_H */

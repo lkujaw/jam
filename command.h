@@ -35,12 +35,14 @@
  * CMD - an action, ready to be formatted into a buffer and executed
  */
 
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef JAM_COMMAND_H
+#define JAM_COMMAND_H 1
 
 #include "ansi.h"
 #include "lists.h"
 #include "rules.h"
+
+#define cmd_next(c) ((c)->next)
 
 typedef struct _cmd CMD;
 
@@ -52,9 +54,11 @@ struct _cmd
     LIST    *shell;           /* $(SHELL) value */
     LOL      args;            /* LISTs for $(<), $(>) */
     char     buf[ MAXLINE ];  /* actual commands */
-} ;
+};
 
-CMD *cmd_new PROTO
+_BEGIN_EXTERNS_
+
+CMD *cmd_new _ARG_
 ((
     RULE    *rule,            /* rule (referenced) */
     LIST    *targets,         /* $(<) (freed) */
@@ -63,8 +67,8 @@ CMD *cmd_new PROTO
     int      maxline          /* max line length */
 ));
 
-void cmd_free PROTO(( CMD *cmd ));
+void cmd_free _ARG_((CMD *cmd));
 
-# define cmd_next( c ) ((c)->next)
+_END_EXTERNS_
 
-#endif /* COMMAND_H */
+#endif /* JAM_COMMAND_H */

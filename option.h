@@ -13,22 +13,30 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#ifndef OPTION_H
-#define OPTION_H
+#ifndef JAM_OPTION_H
+#define JAM_OPTION_H 1
 
 #include "ansi.h"
 
+#define N_OPTS    256
+#define N_TARGETS 256
+
 typedef struct option
 {
-        char    flag;           /* filled in by getoption() */
-        const char      *val;   /* set to random address if true */
+    char         flag;  /* filled in by getoption() */
+    const char  *val;   /* set to random address if true */
 } option;
 
-# define N_OPTS    256
-# define N_TARGETS 256
+_BEGIN_EXTERNS_
 
-int         getoptions PROTO(( int argc, char **argv, const char *opts,
-                               option *optv, char** targets ));
-const char *getoptval  PROTO(( option *optv, int opt, int subopt ));
+int         getoptions _ARG_(( int          argc,
+                               char       **argv,
+                               const char  *opts,
+                               option      *optv,
+                               char       **targets ));
 
-#endif /* OPTION_H */
+const char *getoptval  _ARG_((option *optv, int opt, int subopt));
+
+_END_EXTERNS_
+
+#endif /* JAM_OPTION_H */

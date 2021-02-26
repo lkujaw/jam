@@ -184,18 +184,18 @@ static long regsize;            /* Code size. */
 #ifndef STATIC
 #define STATIC  static
 #endif
-STATIC char *reg       PROTO(( int paren, int *flagp ));
-STATIC char *regbranch PROTO(( int *flagp ));
-STATIC char *regpiece  PROTO(( int *flagp ));
-STATIC char *regatom   PROTO(( int *flagp ));
-STATIC char *regnode   PROTO(( int op ));
-STATIC char *regnext   PROTO(( register char *p ));
-STATIC void  regc      PROTO(( int b ));
-STATIC void  reginsert PROTO(( int op, char *opnd ));
-STATIC void  regtail   PROTO(( char *p, char *val ));
-STATIC void  regoptail PROTO(( char *p, char *val ));
+STATIC char *reg       _ARG_(( int paren, int *flagp ));
+STATIC char *regbranch _ARG_(( int *flagp ));
+STATIC char *regpiece  _ARG_(( int *flagp ));
+STATIC char *regatom   _ARG_(( int *flagp ));
+STATIC char *regnode   _ARG_(( int op ));
+STATIC char *regnext   _ARG_(( register char *p ));
+STATIC void  regc      _ARG_(( int b ));
+STATIC void  reginsert _ARG_(( int op, char *opnd ));
+STATIC void  regtail   _ARG_(( char *p, char *val ));
+STATIC void  regoptail _ARG_(( char *p, char *val ));
 #ifdef STRCSPN
-STATIC int  strcspn    PROTO(( void ));
+STATIC int  strcspn    _ARG_(( void ));
 #endif
 
 /*
@@ -400,8 +400,10 @@ regbranch( flagp )
                         regtail(chain, latest);
                 chain = latest;
         }
-        if (chain == NULL)      /* Loop ran zero times. */
-                (void) regnode(NOTHING);
+        if (chain == NULL) {
+            /* Loop ran zero times. */
+            regnode(NOTHING);
+        }
 
         return(ret);
 }
@@ -785,9 +787,9 @@ static const char **regendp;    /* Ditto for endp. */
 /*
  * Forwards.
  */
-STATIC int regtry    PROTO(( regexp *prog, const char *string ));
-STATIC int regmatch  PROTO(( char *prog ));
-STATIC int regrepeat PROTO(( char *p ));
+STATIC int regtry    _ARG_(( regexp *prog, const char *string ));
+STATIC int regmatch  _ARG_(( char *prog ));
+STATIC int regrepeat _ARG_(( char *p ));
 
 #ifdef DEBUG
 int regnarrate = 0;

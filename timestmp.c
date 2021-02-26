@@ -12,12 +12,13 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#include "jam.h"
-#include "hash.h"
+#include "jam.h"  /* Includes system headers */
+
 #include "filesys.h"
+#include "hash.h"
+#include "newstr.h"
 #include "pathsys.h"
 #include "timestmp.h"
-#include "newstr.h"
 
 /*
  * BINDING - all known files
@@ -26,8 +27,8 @@
 typedef struct _binding BINDING;
 
 struct _binding {
-        const char      *name;
-        short   flags;
+        const char *name;
+        short       flags;
 
 #define BIND_SCANNED   0x01    /* if directory or arch, has been scanned */
 
@@ -43,7 +44,7 @@ struct _binding {
 } ;
 
 static struct hash *bindhash = 0;
-static void time_enter PROTO(( void *, const char *, int , time_t ));
+static void time_enter _ARG_((Void_t *, const char *, int , time_t));
 
 static const char *time_progress[] =
 {
@@ -163,7 +164,7 @@ timestamp( target, time )
 
 static void
 time_enter( closure, target, found, time )
-    void        *closure;
+    Void_t      *closure;
     const char  *target;
     int          found;
     time_t       time;
@@ -199,7 +200,7 @@ time_enter( closure, target, found, time )
  */
 
 void
-donestamps PROTO(( void ))
+donestamps _ARG_((void))
 {
         hashdone( bindhash );
 }

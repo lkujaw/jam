@@ -17,6 +17,13 @@ header  sys/wait.h
 header  assert.h
 mac     assert assert.h
 
+tst     ptr_void note{ standard C void* ok }end compile{
+        extern void* foo();
+        void* bar() { return foo(); }
+}end {
+        #define Void_t void
+}
+
 hdr     vfork
 sys     vfork
 tst     run{

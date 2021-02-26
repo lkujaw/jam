@@ -10,18 +10,30 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#ifndef FILESYS_H
-#define FILESYS_H
+#ifndef JAM_FILESYS_H
+#define JAM_FILESYS_H 1
+
+#include "jam.h"  /* Includes system headers */
 
 #include "ansi.h"
-#include "jam.h"
 
-typedef void (*scanback)PROTO(( void *closure, const char *file,
-                                int found, time_t t ));
+typedef void (*scanback)_ARG_(( Void_t     *closure,
+                                const char *file,
+                                int         found,
+                                time_t      t ));
 
-void file_dirscan  PROTO(( const char *dir, scanback func, void *closure ));
-void file_archscan PROTO(( const char *arch, scanback func, void *closure ));
+_BEGIN_EXTERNS_
 
-int file_time PROTO(( const char *filename, time_t *time ));
+void file_dirscan  _ARG_(( const char *dir,
+                           scanback    func,
+                           Void_t     *closure ));
 
-#endif /* FILESYS_H */
+void file_archscan _ARG_(( const char *arch,
+                           scanback    func,
+                           Void_t     *closure ));
+
+int file_time _ARG_((const char *filename, time_t *time));
+
+_END_EXTERNS_
+
+#endif /* JAM_FILESYS_H */

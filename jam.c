@@ -101,22 +101,23 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "option.h"
-# include "version.h"
+#include "jam.h"  /* Includes system headers */
+
+#include "option.h"
+#include "version.h"
 
 /* These get various function declarations. */
 
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "compile.h"
-# include "builtins.h"
-# include "rules.h"
-# include "newstr.h"
-# include "scan.h"
-# include "timestmp.h"
-# include "make.h"
+#include "lists.h"
+#include "parse.h"
+#include "variable.h"
+#include "compile.h"
+#include "builtins.h"
+#include "rules.h"
+#include "newstr.h"
+#include "scan.h"
+#include "timestmp.h"
+#include "make.h"
 
 /* Macintosh is "special" */
 

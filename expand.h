@@ -10,17 +10,21 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#ifndef EXPAND_H
-#define EXPAND_H
+#ifndef JAM_EXPAND_H
+#define JAM_EXPAND_H 1
 
 #include "ansi.h"
 #include "lists.h"
 
-LIST *var_expand PROTO((
-        LIST         *l,
-        const char   *in,
-        const char   *end,
-        LOL          *lol,
-        int           cancopyin ));
+_BEGIN_EXTERNS_
 
-#endif /* EXPAND_H */
+LIST *var_expand _ARG_((
+    LIST        *l,
+    const char  *in,
+    const char  *end,
+    LOL         *lol,
+    int          cancopyin ));
+
+_END_EXTERNS_
+
+#endif /* JAM_EXPAND_H */

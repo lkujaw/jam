@@ -24,7 +24,8 @@
  * 12/09/02 (seiwald) - new list_printq() for writing lists to Jambase
  */
 
-#include "jam.h"
+#include "jam.h"  /* Includes system headers */
+
 #include "lists.h"
 #include "memory.h"
 #include "newstr.h"

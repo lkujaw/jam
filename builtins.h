@@ -10,11 +10,15 @@
  * 01/10/01 (seiwald) - split from compile.h
  */
 
-#ifndef BUILTINS_H
-#define BUILTINS_H
+#ifndef JAM_BUILTINS_H
+#define JAM_BUILTINS_H 1
 
 #include "ansi.h"
 
-void load_builtins PROTO((void));
+_BEGIN_EXTERNS_
 
-#endif /* BUILTINS_H */
+void load_builtins _ARG_((Void_t));
+
+_END_EXTERNS_
+
+#endif /* JAM_BUILTINS_H */

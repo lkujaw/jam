@@ -26,8 +26,9 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "hash.h"
-#include "jam.h"
 #include "memory.h"
 #include "newstr.h"
 
@@ -93,7 +94,7 @@ freestr( s )
  */
 
 void
-donestr PROTO(( void ))
+donestr _ARG_(( void ))
 {
         hashdone( strhash );
 

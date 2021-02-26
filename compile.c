@@ -68,9 +68,10 @@
  * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "compile.h"
 #include "expand.h"
-#include "jam.h"
 #include "memory.h"
 #include "newstr.h"
 #include "parse.h"
@@ -79,8 +80,8 @@
 #include "variable.h"
 
 static const char *set_names[] = { "=", "+=", "?=" };
-static void debug_compile PROTO(( int which, const char *s ));
-int glob PROTO(( const char *s, const char *c ));
+static void debug_compile _ARG_(( int which, const char *s ));
+int glob _ARG_(( const char *s, const char *c ));
 
 /*
  * compile_append() - append list results of two statements

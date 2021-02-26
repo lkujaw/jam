@@ -11,8 +11,9 @@
  * 09/08/00 (seiwald) - bulletproof PIECEMEAL size computation
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "command.h"
-#include "jam.h"
 #include "lists.h"
 #include "memory.h"
 #include "parse.h"

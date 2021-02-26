@@ -29,7 +29,7 @@
  * 12/30/02 (armstrong) - fix out-of-bounds access in var_expand()
  */
 
-#include "jam.h"
+#include "jam.h"  /* Includes system headers */
 
 #include "expand.h"
 #include "newstr.h"
@@ -47,11 +47,11 @@ typedef struct {
         PATHPART        join;           /* :J -- join list with char */
 } VAR_EDITS ;
 
-static void var_edit_parse PROTO(( const char *mods, VAR_EDITS *edits ));
-static void var_edit_file  PROTO(( const char *in, char *out,
+static void var_edit_parse _ARG_(( const char *mods, VAR_EDITS *edits ));
+static void var_edit_file  _ARG_(( const char *in, char *out,
                                    VAR_EDITS *edits ));
-static void var_edit_shift PROTO(( char *out, VAR_EDITS *edits ));
-static void var_edit_quote PROTO(( char*  out ));
+static void var_edit_shift _ARG_(( char *out, VAR_EDITS *edits ));
+static void var_edit_quote _ARG_(( char*  out ));
 
 # define MAGIC_COLON    '\001'
 # define MAGIC_LEFT     '\002'
@@ -211,7 +211,7 @@ var_expand( l, in, end, lol, cancopyin )
                 /* Look for a : modifier in the variable name */
                 /* Must copy into varname so we can modify it */
 
-                (void)strncpy( varname, vars->string, sizeof(varname)-1);
+                strncpy( varname, vars->string, sizeof(varname)-1);
                 varname[sizeof(varname)-1] = '\0';
 
                 if(( colon = strchr( varname, MAGIC_COLON ) ))

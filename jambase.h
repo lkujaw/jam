@@ -12,4 +12,15 @@
  * declaration for that array.
  */
 
+#ifndef JAM_JAMBASE_H
+#define JAM_JAMBASE_H 1
+
+#include "ansi.h"
+
+_BEGIN_EXTERNS_
+
 extern char *jambase[];
+
+_END_EXTERNS_
+
+#endif /* JAM_JAMBASE_H */

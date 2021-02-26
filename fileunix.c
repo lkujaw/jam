@@ -33,8 +33,9 @@
  * 12/30/02 (seiwald) - skip solaris' empty archive member names (/, //xxx)
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "filesys.h"
-#include "jam.h"
 #include "memory.h"
 #include "pathsys.h"
 
@@ -113,7 +114,7 @@ void
 file_dirscan( dir, func, closure )
     const char *dir;
     scanback func;
-    void *closure;
+    Void_t *closure;
 {
         PATHNAME f;
         DIR *d;
@@ -191,7 +192,7 @@ void
 file_archscan( archive, func, closure )
     const char *archive;
     scanback func;
-    void *closure;
+    Void_t *closure;
 {
 # ifndef NO_AR
         struct ar_hdr ar_hdr;

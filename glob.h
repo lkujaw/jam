@@ -1,8 +1,12 @@
-#ifndef GLOB_H
-#define GLOB_H
+#ifndef JAM_GLOB_H
+#define JAM_GLOB_H 1
 
 #include "ansi.h"
 
-int glob PROTO(( const char *s, const char *c ));
+_BEGIN_EXTERNS_
 
-#endif /* GLOB_H */
+int glob _ARG_((const char *s, const char *c));
+
+_END_EXTERNS_
+
+#endif /* JAM_GLOB_H */

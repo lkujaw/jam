@@ -10,21 +10,25 @@
  * 05/04/94 (seiwald) - async multiprocess interface
  */
 
-#ifndef EXECCMD_H
-#define EXECCMD_H
+#ifndef JAM_EXECCMD_H
+#define JAM_EXECCMD_H 1
 
 #include "ansi.h"
 
-void execcmd PROTO((
-        const char *string,   /* command to execute */
-        void (*func)( void *closure, int status ),
-        void *closure,
-        LIST *shell ));
+#define EXEC_CMD_OK    0
+#define EXEC_CMD_FAIL  1
+#define EXEC_CMD_INTR  2
 
-int execwait PROTO(( void ));
+_BEGIN_EXTERNS_
 
-# define EXEC_CMD_OK    0
-# define EXEC_CMD_FAIL  1
-# define EXEC_CMD_INTR  2
+void execcmd _ARG_((
+    const char *string,   /* command to execute */
+    void      (*func)(Void_t *closure, int status),
+    Void_t     *closure,
+    LIST       *shell ));
 
-#endif /* EXECCMD_H */
+int execwait _ARG_((void));
+
+_END_EXTERNS_
+
+#endif /* JAM_EXECCMD_H */

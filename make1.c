@@ -49,28 +49,27 @@
  * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  */
 
-# include "jam.h"
+#include "jam.h"  /* Includes system headers */
 
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "rules.h"
+#include "command.h"
+#include "execcmd.h"
+#include "lists.h"
+#include "make.h"
+#include "newstr.h"
+#include "parse.h"
+#include "rules.h"
+#include "search.h"
+#include "variable.h"
 
-# include "search.h"
-# include "newstr.h"
-# include "make.h"
-# include "command.h"
-# include "execcmd.h"
+static void make1a _ARG_(( TARGET *t, TARGET *parent ));
+static void make1b _ARG_(( TARGET *t ));
+static void make1c _ARG_(( TARGET *t ));
+static void make1d _ARG_(( void *closure, int status ));
 
-static void make1a PROTO(( TARGET *t, TARGET *parent ));
-static void make1b PROTO(( TARGET *t ));
-static void make1c PROTO(( TARGET *t ));
-static void make1d PROTO(( void *closure, int status ));
-
-static CMD *make1cmds PROTO(( ACTIONS *a0 ));
-static LIST *make1list PROTO(( LIST *l, TARGETS *targets, int flags ));
-static SETTINGS *make1settings PROTO(( LIST *vars ));
-static void make1bind PROTO(( TARGET *t, int warn ));
+static CMD *make1cmds _ARG_(( ACTIONS *a0 ));
+static LIST *make1list _ARG_(( LIST *l, TARGETS *targets, int flags ));
+static SETTINGS *make1settings _ARG_(( LIST *vars ));
+static void make1bind _ARG_(( TARGET *t, int warn ));
 
 /* Ugly static - it's too hard to carry it through the callbacks. */
 
@@ -348,8 +347,8 @@ make1c( t )
 
 static void
 make1d( closure, status )
-    void *closure;
-    int   status;
+    Void_t *closure;
+    int     status;
 {
         TARGET  *t = (TARGET *)closure;
         CMD     *cmd = (CMD *)t->cmds;

@@ -9,14 +9,18 @@
  *              #define MACRO  "filename" definitions
  */
 
-#ifndef HDRMACRO_H
-#define HDRMACRO_H
+#ifndef JAM_HDRMACRO_H
+#define JAM_HDRMACRO_H 1
 
 #include "ansi.h"
 #include "rules.h"
 
-void macro_headers PROTO(( TARGET *t ));
+_BEGIN_EXTERNS_
 
-const char* macro_header_get PROTO(( const char*  macro_name ));
+void macro_headers _ARG_((TARGET *t));
 
-#endif /* HDRMACRO_H */
+const char* macro_header_get _ARG_((const char* macro_name));
+
+_END_EXTERNS_
+
+#endif /* JAM_HDRMACRO_H */

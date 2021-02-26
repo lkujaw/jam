@@ -29,10 +29,14 @@
  * YYSTYPE - value of a lexical token
  */
 
-#ifndef SCAN_H
-#define SCAN_H
+#ifndef JAM_SCAN_H
+#define JAM_SCAN_H 1
 
 #include "ansi.h"
+
+#define SCAN_NORMAL    0       /* normal parsing */
+#define SCAN_STRING    1       /* look only for matching } */
+#define SCAN_PUNCT     2       /* only punctuation keywords */
 
 #define YYSTYPE YYSYMBOL
 
@@ -44,18 +48,18 @@ typedef struct _YYSTYPE {
         int             number;
 } YYSTYPE;
 
+_BEGIN_EXTERNS_
+
 extern YYSTYPE yylval;
 
-void yymode      PROTO(( int n ));
-void yyerror     PROTO(( const char *s ));
-int  yyanyerrors PROTO(( void ));
-void yyfparse    PROTO(( const char *s ));
-int  yyline      PROTO(( void ));
-int  yylex       PROTO(( void ));
-int  yyparse     PROTO(( void ));
+void   yymode      _ARG_((int n));
+void   yyerror     _ARG_((const char *s));
+int    yyanyerrors _ARG_((void));
+void   yyfparse    _ARG_((const char *s));
+int    yyline      _ARG_((void));
+int    yylex       _ARG_((void));
+int    yyparse     _ARG_((void));
 
-#define SCAN_NORMAL    0       /* normal parsing */
-#define SCAN_STRING    1       /* look only for matching } */
-#define SCAN_PUNCT     2       /* only punctuation keywords */
+_END_EXTERNS_
 
-#endif /* SCAN_H */
+#endif /* JAM_SCAN_H */

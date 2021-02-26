@@ -32,11 +32,12 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "builtins.h"
 #include "filesys.h"
 #include "glob.h"
 #include "hdrmacro.h"
-#include "jam.h"
 #include "lists.h"
 #include "memory.h"
 #include "newstr.h"
@@ -52,19 +53,21 @@
 # define P0 (PARSE *)0
 # define C0 (char *)0
 
-LIST *builtin_depends  PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_echo     PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_exit     PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_flags    PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_glob     PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_match    PROTO(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_hdrmacro PROTO(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_depends  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_echo     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_exit     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_flags    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_glob     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_match    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_hdrmacro _ARG_(( PARSE *parse, LOL *args, int *jmp ));
 
-static void builtin_glob_back PROTO(( void *closure, const char *file,
-                                      int status, time_t time ));
+static void builtin_glob_back _ARG_(( Void_t     *closure,
+                                      const char *file,
+                                      int         status,
+                                      time_t      time ));
 
 void
-load_builtins PROTO((void))
+load_builtins _ARG_((void))
 {
     bindrule( "Always" )->procedure =
     bindrule( "ALWAYS" )->procedure =
@@ -230,7 +233,7 @@ struct globbing {
 
 static void
 builtin_glob_back( closure, file, status, time )
-    void       *closure;
+    Void_t     *closure;
     const char *file;
     int         status;
     time_t      time;

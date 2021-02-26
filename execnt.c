@@ -4,10 +4,11 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "execcmd.h"
-# include <errno.h>
+#include <errno.h>
+#include "jam.h"  /* Includes system headers */
+
+#include "lists.h"
+#include "execcmd.h"
 
 # ifdef USE_EXECNT
 

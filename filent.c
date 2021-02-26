@@ -28,9 +28,10 @@
  * 01/23/03 (seiwald) - long long handles for NT IA64
  */
 
-# include "jam.h"
-# include "filesys.h"
-# include "pathsys.h"
+#include "jam.h"  /* Includes system headers */
+
+#include "filesys.h"
+#include "pathsys.h"
 
 # ifdef OS_NT
 

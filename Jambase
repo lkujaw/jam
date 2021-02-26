@@ -159,6 +159,25 @@ JAMBASEDATE = 2004.10.07 ;
 # Initialize variables
 #
 
+rule YaccFind
+{
+    if $(YACC) { return $(YACC) ; }
+
+    # Search for yacc in $PATH
+    local matches = [ Glob $(PATH) : yacc ] ;
+    if $(matches)
+    {
+        YACC = $(matches[1]) ;
+        return $(YACC) ;
+    }
+    matches = [ Glob $(PATH) : bison ] ;
+    if $(matches)
+    {
+        YACC = $(matches[1]) -y ;
+        return $(YACC) ;
+    }
+}
+
 #
 # OS specific variable settings
 #
@@ -249,7 +268,7 @@ if $(NT)
     MV      ?= move /y ;
     CP      ?= copy ;
     RM      ?= del /f/q ;
-    RMDIR       ?= rmdir /s/q ;
+    RMDIR   ?= rmdir /s/q ;
     SLASH   ?= \\ ;
     SUFLIB  ?= .lib ;
     SUFOBJ  ?= .obj ;
@@ -280,10 +299,10 @@ if $(NT)
     {
         Echo "Compiler is Microsoft Visual C++ 16 bit" ;
 
-        AR      ?= lib /nologo ;
-        CC      ?= cl /nologo ;
+        AR          ?= lib /nologo ;
+        CC          ?= cl /nologo ;
         CCFLAGS     ?= /D "\"WIN\"" ;
-        C++     ?= $(CC) ;
+        C++         ?= $(CC) ;
         C++FLAGS    ?= $(CCFLAGS) ;
         LINK        ?= $(CC) ;
         LINKFLAGS   ?= $(CCFLAGS) ;
@@ -576,14 +595,14 @@ else if $(OS2)
 }
 else if $(VMS)
 {
-    C++     ?= cxx ;
+    C++         ?= cxx ;
     C++FLAGS    ?= ;
-    CC      ?= cc ;
+    CC          ?= cc ;
     CCFLAGS     ?= ;
     CHMOD       ?= set file/prot= ;
-    CP      ?= copy/replace ;
+    CP          ?= copy/replace ;
     CRELIB      ?= true ;
-    DOT     ?= [] ;
+    DOT         ?= [] ;
     DOTDOT      ?= [-] ;
     EXEMODE     ?= (w:e) ;
     FILEMODE    ?= (w:r) ;
@@ -592,9 +611,9 @@ else if $(VMS)
     LINKFLAGS   ?= "" ;
     LINKLIBS    ?= ;
     MKDIR       ?= create/dir ;
-    MV      ?= rename ;
+    MV          ?= rename ;
     OPTIM       ?= "" ;
-    RM      ?= delete ;
+    RM          ?= delete ;
     RUNVMS      ?= mcr ;
     SHELLMODE   ?= (w:er) ;
     SLASH       ?= . ;
@@ -639,22 +658,22 @@ else if $(MAC)
         "$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_SIOUX_PPC.Lib"
         "$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC.Lib" ;
 
-    C++     ?= mwcppc ;
+    C++         ?= mwcppc ;
     C++FLAGS    ?= -w off ;
-    CC      ?= mwcppc ;
+    CC          ?= mwcppc ;
     CCFLAGS     ?= -w off ;
-    CP      ?= duplicate -y ;
-    DOT     ?= ":" ;
+    CP          ?= duplicate -y ;
+    DOT         ?= ":" ;
     DOTDOT      ?= "::" ;
     HDRS        ?= $(MACHDRS) $(MPWHDRS) ;
     LINK        ?= mwlinkppc ;
     LINKFLAGS   ?= -mpwtool -warn ;
     LINKLIBS    ?= $(MACLIBS) $(MPWLIBS) ;
     MKDIR       ?= newfolder ;
-    MV      ?= rename -y ;
+    MV          ?= rename -y ;
     NOARSCAN    ?= true ;
     OPTIM       ?= ;
-    RM      ?= delete -y ;
+    RM          ?= delete -y ;
     SLASH       ?= ":" ;
     STDHDRS     ?= ;
     SUFLIB      ?= .lib ;
@@ -680,7 +699,7 @@ else if $(OS) = BEOS && $(OSPLAT) = PPC
     NOARSCAN    ?= true ;
     RANLIB      ?= ranlib ;
     STDHDRS     ?= /boot/develop/headers/posix ;
-    YACC        ?= bison -y ;
+    YACC        ?= [ YaccFind ] ;
     YACCGEN     ?= .c ;
     YACCFILES   ?= y.tab ;
     YACCFLAGS   ?= -d ;
@@ -701,7 +720,7 @@ else if $(OS) = BEOS
     NOARSCAN    ?= true ;
     RANLIB      ?= ranlib ;
     STDHDRS     ?= /boot/develop/headers/posix ;
-    YACC        ?= bison -y ;
+    YACC        ?= [ YaccFind ] ;
     YACCGEN     ?= .c ;
     YACCFILES   ?= y.tab ;
     YACCFLAGS   ?= -d ;
@@ -715,7 +734,6 @@ else if $(UNIX)
 
     case AMIGA :
     CC          ?= gcc ;
-    YACC        ?= bison -y ;
 
     case CYGWIN :
     CC          ?= gcc ;
@@ -724,7 +742,6 @@ else if $(UNIX)
     JAMSHELL    ?= sh -c ;
     RANLIB      ?= "" ;
     SUFEXE      ?= .exe ;
-    YACC        ?= bison -y ;
 
     case DGUX :
     RANLIB      ?= "" ;
@@ -789,6 +806,9 @@ else if $(UNIX)
     RANLIB      ?= "" ;
     AR          ?= "/usr/ccs/bin/ar ru" ;
 
+    case ULTRIX :
+    RELOCATE    ?= true ;
+
     case UNICOS :
     NOARSCAN    ?= true ;
     OPTIM       ?= -O0 ;
@@ -810,7 +830,7 @@ else if $(UNIX)
     LINKLIBS    ?= ;
     OPTIM       ?= ;
     RANLIB      ?= ranlib ;
-    YACC        ?= yacc ;
+    YACC        ?= [ YaccFind ] ;
     YACCGEN     ?= .c ;
     YACCFILES   ?= y.tab ;
     YACCFLAGS   ?= -d ;
@@ -834,60 +854,60 @@ DC ?= dmd ;
 # General defaults; a lot like UNIX
 #
 
-    AR      ?= ar ru ;
-    AS      ?= as ;
-    ASFLAGS     ?= ;
-    AWK     ?= awk ;
-    BINDIR      ?= /usr/local/bin ;
-    C++     ?= cc ;
-    C++FLAGS    ?= ;
-    CC      ?= cc ;
-    CCFLAGS     ?= ;
-    CP      ?= cp -f ;
-    CRELIB      ?= ;
-    DOT     ?= . ;
-    DOTDOT      ?= .. ;
-    EXEMODE     ?= 711 ;
-    FILEMODE    ?= 644 ;
-    FORTRAN     ?= f77 ;
-    FORTRANFLAGS    ?= ;
-    HDRS        ?= ;
-    INSTALLGRIST    ?= installed ;
-    JAMFILE     ?= Jamfile ;
-    JAMRULES    ?= Jamrules ;
-    LEX     ?= ;
-    LIBDIR      ?= /usr/local/lib ;
-    LINK        ?= $(CC) ;
-    LINKFLAGS   ?= ;
-    LINKLIBS    ?= ;
-    LN      ?= ln ;
-    MANDIR      ?= /usr/local/man ;
-    MKDIR       ?= mkdir ;
-    MV      ?= mv -f ;
-    OPTIM       ?= ;
-    RCP     ?= rcp ;
-    RM      ?= rm -f ;
-    RMDIR       ?= $(RM) ;
-    RSH     ?= rsh ;
-    SED     ?= sed ;
-    SHELLHEADER ?= "#!/bin/sh" ;
-    SHELLMODE   ?= 755 ;
-    SLASH       ?= / ;
-    SUBDIRRULES     ?= ;
-    SUBDIRRESET     ?= ASFLAGS HDRS C++FLAGS CCFLAGS ;
-    SUFEXE      ?= "" ;
-    SUFLIB      ?= .a ;
-    SUFOBJ      ?= .o ;
-    UNDEFFLAG   ?= "-u _" ;
-    YACC        ?= ;
-    YACCGEN     ?= ;
-    YACCFILES   ?= ;
-    YACCFLAGS   ?= ;
+    AR             ?= ar ru ;
+    AS             ?= as ;
+    ASFLAGS        ?= ;
+    AWK            ?= awk ;
+    BINDIR         ?= /usr/local/bin ;
+    C++            ?= cc ;
+    C++FLAGS       ?= ;
+    CC             ?= cc ;
+    CCFLAGS        ?= ;
+    CP             ?= cp -f ;
+    CRELIB         ?= ;
+    DOT            ?= . ;
+    DOTDOT         ?= .. ;
+    EXEMODE        ?= 711 ;
+    FILEMODE       ?= 644 ;
+    FORTRAN        ?= f77 ;
+    FORTRANFLAGS   ?= ;
+    HDRS           ?= ;
+    INSTALLGRIST   ?= installed ;
+    JAMFILE        ?= Jamfile ;
+    JAMRULES       ?= Jamrules ;
+    LEX            ?= ;
+    LIBDIR         ?= /usr/local/lib ;
+    LINK           ?= $(CC) ;
+    LINKFLAGS      ?= ;
+    LINKLIBS       ?= ;
+    LN             ?= ln ;
+    MANDIR         ?= /usr/local/man ;
+    MKDIR          ?= mkdir ;
+    MV             ?= mv -f ;
+    OPTIM          ?= ;
+    RCP            ?= rcp ;
+    RM             ?= rm -f ;
+    RMDIR          ?= $(RM) ;
+    RSH            ?= rsh ;
+    SED            ?= sed ;
+    SHELLHEADER    ?= "#!/bin/sh" ;
+    SHELLMODE      ?= 755 ;
+    SLASH          ?= / ;
+    SUBDIRRULES    ?= ;
+    SUBDIRRESET    ?= ASFLAGS HDRS C++FLAGS CCFLAGS ;
+    SUFEXE         ?= "" ;
+    SUFLIB         ?= .a ;
+    SUFOBJ         ?= .o ;
+    UNDEFFLAG      ?= "-u _" ;
+    YACC           ?= ;
+    YACCGEN        ?= ;
+    YACCFILES      ?= ;
+    YACCFLAGS      ?= ;
 
     HDRPATTERN =
             "^[         ]*#[    ]*include[      ]*[<\"]([^\">]*)[\">].*$" ;
 
-    OSFULL = $(OS)$(OSVER)$(OSPLAT) $(OS)$(OSPLAT) $(OS)$(OSVER) $(OS) ;
+    OSFULL = $(OS)$(OSVER).$(OSPLAT) $(OS).$(OSPLAT) $(OS)$(OSVER) $(OS) ;
 
 
 #
@@ -1018,7 +1038,7 @@ rule Chmod
 # /Clean  clean : targets ;
 #
 # Removes existing _targets_ when _clean_ is built. clean is not a dependency
-# of all, and must be built explicitely for targets to be removed
+# of all, and must be built explicitly for targets to be removed
 #
 
 # /File target : source ;
@@ -1089,7 +1109,28 @@ rule HardLink
 #
 rule HdrMacroFile
 {
-  HDRMACRO $(<) ;
+    HDRMACRO $(<) ;
+}
+
+rule Iffe
+{
+    local cmdIffe = iffe.sh ;
+    local _s = $(>:BS=.iff) ;
+    Depends $(<) : $(>) ;
+    Depends $(>) : $(cmdIffe) $(_s) ;
+    Iffe1 $(>) : $(cmdIffe) $(_s) ;
+    Clean clean : $(>) ;
+}
+
+rule Iffe1
+{
+    SEARCH on $(>) = $(SEARCH_SOURCE) ;
+}
+
+actions Iffe1
+{
+    PATH="$PATH:."
+    sh $(>[1]) -v $(>[2-])
 }
 
 # /HdrRule source : headers ;
@@ -1114,6 +1155,15 @@ rule HdrRule
     # set SEARCH so Jam can find the headers, but then say we don't
     # care if we can't actually find the headers (they may have been
     # within ifdefs),
+
+    local i ;
+    for i in $(>)
+    {
+        switch $(i)
+        {
+            case FEATURE/* : Iffe $(<) : $(i) ;
+        }
+    }
 
     local s = $(>:G=$(HDRGRIST:E)) ;
 
@@ -1944,7 +1994,7 @@ rule SharedObjects
   #
   ObjectCcFlags $(<) : $(PICFLAGS) ;
 
-  # change the compiler invokation for all these objects
+  # change the compiler invocation for all these objects
   # to use Libtool on Unix systems. We explicitely disable the
   # generation of static objects here
   #
@@ -2083,7 +2133,7 @@ rule SubDir
         #
         # In the most complicated case, the _tokens also
         # represents directories down, because TOP is being
-        # estalished in a directory other than TOP's root.
+        # established in a directory other than TOP's root.
         # Hopefully, _tokens and SUBDIR_DOWN represent the
         # same final directory, relative to the new TOP and
         # the previous SubDIr's TOP.  To find the new TOP,
@@ -2093,7 +2143,7 @@ rule SubDir
         # remove the initial common elements, and then
         # reverse them again.  After this process, if
         # both _tokens and SUBDIR_DOWN have elements, it
-        # means the directory names estalished by the two
+        # means the directory names established by the two
         # SubDir calls don't match, and a warning is issued.
         # All hell will likely break loose at this point,
         # since the whole SubDir scheme relies on the SubDir
@@ -2126,7 +2176,7 @@ rule SubDir
         # Set subdir vars for the inclusion of the Jamrules,
         # just in case they have SubDir rules of their own.
         # Note that SUBDIR_DOWN is empty: it's all the way
-        # up where the Jamrules live.  These gets overrided
+        # up where the Jamrules live.  These get overridden
         # just after the inclusion.
 
         SUBDIR_UP = $($(_top)-UP) ;

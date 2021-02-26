@@ -33,8 +33,9 @@
  * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "hash.h"
-#include "jam.h"
 #include "lists.h"
 #include "memory.h"
 #include "newstr.h"

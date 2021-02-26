@@ -15,7 +15,8 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#include "jam.h"
+#include "jam.h"  /* Includes system headers */
+
 #include "lists.h"
 #include "memory.h"
 #include "newstr.h"
@@ -73,7 +74,7 @@ parse_save( p )
 
 PARSE *
 parse_make( func, left, right, third, string, string1, num )
-        LIST       *(*func)PROTO(( PARSE *p, LOL *args, int *jmp ));
+        LIST       *(*func)_ARG_(( PARSE *p, LOL *args, int *jmp ));
         PARSE        *left;
         PARSE        *right;
         PARSE        *third;

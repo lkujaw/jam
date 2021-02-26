@@ -8,11 +8,15 @@
  * headers.h - handle #includes in source files
  */
 
-#ifndef HEADERS_H
-#define HEADERS_H
+#ifndef JAM_HEADERS_H
+#define JAM_HEADERS_H 1
 
 #include "ansi.h"
 
-void headers PROTO((TARGET *t ));
+_BEGIN_EXTERNS_
 
-#endif /* HEADERS_H */
+void headers _ARG_((TARGET *t));
+
+_END_EXTERNS_
+
+#endif /* JAM_HEADERS_H */

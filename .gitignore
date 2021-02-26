@@ -1,3 +1,5 @@
-FEATURE
-bin.unix
+FEATURE/*
+!FEATURE/README.txt
+*.o
 jam0
+tgt

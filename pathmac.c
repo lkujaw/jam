@@ -35,21 +35,22 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "pathsys.h"
+#include "jam.h"  /* Includes system headers */
 
-# ifdef OS_MAC
+#include "pathsys.h"
 
-# define DELIM ':'
+#ifdef OS_MAC
+
+#define DELIM ':'
 
 /*
  * path_parse() - split a file name into dir/base/suffix/member
  */
 
 void
-path_parse(
-        const char *file,
-        PATHNAME *f )
+path_parse( file, f )
+    const char *file;
+    PATHNAME   *f;
 {
         const char *p, *q;
         const char *end;
@@ -119,18 +120,18 @@ path_parse(
  * path_build() - build a filename given dir/base/suffix/member
  */
 
-# define DIR_EMPTY      0       /* "" */
-# define DIR_DOT        1       /* : */
-# define DIR_DOTDOT     2       /* :: */
-# define DIR_ABS        3       /* dira:dirb: */
-# define DIR_REL        4       /* :dira:dirb: */
+#define DIR_EMPTY      0       /* "" */
+#define DIR_DOT        1       /* : */
+#define DIR_DOTDOT     2       /* :: */
+#define DIR_ABS        3       /* dira:dirb: */
+#define DIR_REL        4       /* :dira:dirb: */
 
-# define G_DIR          0       /* take dir */
-# define G_ROOT         1       /* take root */
-# define G_CAT          2       /* prepend root to dir */
-# define G_DTDR         3       /* :: of rel dir */
-# define G_DDDD         4       /* make it ::: (../..) */
-# define G_MT           5       /* leave it empty */
+#define G_DIR          0       /* take dir */
+#define G_ROOT         1       /* take root */
+#define G_CAT          2       /* prepend root to dir */
+#define G_DTDR         3       /* :: of rel dir */
+#define G_DDDD         4       /* make it ::: (../..) */
+#define G_MT           5       /* leave it empty */
 
 char grid[5][5] = {
 /*              EMPTY   DOT     DOTDOT  ABS     REL */
@@ -142,124 +143,124 @@ char grid[5][5] = {
 } ;
 
 static int
-file_flags(
-        const char      *ptr,
-        int     len )
+file_flags( ptr, len )
+    const char  *ptr;
+    int          len;
 {
-        if( !len )
-            return DIR_EMPTY;
-        if( len == 1 && ptr[0] == DELIM )
-            return DIR_DOT;
-        if( len == 2 && ptr[0] == DELIM && ptr[1] == DELIM )
-            return DIR_DOTDOT;
-        if( ptr[0] == DELIM )
-            return DIR_REL;
-        return DIR_ABS;
+    if( !len )
+        return DIR_EMPTY;
+    if( len == 1 && ptr[0] == DELIM )
+        return DIR_DOT;
+    if( len == 2 && ptr[0] == DELIM && ptr[1] == DELIM )
+        return DIR_DOTDOT;
+    if( ptr[0] == DELIM )
+        return DIR_REL;
+    return DIR_ABS;
 }
 
 void
-path_build(
-        PATHNAME *f,
-        char    *file,
-        int     binding )
+path_build( f, file, binding )
+    PATHNAME *f;
+    char     *file;
+    int       binding;
 {
-        char *ofile = file;
-        int dflag, rflag, act;
+    char *ofile = file;
+    int dflag, rflag, act;
 
-        if( DEBUG_SEARCH )
-        {
+    if( DEBUG_SEARCH )
+    {
         printf("build file: ");
         if( f->f_root.len )
-                printf( "root = '%.*s' ", f->f_root.len, f->f_root.ptr );
+            printf( "root = '%.*s' ", f->f_root.len, f->f_root.ptr );
         if( f->f_dir.len )
-                printf( "dir = '%.*s' ", f->f_dir.len, f->f_dir.ptr );
+            printf( "dir = '%.*s' ", f->f_dir.len, f->f_dir.ptr );
         if( f->f_base.len )
-                printf( "base = '%.*s' ", f->f_base.len, f->f_base.ptr );
-        }
+            printf( "base = '%.*s' ", f->f_base.len, f->f_base.ptr );
+    }
 
-        /* Start with the grist.  If the current grist isn't */
-        /* surrounded by <>'s, add them. */
+    /* Start with the grist.  If the current grist isn't */
+    /* surrounded by <>'s, add them. */
 
-        if( f->f_grist.len )
-        {
-            if( f->f_grist.ptr[0] != '<' ) *file++ = '<';
-            memcpy( file, f->f_grist.ptr, f->f_grist.len );
-            file += f->f_grist.len;
-            if( file[-1] != '>' ) *file++ = '>';
-        }
+    if( f->f_grist.len )
+    {
+        if( f->f_grist.ptr[0] != '<' ) *file++ = '<';
+        memcpy( file, f->f_grist.ptr, f->f_grist.len );
+        file += f->f_grist.len;
+        if( file[-1] != '>' ) *file++ = '>';
+    }
 
-        /* Combine root & directory, according to the grid. */
+    /* Combine root & directory, according to the grid. */
 
-        dflag = file_flags( f->f_dir.ptr, f->f_dir.len );
-        rflag = file_flags( f->f_root.ptr, f->f_root.len );
+    dflag = file_flags( f->f_dir.ptr, f->f_dir.len );
+    rflag = file_flags( f->f_root.ptr, f->f_root.len );
 
-        switch( act = grid[ rflag ][ dflag ] )
-        {
-        case G_DTDR:
-                /* :: of rel dir */
-                *file++ = DELIM;
-                /* fall through */
+    switch( act = grid[ rflag ][ dflag ] )
+    {
+    case G_DTDR:
+        /* :: of rel dir */
+        *file++ = DELIM;
+        /* fall through */
 
-        case G_DIR:
-                /* take dir */
-                memcpy( file, f->f_dir.ptr, f->f_dir.len );
-                file += f->f_dir.len;
-                break;
+    case G_DIR:
+        /* take dir */
+        memcpy( file, f->f_dir.ptr, f->f_dir.len );
+        file += f->f_dir.len;
+        break;
 
-        case G_ROOT:
-                /* take root */
-                memcpy( file, f->f_root.ptr, f->f_root.len );
-                file += f->f_root.len;
-                break;
+    case G_ROOT:
+        /* take root */
+        memcpy( file, f->f_root.ptr, f->f_root.len );
+        file += f->f_root.len;
+        break;
 
-        case G_CAT:
-                /* prepend root to dir */
-                memcpy( file, f->f_root.ptr, f->f_root.len );
-                file += f->f_root.len;
-                if( file[-1] == DELIM ) --file;
-                memcpy( file, f->f_dir.ptr, f->f_dir.len );
-                file += f->f_dir.len;
-                break;
+    case G_CAT:
+        /* prepend root to dir */
+        memcpy( file, f->f_root.ptr, f->f_root.len );
+        file += f->f_root.len;
+        if( file[-1] == DELIM ) --file;
+        memcpy( file, f->f_dir.ptr, f->f_dir.len );
+        file += f->f_dir.len;
+        break;
 
-        case G_DDDD:
-                /* make it ::: (../..) */
-                strcpy( file, ":::" );
-                file += 3;
-                break;
-        }
+    case G_DDDD:
+        /* make it ::: (../..) */
+        strcpy( file, ":::" );
+        file += 3;
+        break;
+    }
 
-        /* Put : between dir and file (if none already) */
+    /* Put : between dir and file (if none already) */
 
-        if( act != G_MT &&
-            file[-1] != DELIM &&
-            ( f->f_base.len || f->f_suffix.len ) )
-        {
-            *file++ = DELIM;
-        }
+    if( act != G_MT &&
+        file[-1] != DELIM &&
+        ( f->f_base.len || f->f_suffix.len ) )
+    {
+        *file++ = DELIM;
+    }
 
-        if( f->f_base.len )
-        {
-            memcpy( file, f->f_base.ptr, f->f_base.len );
-            file += f->f_base.len;
-        }
+    if( f->f_base.len )
+    {
+        memcpy( file, f->f_base.ptr, f->f_base.len );
+        file += f->f_base.len;
+    }
 
-        if( f->f_suffix.len )
-        {
-            memcpy( file, f->f_suffix.ptr, f->f_suffix.len );
-            file += f->f_suffix.len;
-        }
+    if( f->f_suffix.len )
+    {
+        memcpy( file, f->f_suffix.ptr, f->f_suffix.len );
+        file += f->f_suffix.len;
+    }
 
-        if( f->f_member.len )
-        {
-            *file++ = '(';
-            memcpy( file, f->f_member.ptr, f->f_member.len );
-            file += f->f_member.len;
-            *file++ = ')';
-        }
-        *file = 0;
+    if( f->f_member.len )
+    {
+        *file++ = '(';
+        memcpy( file, f->f_member.ptr, f->f_member.len );
+        file += f->f_member.len;
+        *file++ = ')';
+    }
+    *file = 0;
 
-        if( DEBUG_SEARCH )
-                printf(" -> '%s'\n", ofile);
+    if( DEBUG_SEARCH )
+        printf(" -> '%s'\n", ofile);
 }
 
 /*
@@ -267,17 +268,18 @@ path_build(
  */
 
 void
-path_parent( PATHNAME *f )
+path_parent( f )
+    PATHNAME *f;
 {
-        /* just set everything else to nothing */
+    /* just set everything else to nothing */
 
-        f->f_base.ptr =
+    f->f_base.ptr =
         f->f_suffix.ptr =
         f->f_member.ptr = "";
 
-        f->f_base.len =
+    f->f_base.len =
         f->f_suffix.len =
         f->f_member.len = 0;
 }
 
-# endif /* OS_MAC */
+#endif /* OS_MAC */

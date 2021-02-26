@@ -10,14 +10,19 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#ifndef NEWSTR_H
-#define NEWSTR_H
+#ifndef JAM_NEWSTR_H
+#define JAM_NEWSTR_H 1
 
 #include "ansi.h"
 
-const char *newstr PROTO(( const char *string ));
-const char *copystr PROTO(( const char *s ));
-void freestr PROTO(( const char *s ));
-void donestr PROTO(( void ));
+_BEGIN_EXTERNS_
 
-#endif /* NEWSTR_H */
+const char *newstr  _ARG_((const char *string));
+const char *copystr _ARG_((const char *s));
+
+void freestr _ARG_((const char *s));
+void donestr _ARG_((void));
+
+_END_EXTERNS_
+
+#endif /* JAM_NEWSTR_H */

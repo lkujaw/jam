@@ -30,13 +30,14 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#include "jam.h"
-#include "lists.h"
-#include "parse.h"
-#include "variable.h"
+#include "jam.h"  /* Includes system headers */
+
 #include "expand.h"
 #include "hash.h"
+#include "lists.h"
 #include "newstr.h"
+#include "parse.h"
+#include "variable.h"
 
 static struct hash *varhash = 0;
 
@@ -51,8 +52,8 @@ struct _variable {
         LIST       *value;
 } ;
 
-static VARIABLE *var_enter PROTO(( const char *symbol ));
-static void var_dump PROTO(( const char *symbol, LIST *value,
+static VARIABLE *var_enter _ARG_(( const char *symbol ));
+static void var_dump _ARG_(( const char *symbol, LIST *value,
                              const char *what ));
 
 /*
@@ -352,7 +353,7 @@ var_dump( symbol, value, what )
  */
 
 void
-var_done PROTO(( void ))
+var_done _ARG_(( void ))
 {
         hashdone( varhash );
 }

@@ -26,14 +26,15 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+#include "jam.h"  /* Includes system headers */
+
 #include "ansi.h"
 #include "glob.h"
-#include "jam.h"
 
-# define CHECK_BIT( tab, bit ) ( tab[ (bit)/8 ] & (1<<( (bit)%8 )) )
-# define BITLISTSIZE 16 /* bytes used for [chars] in compiled expr */
+#define CHECK_BIT( tab, bit ) ( tab[ (bit)/8 ] & (1<<( (bit)%8 )) )
+#define BITLISTSIZE 16 /* bytes used for [chars] in compiled expr */
 
-static void globchars PROTO(( const char *s, const char *e, char *b ));
+static void globchars _ARG_(( const char *s, const char *e, char *b ));
 
 /*
  * glob() - match a string against a simple pattern

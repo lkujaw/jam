@@ -52,60 +52,55 @@
  *                      are newer
  */
 
-# include "jam.h"
+#include "jam.h"  /* Includes system headers */
 
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "rules.h"
-
-# include "search.h"
-# include "newstr.h"
-# include "make.h"
-# include "headers.h"
-# include "command.h"
-
-# ifndef max
-# define max( a,b ) ((a)>(b)?(a):(b))
-# endif
+#include "command.h"
+#include "headers.h"
+#include "lists.h"
+#include "make.h"
+#include "newstr.h"
+#include "parse.h"
+#include "rules.h"
+#include "search.h"
+#include "variable.h"
 
 typedef struct {
-        int     temp;
-        int     updating;
-        int     cantfind;
-        int     cantmake;
-        int     targets;
-        int     made;
-} COUNTS ;
+    int     temp;
+    int     updating;
+    int     cantfind;
+    int     cantmake;
+    int     targets;
+    int     made;
+} COUNTS;
 
-static void make0 PROTO(( TARGET *t, TARGET *p, int depth,
+static void make0 _ARG_(( TARGET *t, TARGET *p, int depth,
                           COUNTS *counts, int anyhow ));
 
-static TARGETS *make0sort PROTO(( TARGETS *c ));
+static TARGETS *make0sort _ARG_(( TARGETS *c ));
 
 static const char *target_fate[] =
 {
-        "init",         /* T_FATE_INIT */
-        "making",       /* T_FATE_MAKING */
-        "stable",       /* T_FATE_STABLE */
-        "newer",        /* T_FATE_NEWER */
-        "temp",         /* T_FATE_ISTMP */
-        "touched",      /* T_FATE_TOUCHED */
-        "missing",      /* T_FATE_MISSING */
-        "needtmp",      /* T_FATE_NEEDTMP */
-        "old",          /* T_FATE_OUTDATED */
-        "update",       /* T_FATE_UPDATE */
-        "nofind",       /* T_FATE_CANTFIND */
-        "nomake"        /* T_FATE_CANTMAKE */
-} ;
+    "init",         /* T_FATE_INIT */
+    "making",       /* T_FATE_MAKING */
+    "stable",       /* T_FATE_STABLE */
+    "newer",        /* T_FATE_NEWER */
+    "temp",         /* T_FATE_ISTMP */
+    "touched",      /* T_FATE_TOUCHED */
+    "missing",      /* T_FATE_MISSING */
+    "needtmp",      /* T_FATE_NEEDTMP */
+    "old",          /* T_FATE_OUTDATED */
+    "update",       /* T_FATE_UPDATE */
+    "nofind",       /* T_FATE_CANTFIND */
+    "nomake"        /* T_FATE_CANTMAKE */
+};
 
 static const char *target_bind[] =
 {
-        "unbound",
-        "missing",
-        "parents",
-        "exists",
-} ;
+    "unbound",
+    "missing",
+    "parents",
+    "exists",
+};
 
 static const char szSpaces[] =  "                ";
 
@@ -298,7 +293,7 @@ make0( t, p, depth, counts, anyhow )
                also needs to be marked newer. This is needed so that 'updated'
                correctly will include the original target in the $(<) variable. */
             if(c->target->includes->time > t->time)
-              c->target->fate = max(T_FATE_NEWER, c->target->fate);
+              c->target->fate = MAX(T_FATE_NEWER, c->target->fate);
           }
 
 
@@ -319,7 +314,7 @@ make0( t, p, depth, counts, anyhow )
             /* If LEAVES has been applied, we only heed the timestamps of */
             /* the leaf source nodes. */
 
-            leaf = max( leaf, c->target->leaf );
+            leaf = MAX( leaf, c->target->leaf );
 
             if( t->flags & T_FLAG_LEAVES )
             {
@@ -327,8 +322,8 @@ make0( t, p, depth, counts, anyhow )
                 continue;
             }
 
-            last = max( last, c->target->time );
-            fate = max( fate, c->target->fate );
+            last = MAX( last, c->target->time );
+            fate = MAX( fate, c->target->fate );
         }
 
         /* Step 4b: pick up included headers time */
@@ -444,7 +439,7 @@ make0( t, p, depth, counts, anyhow )
         /* Step 4f: propagate dependents' time & fate. */
         /* Set leaf time to be our time only if this is a leaf. */
 
-        t->time = max( t->time, last );
+        t->time = MAX( t->time, last );
         t->leaf = leaf ? leaf : t->time ;
         t->fate = fate;
 

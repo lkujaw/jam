@@ -38,9 +38,9 @@
  * 12/27/02 (seiwald) - grist .bat file with pid for system uniqueness
  */
 
-#
 #include <errno.h>
-#include "jam.h"
+#include "jam.h"  /* includes system headers */
+
 #include "lists.h"
 #include "execcmd.h"
 
@@ -59,20 +59,20 @@
 # define USE_MYWAIT
 # if !defined( __BORLANDC__ )
 #  define wait my_wait
-static int my_wait PROTO(( int *status ));
+static int my_wait _ARG_(( int *status ));
 # endif
 #endif
 
 static int intr = 0;
 static int cmdsrunning = 0;
-static void onintr PROTO(( int ));
-static void (*istat)PROTO(( int ));
+static void onintr _ARG_(( int ));
+static void (*istat)_ARG_(( int ));
 
 static struct
 {
-        int     pid; /* on win32, a real process handle */
-        void    (*func)PROTO(( void *closure, int status ));
-        void    *closure;
+        int      pid; /* on win32, a real process handle */
+        void   (*func)_ARG_(( Void_t *closure, int status ));
+        Void_t  *closure;
 
 # ifdef USE_EXECNT
         char    *tempfile;
@@ -84,12 +84,12 @@ static struct
  * onintr() - bump intr to note command interruption
  */
 
-void
+static void
 onintr( disp )
     int disp;
 {
-        intr++;
-        printf( "...interrupted\n" );
+    intr++;
+    printf( "...interrupted\n" );
 }
 
 /*
@@ -99,9 +99,9 @@ onintr( disp )
 void
 execcmd( string, func, closure, shell )
     const char *string;
-    void (*func)PROTO(( void *closure, int status ));
-    void *closure;
-    LIST *shell;
+    void      (*func)_ARG_(( Void_t *closure, int status ));
+    Void_t     *closure;
+    LIST       *shell;
 {
         int pid;
         int slot;
@@ -215,8 +215,9 @@ execcmd( string, func, closure, shell )
 
         /* Catch interrupts whenever commands are running. */
 
-        if( !cmdsrunning++ )
+        if( !cmdsrunning++ ) {
             istat = signal( SIGINT, onintr );
+        }
 
         /* Start the command */
 
@@ -263,7 +264,7 @@ execcmd( string, func, closure, shell )
  */
 
 int
-execwait PROTO((void))
+execwait _ARG_((void))
 {
         int i;
         int status, w;

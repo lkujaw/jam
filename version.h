@@ -1,10 +1,11 @@
 /* Keep JAMVERSYM in sync with VERSION. */
 /* It can be accessed as $(JAMVERSION) in the Jamfile. */
 
-#ifndef VERSION_H
-#define VERSION_H
+#ifndef JAM_VERSION_H
+#define JAM_VERSION_H 1
 
-#define VERSION "2.5.2"
-#define JAMVERSYM "JAMVERSION=" VERSION
+#define VERSION "@BOOTSTRAP@"
+/* Ultrix cannot concatenate string literals */
+#define JAMVERSYM "JAMVERSION=@BOOTSTRAP@"
 
-#endif /* VERSION_H */
+#endif /* JAM_VERSION_H */

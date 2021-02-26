@@ -10,11 +10,15 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#ifndef SEARCH_H
-#define SEARCH_H
+#ifndef JAM_SEARCH_H
+#define JAM_SEARCH_H 1
 
 #include "ansi.h"
 
-const char *search PROTO(( const char *target, time_t *time ));
+_BEGIN_EXTERNS_
 
-#endif /* SEARCH_H */
+const char *search _ARG_((const char *target, time_t *time));
+
+_END_EXTERNS_
+
+#endif /* JAM_SEARCH_H */

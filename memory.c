@@ -1,15 +1,17 @@
-#include "jam.h"
+#include "jam.h"  /* Includes system headers */
+
 #include "memory.h"
 
-void *xmalloc( size )
+Void_t* xmalloc( size )
     int size;
 {
-    void *pAllocMem = NULL;
+    Void_t *pAllocMem = NULL;
 
     assert(size > 0);
 
-    if ((pAllocMem = malloc((unsigned)size)) == NULL) {
-        (void)fprintf
+    /* The curious void cast is necessary on Ultrix. */
+    if ((pAllocMem = (Void_t *)malloc((unsigned)size)) == NULL) {
+        fprintf
             (stderr, "fatal: heap exhausted (xmalloc of %u octets).\n", size);
         exit(EXIT_FAILURE);
     }
@@ -18,7 +20,7 @@ void *xmalloc( size )
 }
 
 void xfree( ptr )
-    void *ptr;
+    Void_t *ptr;
 {
     if (ptr != NULL) {
         free(ptr);

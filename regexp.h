@@ -7,12 +7,19 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-#ifndef REGEXP_H
-#define REGEXP_H
+#ifndef JAM_REGEXP_H
+#define JAM_REGEXP_H 1
 
 #include "ansi.h"
 
 #define NSUBEXP  10
+
+/*
+ * The first byte of the regexp internal "program" is actually this magic
+ * number; the start node begins in the second byte.
+ */
+#define MAGIC   0234
+
 typedef struct regexp {
     const char *startp[NSUBEXP];
     const char *endp[NSUBEXP];
@@ -23,14 +30,12 @@ typedef struct regexp {
     char  program[1];       /* Unwarranted chumminess with compiler. */
 } regexp;
 
-regexp *regcomp PROTO(( const char *exp ));
-int     regexec PROTO(( regexp *prog, const char *string ));
-void   regerror PROTO(( const char *s ));
+_BEGIN_EXTERNS_
 
-/*
- * The first byte of the regexp internal "program" is actually this magic
- * number; the start node begins in the second byte.
- */
-#define MAGIC   0234
+regexp *regcomp  _ARG_((const char *exp));
+int     regexec  _ARG_((regexp *prog, const char *string));
+void    regerror _ARG_((const char *s));
 
-#endif /* REGEXP_H */
+_END_EXTERNS_
+
+#endif /* JAM_REGEXP_H */

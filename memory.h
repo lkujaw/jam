@@ -1,9 +1,13 @@
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef JAM_MEMORY_H
+#define JAM_MEMORY_H 1
 
 #include "ansi.h"
 
-void *xmalloc PROTO((int size));
-void xfree    PROTO((void *ptr));
+_BEGIN_EXTERNS_
 
-#endif /* MEMORY_H */
+Void_t* xmalloc _ARG_((int size));
+void    xfree   _ARG_((Void_t *ptr));
+
+_END_EXTERNS_
+
+#endif /* JAM_MEMORY_H */

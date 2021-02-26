@@ -25,8 +25,9 @@
  * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-# include "jam.h"
-# include "pathsys.h"
+#include "jam.h"  /* Includes system headers */
+
+#include "pathsys.h"
 
 # ifdef OS_VMS
 
