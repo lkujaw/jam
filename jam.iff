@@ -1,37 +1,153 @@
+header  sys/types.h
+header  assert.h
+mac     assert assert.h
 header  ctype.h
-header  fcntl.h
 header  limits.h
-header  malloc.h
-header  memory.h
 header  signal.h
 header  stdio.h
 header  stdlib.h
 header  string.h
 header  time.h
+
+# UNIX headers
 header  unistd.h
 header  sys/file.h
 header  sys/stat.h
-header  sys/types.h
 header  sys/wait.h
+if sys utsname
+header  sys/utsname.h
+endif
+mem     utsname.machine, sys/utsname.h
+mem     utsname.version, sys/utsname.h
+mem     utsname.release, sys/utsname.h
+mem     utsname.nodename, sys/utsname.h
+mem     utsname.sysname, sys/utsname.h
+header  fcntl.h
+header  malloc.h
+header  memory.h
 
-header  assert.h
-mac     assert assert.h
+hdr     ar
 
-tst     ptr_void note{ standard C void* ok }end compile{
-        extern void* foo();
-        void* bar() { return foo(); }
-}end {
-        #define Void_t void
-}
+lib     wait
 
-hdr     vfork
-sys     vfork
-tst     run{
-        if      test "$_hdr_vfork" = 1
-        then    echo "#include <vfork.h>"
-        elif    test "$_sys_vfork" = 1
-        then    echo "#include <sys/vfork.h>"
-        else    echo '#include <unistd.h>' > $tmp.c
-                $cc -E $tmp.c | grep vfork
-        fi
+if tst ptr_void note{ is ISO C 90 void* usable }end compile{
+    extern void* foo();
+    void* bar() { return foo(); }
 }end
+define voidT void
+endif
+
+header vfork
+header sys/vfork
+
+if ! lib vfork
+# vfork() is sometimes hidden behind various defines, so try grepping it
+tst note{ is vfork hidden }end run{
+    echo '#include <unistd.h>' > $tmp.c
+    $cc -E $tmp.c | grep vfork
+}end
+endif
+
+if ! tst note{ is O_BINARY an open flag }end compile{
+    int main() { open("/dev/null", O_BINARY); return 0; }
+}end
+define O_BINARY 0
+endif
+
+if tst sizet_llu note{ is size_t an unsigned long long int }end output{
+    typedef unsigned long long int sizeT;
+    typedef size_t __ast_size_t__;
+    extern sizeT x;
+    __ast_size_t__ x;
+    int main() {
+        char szBuf[512];
+        sizeT mFirst = 0;
+        sizeT mLast  = mFirst - 1;
+        printf("#define SIZET_MIN\t%llu\n", mFirst);
+        printf("#define SIZET_MAX\t%llu\n", mLast);
+        printf("#define SIZET_BIT\t%llu\n", sizeof(sizeT)*8);
+        sprintf(szBuf, "%llu", mLast);
+        printf("#define SIZET_CHD\t%llu\n", strlen(szBuf));
+        return 0;
+    }
+}end
+print typedef unsigned long long int sizeT;
+define SIZET_FMT "%llu"
+
+elif tst sizet_lu note{ is size_t an unsigned long int }end output{
+    typedef unsigned long int sizeT;
+    typedef size_t __ast_size_t__;
+    extern sizeT x;
+    __ast_size_t__ x;
+    int main() {
+        char szBuf[512];
+        sizeT mFirst = 0;
+        sizeT mLast  = mFirst - 1;
+        printf("#define SIZET_MIN\t%lu\n", mFirst);
+        printf("#define SIZET_MAX\t%lu\n", mLast);
+        printf("#define SIZET_BIT\t%lu\n", sizeof(sizeT)*8);
+        sprintf(szBuf, "%lu", mLast);
+        printf("#define SIZET_CHD\t%lu\n", strlen(szBuf));
+        return 0;
+    }
+}end
+print typedef unsigned long int sizeT;
+define SIZET_FMT "%lu"
+
+elif tst sizet_u note{ is size_t an unsigned int }end output{
+    typedef unsigned int sizeT;
+    typedef size_t __ast_size_t__;
+    extern sizeT x;
+    __ast_size_t__ x;
+    int main() {
+        char szBuf[512];
+        sizeT mFirst = 0;
+        sizeT mLast  = mFirst - 1;
+        printf("#define SIZET_MIN\t%u\n", mFirst);
+        printf("#define SIZET_MAX\t%u\n", mLast);
+        printf("#define SIZET_BIT\t%u\n", sizeof(sizeT)*8);
+        sprintf(szBuf, "%u", mLast);
+        printf("#define SIZET_CHD\t%u\n", strlen(szBuf));
+        return 0;
+    }
+}end
+print typedef unsigned int sizeT;
+define SIZET_FMT "%u"
+endif
+
+if tst imaxt_lld note{ is long long int usable }end output{
+    int main() {
+        char szBuf[512];
+        printf("#define IMAXT_MIN\t%lld\n", LLONG_MIN);
+        printf("#define IMAXT_MAX\t%lld\n", LLONG_MAX);
+        printf("#define IMAXT_BIT\t");
+        printf(SIZET_FMT, sizeof(long long int)*8);
+        printf("\n");
+        sprintf(szBuf, "%lld", LLONG_MIN);
+        printf("#define IMAXT_CHD\t");
+        printf(SIZET_FMT, strlen(szBuf));
+        printf("\n");
+        return 0;
+    }
+}end
+print typedef long long int iMaxT;
+define IMAXT_FMT "%lld"
+
+elif tst imaxt_ld note{ is long int usable }end output{
+    int main() {
+        char szBuf[512];
+        printf("#define IMAXT_MIN\t%ld\n", LONG_MIN);
+        printf("#define IMAXT_MAX\t%ld\n", LONG_MAX);
+        printf("#define IMAXT_BIT\t");
+        printf(SIZET_FMT, sizeof(long int)*8);
+        printf("\n");
+        sprintf(szBuf, "%ld", LONG_MIN);
+        printf("#define IMAXT_CHD\t");
+        printf(SIZET_FMT, strlen(szBuf));
+        printf("\n");
+        return 0;
+    }
+}end
+print typedef long int iMaxT;
+define IMAXT_FMT "%ld"
+endif

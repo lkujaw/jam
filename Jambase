@@ -316,7 +316,7 @@ if $(NT)
         STDHDRS     ?= $(VISUALC16)\\include ;
         UNDEFFLAG   ?= "/u _" ;
     }
-        else if $(JAM_TOOLSET) = VISUALC
+    else if $(JAM_TOOLSET) = VISUALC
     {
         # Visual C++ 6.0 uses MSVCDIR
 
@@ -334,10 +334,7 @@ if $(NT)
         C++FLAGS    ?= $(CCFLAGS) ;
         LINK        ?= link /nologo ;
         LINKFLAGS   ?= "" ;
-        LINKLIBS    ?=
-                $(MSVCNT)\\lib\\$(I)libc.lib
-                $(MSVCNT)\\lib\\$(I)oldnames.lib
-                $(MSVCNT)\\lib\\$(I)kernel32.lib ;
+        LINKLIBS    ?= "" ;
         OPTIM       ?= "" ;
         STDHDRS     ?= $(VISUALC)\\include ;
         UNDEFFLAG   ?= "/u _" ;
@@ -389,7 +386,6 @@ if $(NT)
         NOARSCAN    ?= true ;
         OPTIM       ?= ;
         RM          ?= del /f ;
-        SLASH       ?= \\ ;
         STDHDRS     ?= $(WATCOM)\\h $(WATCOM)\\h\\nt ;
         SUFEXE      ?= .exe ;
         SUFLIB      ?= .lib ;
@@ -1156,12 +1152,15 @@ rule HdrRule
     # care if we can't actually find the headers (they may have been
     # within ifdefs),
 
-    local i ;
-    for i in $(>)
-    {
-        switch $(i)
+    # TODO: Duplicate iffe functionality on non-POSIX platforms.
+    if $(UNIX) {
+        local i ;
+        for i in $(>)
         {
+            switch $(i)
+            {
             case FEATURE/* : Iffe $(<) : $(i) ;
+            }
         }
     }
 

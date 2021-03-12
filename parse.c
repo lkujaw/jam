@@ -18,108 +18,116 @@
 #include "jam.h"  /* Includes system headers */
 
 #include "lists.h"
-#include "memory.h"
-#include "newstr.h"
 #include "parse.h"
 #include "scan.h"
+#include "str.h"
+#include "xmem.h"
 
 static PARSE *yypsave;
 
 void
-parse_file( f )
+parse_file(f)
     const char *f;
 {
-        /* Suspend scan of current file */
-        /* and push this new file in the stream */
+    /* Suspend scan of current file */
+    /* and push this new file in the stream */
 
-        yyfparse(f);
+    yyfparse(f);
 
-        /* Now parse each block of rules and execute it. */
-        /* Execute it outside of the parser so that recursive */
-        /* calls to yyrun() work (no recursive yyparse's). */
+    /* Now parse each block of rules and execute it. */
+    /* Execute it outside of the parser so that recursive */
+    /* calls to yyrun() work (no recursive yyparse's). */
 
-        for(;;)
-        {
-            LOL l;
-            PARSE *p;
-            int jmp = 0; /* JMP_NONE */
+    for(;;) {
+        LOL    l;
+        PARSE *p;
+        int    jmp = 0; /* JMP_NONE */
 
-            /* $(<) and $(>) empty in outer scope. */
+        /* $(<) and $(>) empty in outer scope. */
 
-            lol_init( &l );
+        lol_init(&l);
 
-            /* Filled by yyparse() calling parse_save() */
+        /* Filled by yyparse() calling parse_save() */
 
-            yypsave = 0;
+        yypsave = 0;
 
-            /* If parse error or empty parse, outta here */
+        /* If parse error or empty parse, outta here */
 
-            if( yyparse() || !( p = yypsave ) )
-                break;
-
-            /* Run the parse tree. */
-
-            list_free( (*(p->func))( p, &l, &jmp ) );
-
-            parse_free( p );
+        if(yyparse() || !(p = yypsave)) {
+            break;
         }
+
+        /* Run the parse tree. */
+
+        list_free((*(p->func))(p, &l, &jmp));
+
+        parse_free(p);
+    }
 }
 
 void
-parse_save( p )
+parse_save(p)
     PARSE *p;
 {
-        yypsave = p;
+    yypsave = p;
 }
 
 PARSE *
-parse_make( func, left, right, third, string, string1, num )
-        LIST       *(*func)_ARG_(( PARSE *p, LOL *args, int *jmp ));
-        PARSE        *left;
-        PARSE        *right;
-        PARSE        *third;
-        const char   *string;
-        const char   *string1;
-        int           num;
+parse_make(func, left, right, third, string, string1, num)
+    LIST       *(*func)_ARG_((PARSE *p, LOL *args, int *jmp));
+    PARSE        *left;
+    PARSE        *right;
+    PARSE        *third;
+    const char   *string;
+    const char   *string1;
+    int           num;
 {
-        PARSE   *p = (PARSE *)xmalloc( sizeof( PARSE ) );
+    PARSE *p = _NIL_(PARSE *);
 
-        p->func = func;
-        p->left = left;
-        p->right = right;
-        p->third = third;
-        p->string = string;
-        p->string1 = string1;
-        p->num = num;
-        p->refs = 1;
+    memoryAllocateOrFail((voidT **)&p, sizeof(PARSE));
 
-        return p;
+    p->func    = func;
+    p->left    = left;
+    p->right   = right;
+    p->third   = third;
+    p->string  = string;
+    p->string1 = string1;
+    p->num     = num;
+    p->refs    = 1;
+
+    return(p);
 }
 
 void
-parse_refer( p )
+parse_refer(p)
     PARSE *p;
 {
-        ++p->refs;
+    ++p->refs;
 }
 
 void
-parse_free( p )
+parse_free(p)
     PARSE *p;
 {
-        if( --p->refs )
-            return;
+    if(--p->refs) {
+        return;
+    }
 
-        if( p->string )
-            freestr( p->string );
-        if( p->string1 )
-            freestr( p->string1 );
-        if( p->left )
-            parse_free( p->left );
-        if( p->right )
-            parse_free( p->right );
-        if( p->third )
-            parse_free( p->third );
+    if(p->string) {
+        freestr(p->string);
+    }
+    if(p->string1) {
+        freestr(p->string1);
+    }
+    if(p->left) {
+        parse_free(p->left);
+    }
+    if(p->right) {
+        parse_free(p->right);
+    }
+    if(p->third) {
+        parse_free(p->third);
+    }
 
-        free( (char *)p );
+    memoryRelease((voidT **)&p);
 }

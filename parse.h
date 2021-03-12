@@ -43,7 +43,7 @@ PARSE * parse_make _ARG_((
         PARSE           *third,
         const char      *string,
         const char      *string1,
-        int              num ));
+        int              num));
 
 void    parse_refer _ARG_((PARSE *p));
 void    parse_free  _ARG_((PARSE *p));

@@ -41,16 +41,16 @@
 #define YYSTYPE YYSYMBOL
 
 typedef struct _YYSTYPE {
-        int             type;
-        const char      *string;
-        PARSE           *parse;
-        LIST            *list;
-        int             number;
+    int         type;
+    const char *string;
+    PARSE      *parse;
+    LIST       *list;
+    int         number;
 } YYSTYPE;
 
 _BEGIN_EXTERNS_
 
-extern YYSTYPE yylval;
+extern YYSTYPE  yylval;
 
 void   yymode      _ARG_((int n));
 void   yyerror     _ARG_((const char *s));

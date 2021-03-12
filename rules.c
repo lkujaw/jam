@@ -37,42 +37,51 @@
 
 #include "hash.h"
 #include "lists.h"
-#include "memory.h"
-#include "newstr.h"
 #include "parse.h"
 #include "rules.h"
+#include "str.h"
 #include "variable.h"
+#include "xmem.h"
 
-static struct hash *rulehash = 0;
-static struct hash *targethash = 0;
+void targetInit _ARG_((TARGET *t));
 
-
+static struct hash *rulehash   = _NIL_(struct hash *);
+static struct hash *targethash = _NIL_(struct hash *);
+
+void
+targetInit(target)
+    TARGET *target;
+{
+    assert(target != _NIL_(TARGET *));
+    memset((char *)target, '\0', sizeof(*target));
+}
+
 /*
  * bindrule() - return pointer to RULE, creating it if necessary
  */
 
 RULE *
-bindrule( rulename )
+bindrule(rulename)
     const char *rulename;
 {
-        RULE rule, *r = &rule;
+    RULE  rule, *r = &rule;
 
-        if( !rulehash )
-            rulehash = hashinit( sizeof( RULE ), "rules" );
+    if(!rulehash) {
+        rulehash = hashinit(sizeof(RULE), "rules");
+    }
 
-        r->name = rulename;
+    r->name = rulename;
 
-        if( hashenter( rulehash, (HASHDATA **)&r ) )
-        {
-            r->name = newstr( rulename );       /* never freed */
-            r->procedure = (PARSE *)0;
-            r->actions = (char *)0;
-            r->bindlist = L0;
-            r->params = L0;
-            r->flags = 0;
-        }
+    if(hashenter(rulehash, (HASHDATA **)&r)) {
+        r->name      = newstr(rulename);         /* never freed */
+        r->procedure = _NIL_(PARSE *);
+        r->actions   = _NIL_(char *);
+        r->bindlist  = L0;
+        r->params    = L0;
+        r->flags     = 0;
+    }
 
-        return r;
+    return(r);
 }
 
 /*
@@ -80,24 +89,24 @@ bindrule( rulename )
  */
 
 TARGET *
-bindtarget( targetname )
+bindtarget(targetname)
     const char *targetname;
 {
-        TARGET target, *t = &target;
+    TARGET  target, *t = &target;
 
-        if( !targethash )
-            targethash = hashinit( sizeof( TARGET ), "targets" );
+    if(!targethash) {
+        targethash = hashinit(sizeof(TARGET), "targets");
+    }
 
-        t->name = targetname;
+    t->name = targetname;
 
-        if( hashenter( targethash, (HASHDATA **)&t ) )
-        {
-            memset( (char *)t, '\0', sizeof( *t ) );
-            t->name = newstr( targetname );     /* never freed */
-            t->boundname = t->name;             /* default for T_FLAG_NOTFILE */
-        }
+    if(hashenter(targethash, (HASHDATA **)&t)) {
+        targetInit(t);
+        t->name      = newstr(targetname); /* never freed */
+        t->boundname = t->name;            /* default for T_FLAG_NOTFILE */
+    }
 
-        return t;
+    return(t);
 }
 
 /*
@@ -107,19 +116,18 @@ bindtarget( targetname )
  */
 
 TARGET *
-copytarget( ot )
+copytarget(ot)
     const TARGET *ot;
 {
-        TARGET *t;
+    TARGET *t = _NIL_(TARGET *);
 
-        t = (TARGET *)xmalloc( sizeof( *t ) );
-        memset( (char *)t, '\0', sizeof( *t ) );
-        t->name = copystr( ot->name );
-        t->boundname = t->name;
+    memoryAllocateOrFail((voidT **)&t, sizeof(*t));
+    targetInit(t);
+    t->name      = copystr(ot->name);
+    t->boundname = t->name;
+    t->flags    |= T_FLAG_NOTFILE | T_FLAG_INTERNAL;
 
-        t->flags |= T_FLAG_NOTFILE | T_FLAG_INTERNAL;
-
-        return t;
+    return(t);
 }
 
 /*
@@ -127,10 +135,10 @@ copytarget( ot )
  */
 
 void
-touchtarget( t )
+touchtarget(t)
     const char *t;
 {
-        bindtarget( t )->flags |= T_FLAG_TOUCHED;
+    bindtarget(t)->flags |= T_FLAG_TOUCHED;
 }
 
 /*
@@ -142,14 +150,15 @@ touchtarget( t )
  */
 
 TARGETS *
-targetlist( chain, targets )
+targetlist(chain, targets)
     TARGETS *chain;
     LIST    *targets;
 {
-        for( ; targets; targets = list_next( targets ) )
-            chain = targetentry( chain, bindtarget( targets->string ) );
+    for(; targets; targets = list_next(targets)) {
+        chain = targetentry(chain, bindtarget(targets->string));
+    }
 
-        return chain;
+    return(chain);
 }
 
 /*
@@ -161,21 +170,25 @@ targetlist( chain, targets )
  */
 
 TARGETS *
-targetentry( chain, target )
+targetentry(chain, target)
     TARGETS *chain;
     TARGET  *target;
 {
-        TARGETS *c;
+    TARGETS *c = _NIL_(TARGETS *);
 
-        c = (TARGETS *)xmalloc( sizeof( TARGETS ) );
-        c->target = target;
+    memoryAllocateOrFail((voidT **)&c, sizeof(TARGETS));
+    c->target = target;
 
-        if( !chain ) chain = c;
-        else chain->tail->next = c;
-        chain->tail = c;
-        c->next = 0;
+    if(!chain) {
+        chain = c;
+    } else {
+        chain->tail->next = c;
+    }
 
-        return chain;
+    chain->tail = c;
+    c->next     = 0;
+
+    return(chain);
 }
 
 /*
@@ -187,19 +200,20 @@ targetentry( chain, target )
  */
 
 TARGETS *
-targetchain( chain, targets )
+targetchain(chain, targets)
     TARGETS *chain;
     TARGETS *targets;
 {
-        if( !targets )
-            return chain;
-        else if( !chain )
-            return targets;
+    if(!targets) {
+        return(chain);
+    } else if(!chain) {
+        return(targets);
+    }
 
-        chain->tail->next = targets;
-        chain->tail = targets->tail;
+    chain->tail->next = targets;
+    chain->tail       = targets->tail;
 
-        return chain;
+    return(chain);
 }
 
 /*
@@ -207,20 +221,25 @@ targetchain( chain, targets )
  */
 
 ACTIONS *
-actionlist( chain, action )
+actionlist(chain, action)
     ACTIONS *chain;
     ACTION  *action;
 {
-        ACTIONS *actions = (ACTIONS *)xmalloc( sizeof( ACTIONS ) );
+    ACTIONS *actions = _NIL_(ACTIONS *);
 
-        actions->action = action;
+    memoryAllocateOrFail((voidT **)&actions, sizeof(ACTIONS));
+    actions->action = action;
 
-        if( !chain ) chain = actions;
-        else chain->tail->next = actions;
-        chain->tail = actions;
-        actions->next = 0;
+    if(!chain) {
+        chain = actions;
+    } else {
+        chain->tail->next = actions;
+    }
 
-        return chain;
+    chain->tail   = actions;
+    actions->next = 0;
+
+    return(chain);
 }
 
 /*
@@ -233,54 +252,53 @@ actionlist( chain, action )
  */
 
 SETTINGS *
-addsettings( head, setflag, symbol, value )
+addsettings(head, setflag, symbol, value)
     SETTINGS   *head;
     int         setflag;
     const char *symbol;
     LIST       *value;
 {
-        SETTINGS *v;
+    SETTINGS *v;
 
-        /* Look for previous setting */
+    /* Look for previous setting */
 
-        for( v = head; v; v = v->next )
-            if( !strcmp( v->symbol, symbol ) )
-                break;
-
-        /* If not previously set, alloc a new. */
-        /* If appending, do so. */
-        /* Else free old and set new. */
-
-        if( !v )
-        {
-            v = (SETTINGS *)xmalloc( sizeof( *v ) );
-            v->symbol = newstr( symbol );
-            v->value = value;
-            v->next = head;
-            head = v;
+    for(v = head; v; v = v->next) {
+        if(!strcmp(v->symbol, symbol)) {
+            break;
         }
-        else switch( setflag )
-        {
+    }
+
+    /* If not previously set, alloc a new. */
+    /* If appending, do so. */
+    /* Else free old and set new. */
+
+    if(!v) {
+        memoryAllocateOrFail((voidT **)&v, sizeof(*v));
+        v->symbol = newstr(symbol);
+        v->value  = value;
+        v->next   = head;
+        head      = v;
+    } else {
+        switch(setflag) {
         case VAR_SET:
             /* Toss old, set new */
-            list_free( v->value );
+            list_free(v->value);
             v->value = value;
             break;
 
         case VAR_APPEND:
             /* Append new to old */
-            v->value = list_append( v->value, value );
+            v->value = list_append(v->value, value);
             break;
 
         case VAR_DEFAULT:
             /* Toss new, old already set */
-            list_free( value );
+            list_free(value);
             break;
         }
-
-        /* Return (new) head of list. */
-
-        return head;
+    }
+    /* Return (new) head of list. */
+    return(head);
 }
 
 /*
@@ -299,21 +317,21 @@ addsettings( head, setflag, symbol, value )
  */
 
 SETTINGS *
-copysettings( from )
+copysettings(from)
     SETTINGS *from;
 {
-        SETTINGS *head = 0, *v;
+    SETTINGS *head = _NIL_(SETTINGS *), *v;
 
-        for( ; from; from = from->next )
-        {
-            v = (SETTINGS *)xmalloc( sizeof( *v ) );
-            v->symbol = copystr( from->symbol );
-            v->value = list_copy( 0, from->value );
-            v->next = head;
-            head = v;
-        }
+    for(; from; from = from->next) {
+        v = _NIL_(SETTINGS*);
+        memoryAllocateOrFail((voidT **)&v, sizeof(SETTINGS));
+        v->symbol = copystr(from->symbol);
+        v->value  = list_copy(0, from->value);
+        v->next   = head;
+        head      = v;
+    }
 
-        return head;
+    return(head);
 }
 
 /*
@@ -321,11 +339,12 @@ copysettings( from )
  */
 
 void
-pushsettings( v )
+pushsettings(v)
     SETTINGS *v;
 {
-        for( ; v; v = v->next )
-            v->value = var_swap( v->symbol, v->value );
+    for(; v; v = v->next) {
+        v->value = var_swap(v->symbol, v->value);
+    }
 }
 
 /*
@@ -333,10 +352,10 @@ pushsettings( v )
  */
 
 void
-popsettings( v )
+popsettings(v)
     SETTINGS *v;
 {
-        pushsettings( v );      /* just swap again */
+    pushsettings(v);      /* just swap again */
 }
 
 /*
@@ -344,17 +363,17 @@ popsettings( v )
  */
 
 void
-freesettings( v )
+freesettings(v)
     SETTINGS *v;
 {
-    SETTINGS *n = NULL;
+    SETTINGS *n = _NIL_(SETTINGS *);
 
-    while( v != NULL ) {
+    while(v != _NIL_(SETTINGS *)) {
         n = v->next;
 
-        freestr( v->symbol );
-        list_free( v->value );
-        xfree( (char *)v );
+        freestr(v->symbol);
+        list_free(v->value);
+        memoryRelease((voidT **)&v);
 
         v = n;
     }
@@ -367,6 +386,6 @@ freesettings( v )
 void
 donerules()
 {
-        hashdone( rulehash );
-        hashdone( targethash );
+    hashdone(rulehash);
+    hashdone(targethash);
 }

@@ -48,15 +48,15 @@
 #include "jam.h"
 
 #include "ansi.h"
-#include "lists.h"
-#include "variable.h"
-#include "parse.h"
-#include "scan.h"
 #include "compile.h"
-#include "newstr.h"
+#include "lists.h"
+#include "parse.h"
 #include "rules.h"
+#include "scan.h"
+#include "str.h"
+#include "variable.h"
 
-#define YYMAXDEPTH 10000       /* for OSF and other less endowed yaccs */
+#define YYMAXDEPTH 10000  /* increase depth for OSF and similar system */
 
 #if __STD_C
 # define F0 (LIST *(*)(PARSE *, LOL *, int *))0
@@ -506,7 +506,7 @@ int yychar;			/* current input token number */
 #define YYLEX()		yycvtok(yylex())
 /*
 ** yycvtok - return a token if i is a wchar_t value that exceeds 255.
-**	If i<255, i itself is the token.  If i>255 but the neither 
+**	If i<255, i itself is the token.  If i>255 but the neither
 **	of the 30th or 31st bit is on, i is already a token.
 */
 #if defined(__STDC__) || defined(__cplusplus)
@@ -527,7 +527,7 @@ int yycvtok(i) int i;
 		while ((last>=first)&&(first>=0)) {/*Binary search loop*/
 			mid = (first+last)/2;
 			j = yymbchars[mid].character;
-			if( j==i ){/*Found*/ 
+			if( j==i ){/*Found*/
 				return yymbchars[mid].tvalue;
 			}else if( j<i ){
 				first = mid + 1;
@@ -968,7 +968,7 @@ int yyparse()
 	*/
 	switch( yytmp )
 	{
-		
+
 case 2:{ parse_save( yypvt[-0].parse ); } break;
 case 3:{ yyval.parse = pnull(); } break;
 case 4:{ yyval.parse = yypvt[-0].parse; } break;

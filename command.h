@@ -46,25 +46,24 @@
 
 typedef struct _cmd CMD;
 
-struct _cmd
-{
-    CMD     *next;
-    CMD     *tail;            /* valid on in head */
-    RULE    *rule;            /* rule->actions contains shell script */
-    LIST    *shell;           /* $(SHELL) value */
-    LOL      args;            /* LISTs for $(<), $(>) */
-    char     buf[ MAXLINE ];  /* actual commands */
+struct _cmd {
+    CMD  *next;
+    CMD  *tail;             /* valid on in head */
+    RULE *rule;             /* rule->actions contains shell script */
+    LIST *shell;            /* $(SHELL) value */
+    LOL   args;             /* LISTs for $(<), $(>) */
+    char  buf[MAXLINE];     /* actual commands */
 };
 
 _BEGIN_EXTERNS_
 
 CMD *cmd_new _ARG_
 ((
-    RULE    *rule,            /* rule (referenced) */
-    LIST    *targets,         /* $(<) (freed) */
-    LIST    *sources,         /* $(>) (freed) */
-    LIST    *shell,           /* $(SHELL) (freed) */
-    int      maxline          /* max line length */
+    RULE    *rule,          /* rule (referenced) */
+    LIST    *targets,       /* $(<) (freed) */
+    LIST    *sources,       /* $(>) (freed) */
+    LIST    *shell,         /* $(SHELL) (freed) */
+    int      maxline        /* max line length */
 ));
 
 void cmd_free _ARG_((CMD *cmd));

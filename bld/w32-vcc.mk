@@ -10,9 +10,9 @@
 #
 
 CC       = cl /nologo
-CFLAGS   = -DNT
+CFLAGS   = -DNT -D__STD_C
 TARGET   = /Fejam0
-LINKLIBS = oldnames.lib kernel32.lib libc.lib
+LINKLIBS = oldnames.lib kernel32.lib
 
 all: jam0
 	attrib -r jambase.c

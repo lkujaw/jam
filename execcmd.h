@@ -23,9 +23,9 @@ _BEGIN_EXTERNS_
 
 void execcmd _ARG_((
     const char *string,   /* command to execute */
-    void      (*func)(Void_t *closure, int status),
-    Void_t     *closure,
-    LIST       *shell ));
+    void      (*func)(voidT *closure, int status),
+    voidT      *closure,
+    LIST       *shell));
 
 int execwait _ARG_((void));
 

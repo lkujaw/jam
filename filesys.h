@@ -17,20 +17,20 @@
 
 #include "ansi.h"
 
-typedef void (*scanback)_ARG_(( Void_t     *closure,
-                                const char *file,
-                                int         found,
-                                time_t      t ));
+typedef void (*scanback)_ARG_((voidT      *closure,
+                               const char *file,
+                               int         found,
+                               time_t      t));
 
 _BEGIN_EXTERNS_
 
-void file_dirscan  _ARG_(( const char *dir,
-                           scanback    func,
-                           Void_t     *closure ));
+void file_dirscan  _ARG_((const char *dir,
+                          scanback    func,
+                          voidT      *closure));
 
-void file_archscan _ARG_(( const char *arch,
-                           scanback    func,
-                           Void_t     *closure ));
+void file_archscan _ARG_((const char *arch,
+                          scanback    func,
+                          voidT      *closure));
 
 int file_time _ARG_((const char *filename, time_t *time));
 

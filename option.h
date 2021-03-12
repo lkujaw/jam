@@ -21,19 +21,18 @@
 #define N_OPTS    256
 #define N_TARGETS 256
 
-typedef struct option
-{
-    char         flag;  /* filled in by getoption() */
-    const char  *val;   /* set to random address if true */
+typedef struct option {
+    char        flag;   /* filled in by getoption() */
+    const char *val;    /* set to random address if true */
 } option;
 
 _BEGIN_EXTERNS_
 
-int         getoptions _ARG_(( int          argc,
-                               char       **argv,
-                               const char  *opts,
-                               option      *optv,
-                               char       **targets ));
+int        getoptions _ARG_((int          argc,
+                             char       **argv,
+                             const char  *opts,
+                             option      *optv,
+                             char       **targets));
 
 const char *getoptval  _ARG_((option *optv, int opt, int subopt));
 

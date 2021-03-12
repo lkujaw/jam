@@ -5,14 +5,12 @@
 #
 # Put executables in platform-specific  subdirectory.
 
+# TODO: Use this to generate the non-bootstrap version.h
+VERSION = ftjam-2.5.2 ;
 include Jamrules ;
 
-# note that we use the target directory 'bin.unix' to ensure that
-# 'make install' and 'make uninstall' work correctly
-#
-if $(VMS)       { LOCATE_TARGET ?= [.binvms] ; }
-else if $(MAC)  { LOCATE_TARGET ?= :bin.mac ; }
-else            { LOCATE_TARGET ?= tgt/$(OSFULL[1]:L) ; }
+if $(VMS)  { LOCATE_TARGET ?= [.binvms] ; }
+else       { LOCATE_TARGET ?= [ FDirName tgt $(OSFULL[1]:L) ] ; }
 
 # Leave generated source in current directory; it would be nice to use
 # these lines below to build the source into the platform-specific
@@ -74,10 +72,10 @@ if $(OS) = NT
 {
     switch $(JAM_TOOLSET)
     {
-        case MINGW       : CCFLAGS += -DNT ;
-        case LCC         : CCFLAGS += -DNT ;
-        case DIGITALMARS : CCFLAGS += -DNT ;
-        case *           : CCFLAGS += /DNT ;
+        case MINGW       : CCFLAGS += -DNT -D__STD_C ;
+        case LCC         : CCFLAGS += -DNT -D__STD_C ;
+        case DIGITALMARS : CCFLAGS += -DNT -D__STD_C ;
+        case *           : CCFLAGS += /DNT /D__STD_C ;
     }
 }
 
@@ -120,9 +118,9 @@ GenFile   jambase.c : mkjamb Jambase ;
 
 Library    libjam.a :
     $(code) builtins.c command.c compile.c expand.c glob.c hash.c
-    headers.c lists.c make.c make1.c memory.c newstr.c option.c
-    parse.c regexp.c rules.c scan.c search.c timestmp.c variable.c
-    hdrmacro.c ;
+    hdrmacro.c headers.c lists.c make.c make1.c option.c parse.c
+    regexp.c rules.c scan.c search.c str.c timestmp.c variable.c
+    xmem.c ;
 
 # Strip the Jam executable on Mingw
 #
@@ -145,18 +143,17 @@ if $(BINDIR)    { InstallBin $(BINDIR) : jam ; }
 
 ALLSOURCE =
         Build.com Build.mpw Jam.html Jambase Jambase.html Jamfile
-        Jamfile.html Porting README RELNOTES builtins.c builtins.h
-        command.c command.h compile.c compile.h execcmd.h execmac.c
-        execnt.c execunix.c execvms.c expand.c expand.h filemac.c
-        filent.c fileos2.c filesys.h fileunix.c filevms.c glob.c
-        hash.c hash.h hdrmacro.c hdrmacro.h headers.c headers.h jam.c
-        jam.h jambase.c jambase.h jamgram.c jamgram.h jamgram.y
+        Jamfile.html Porting README RELNOTES ansi.h bool.h builtins.c
+        builtins.h command.c command.h compile.c compile.h execcmd.h
+        execmac.c execnt.c execunix.c execvms.c expand.c expand.h
+        filemac.c filent.c fileos2.c filesys.h fileunix.c filevms.c
+        glob.c hash.c hash.h hdrmacro.c hdrmacro.h headers.c headers.h
+        jam.c jam.h jambase.c jambase.h jamgram.c jamgram.h jamgram.y
         jamgram.yy jamgramt.h lists.c lists.h make.c make.h make1.c
-        memory.c memory.h mkjamb.c newstr.c newstr.h option.c option.h
-        parse.c parse.h pathmac.c pathsys.h pathunix.c pathvms.c
-        regexp.c regexp.h rules.c rules.h scan.c scan.h search.c
-        search.h timestmp.c timestmp.h variable.c variable.h yyacc.sh
-        hdrmacro.c
+        mkjamb.c option.c option.h parse.c parse.h pathmac.c pathsys.h
+        pathunix.c pathvms.c regexp.c regexp.h rules.c rules.h scan.c
+        scan.h search.c search.h str.c str.h timestmp.c timestmp.h
+        variable.c variable.h yyacc.sh xmem.c xmem.h
         INSTALL
         README.ORG
         CHANGES
@@ -202,9 +199,6 @@ rule Package
         case *.zip  :   Zip     $(<) : $(>) ;
     }
 }
-
-
-VERSION = ftjam-2.5.2 ;
 
 actions Tar-Gz
 {

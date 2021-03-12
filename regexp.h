@@ -23,11 +23,11 @@
 typedef struct regexp {
     const char *startp[NSUBEXP];
     const char *endp[NSUBEXP];
-    char  regstart;         /* Internal use only. */
-    char  reganch;          /* Internal use only. */
-    char *regmust;          /* Internal use only. */
-    int   regmlen;          /* Internal use only. */
-    char  program[1];       /* Unwarranted chumminess with compiler. */
+    char        regstart;   /* Internal use only. */
+    char        reganch;    /* Internal use only. */
+    char       *regmust;    /* Internal use only. */
+    int         regmlen;    /* Internal use only. */
+    char        program[1]; /* Unwarranted chumminess with compiler. */
 } regexp;
 
 _BEGIN_EXTERNS_

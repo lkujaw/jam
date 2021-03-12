@@ -23,7 +23,7 @@ LIST *var_expand _ARG_((
     const char  *in,
     const char  *end,
     LOL         *lol,
-    int          cancopyin ));
+    int          cancopyin));
 
 _END_EXTERNS_
 

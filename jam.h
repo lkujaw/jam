@@ -65,16 +65,16 @@
 # define OS_VMS
 # define MAXLINE 1024 /* longest 'together' actions */
 # define SPLITPATH ','
-# define EXITOK 1
-# define EXITBAD 0
+# define EXITOK   1
+# define EXITFAIL 0
 # define DOWNSHIFT_PATHS
 
 /* Do any of these work? */
-#ifndef OSPLAT
-# if defined( VAX ) || defined( __VAX ) || defined( vax )
-#  define OSPLAT "OSPLAT=VAX"
+# ifndef OSPLAT
+#  if defined(VAX) || defined(__VAX) || defined(vax)
+#   define OSPLAT "OSPLAT=VAX"
+#  endif
 # endif
-#endif
 
 /*
  * Windows NT
@@ -102,14 +102,24 @@
 # define PATH_DELIM '\\'
 # define DOWNSHIFT_PATHS
 
+# if _WIN64
+typedef unsigned long long int sizeT;
+# define SIZET_CHD 20
+typedef long long int iMaxT;
+# else
+typedef unsigned long int sizeT;
+# define SIZET_CHD 11
+typedef long int iMaxT;
+# endif
+
 /* AS400 cross-compile from NT */
 
 # ifdef AS400
-# undef OSMINOR
-# undef OSMAJOR
-# define OSMAJOR "AS400=true"
-# define OSMINOR "OS=AS400"
-# define OS_AS400
+#  undef OSMINOR
+#  undef OSMAJOR
+#  define OSMAJOR "AS400=true"
+#  define OSMINOR "OS=AS400"
+#  define OS_AS400
 # endif
 
 /*
@@ -194,158 +204,153 @@
 # define PATH_DELIM '/'
 
 # ifdef _AIX
-# define unix
-# define OSMINOR "OS=AIX"
-# define OS_AIX
+#  define OSMINOR "OS=AIX"
+#  define OS_AIX
 # endif
 # ifdef AMIGA
-# define OSMINOR "OS=AMIGA"
-# define OS_AMIGA
+#  define OSMINOR "OS=AMIGA"
+#  define OS_AMIGA
 # endif
 # ifdef __BEOS__
-# define unix
-# define OSMINOR "OS=BEOS"
-# define OS_BEOS
+#  define OSMINOR "OS=BEOS"
+#  define OS_BEOS
 # endif
 # ifdef __bsdi__
-# define OSMINOR "OS=BSDI"
-# define OS_BSDI
+#  define OSMINOR "OS=BSDI"
+#  define OS_BSDI
 # endif
 # if defined (COHERENT) && defined (_I386)
-# define OSMINOR "OS=COHERENT"
-# define OS_COHERENT
+#  define OSMINOR "OS=COHERENT"
+#  define OS_COHERENT
 # endif
 # ifdef __cygwin__
-# define OSMINOR "OS=CYGWIN"
-# define OS_CYGWIN
+#  define OSMINOR "OS=CYGWIN"
+#  define OS_CYGWIN
 # endif
 # ifdef __FreeBSD__
-# define OSMINOR "OS=FREEBSD"
-# define OS_FREEBSD
+#  define OSMINOR "OS=FREEBSD"
+#  define OS_FREEBSD
 # endif
 # ifdef __DGUX__
-# define OSMINOR "OS=DGUX"
-# define OS_DGUX
+#  define OSMINOR "OS=DGUX"
+#  define OS_DGUX
 # endif
 # ifdef __hpux
-# define OSMINOR "OS=HPUX"
-# define OS_HPUX
+#  define OSMINOR "OS=HPUX"
+#  define OS_HPUX
 # endif
 # ifdef __OPENNT
-# define unix
-# define OSMINOR "OS=INTERIX"
-# define OS_INTERIX
+#  define OSMINOR "OS=INTERIX"
+#  define OS_INTERIX
 # endif
 # ifdef __sgi
-# define OSMINOR "OS=IRIX"
-# define OS_IRIX
+#  define OSMINOR "OS=IRIX"
+#  define OS_IRIX
 # endif
 # ifdef __ISC
-# define OSMINOR "OS=ISC"
-# define OS_ISC
+#  define OSMINOR "OS=ISC"
+#  define OS_ISC
 # endif
 # ifdef linux
-# define OSMINOR "OS=LINUX"
-# define OS_LINUX
+#  define OSMINOR "OS=LINUX"
+#  define OS_LINUX
 # endif
 # ifdef __Lynx__
-# define OSMINOR "OS=LYNX"
-# define OS_LYNX
-# define unix
+#  define OSMINOR "OS=LYNX"
+#  define OS_LYNX
 # endif
 # ifdef __MACHTEN__
-# define OSMINOR "OS=MACHTEN"
-# define OS_MACHTEN
+#  define OSMINOR "OS=MACHTEN"
+#  define OS_MACHTEN
 # endif
 # ifdef mpeix
-# define unix
-# define OSMINOR "OS=MPEIX"
-# define OS_MPEIX
+#  define OSMINOR "OS=MPEIX"
+#  define OS_MPEIX
 # endif
 # ifdef __MVS__
-# define unix
-# define OSMINOR "OS=MVS"
-# define OS_MVS
+#  define OSMINOR "OS=MVS"
+#  define OS_MVS
 # endif
 # ifdef _ATT4
-# define OSMINOR "OS=NCR"
-# define OS_NCR
+#  define OSMINOR "OS=NCR"
+#  define OS_NCR
 # endif
 # ifdef __NetBSD__
-# define unix
-# define OSMINOR "OS=NETBSD"
-# define OS_NETBSD
+#  define OSMINOR "OS=NETBSD"
+#  define OS_NETBSD
 # endif
 # ifdef __QNX__
-# ifdef __QNXNTO__
-# define OSMINOR "OS=QNXNTO"
-# define OS_QNXNTO
-# else
-# define unix
-# define OSMINOR "OS=QNX"
-# define OS_QNX
-# define MAXLINE 996
-# endif
+#  ifdef __QNXNTO__
+#   define OSMINOR "OS=QNXNTO"
+#   define OS_QNXNTO
+#  else
+#   define OSMINOR "OS=QNX"
+#   define OS_QNX
+#   define MAXLINE 996
+#  endif
 # endif
 # ifdef NeXT
-# ifdef __APPLE__
-# define OSMINOR "OS=RHAPSODY"
-# define OS_RHAPSODY
-# else
-# define OSMINOR "OS=NEXT"
-# define OS_NEXT
+#  ifdef __APPLE__
+#   define OSMINOR "OS=RHAPSODY"
+#   define OS_RHAPSODY
+#  else
+#   define OSMINOR "OS=NEXT"
+#   define OS_NEXT
+#  endif
 # endif
-# endif
 # ifdef __APPLE__
-# define unix
-# define OSMINOR "OS=MACOSX"
-# define OS_MACOSX
+#  define OSMINOR "OS=MACOSX"
+#  define OS_MACOSX
 # endif
 # ifdef __osf__
-# define OSMINOR "OS=OSF"
-# define OS_OSF
+#  define OSMINOR "OS=OSF"
+#  define OS_OSF
 # endif
 # ifdef _SEQUENT_
-# define OSMINOR "OS=PTX"
-# define OS_PTX
+#  define OSMINOR "OS=PTX"
+#  define OS_PTX
 # endif
 # ifdef M_XENIX
-# define OSMINOR "OS=SCO"
-# define OS_SCO
+#  define OSMINOR "OS=SCO"
+#  define OS_SCO
 # endif
 # ifdef sinix
-# define unix
-# define OSMINOR "OS=SINIX"
-# define OS_SINIX
+#  define OSMINOR "OS=SINIX"
+#  define OS_SINIX
 # endif
 # ifdef sun
-# if defined(__svr4__) || defined(__SVR4)
-# define OSMINOR "OS=SOLARIS"
-# define OS_SOLARIS
-# else
-# define OSMINOR "OS=SUNOS"
-# define OS_SUNOS
-# endif
+#  if defined(__svr4__) || defined(__SVR4)
+#   define OSMINOR "OS=SOLARIS"
+#   define OS_SOLARIS
+#  else
+#   define OSMINOR "OS=SUNOS"
+#   define OS_SUNOS
+#  endif
 # endif
 # ifdef ultrix
-# define OSMINOR "OS=ULTRIX"
-# define OS_ULTRIX
+#  define OSMINOR "OS=ULTRIX"
+#  define OS_ULTRIX
 # endif
 # ifdef _UNICOS
-# define OSMINOR "OS=UNICOS"
-# define OS_UNICOS
+#  define OSMINOR "OS=UNICOS"
+#  define OS_UNICOS
 # endif
 # if defined(__USLC__) && !defined(M_XENIX)
-# define OSMINOR "OS=UNIXWARE"
-# define OS_UNIXWARE
+#  define OSMINOR "OS=UNIXWARE"
+#  define OS_UNIXWARE
 # endif
 # ifndef OSMINOR
-# define OSMINOR "OS=UNKNOWN"
+#  define OSMINOR "OS=UNKNOWN"
 # endif
 
 /* All the UNIX includes */
 
-# include "FEATURE/jam"
+# if defined(_lint)
+#  include "jam-lint.h"
+# else
+#  include "FEATURE/jam"
+# endif
+# define HAVE_IFFE 1
 
 #endif /* UNIX */
 
@@ -356,134 +361,134 @@
 #ifndef OSPLAT
 #if defined(_i386_)   || \
     defined(__i386__) || \
-    defined(_M_IX86 )
-# if !defined( OS_OS2 )
+    defined(_M_IX86)
+# if !defined(OS_OS2)
 #  define OSPLAT "OSPLAT=I386"
 # endif
 
-#elif defined(_amd64_)    || \
-      defined(__amd64__)  || \
-      defined(_x86_64_)   || \
-      defined(__x86_64__)
-# define OSPLAT "OSPLAT=I386-64"
+# elif defined(_amd64_)   || \
+       defined(__amd64__) || \
+       defined(_x86_64_)  || \
+       defined(__x86_64__)
+#  define OSPLAT "OSPLAT=I386-64"
 
-#elif defined(alpha) || \
-      defined(_ALPHA_) || \
-      defined(__alpha__)
-# define OSPLAT "OSPLAT=AXP"
+# elif defined(alpha)   || \
+       defined(_ALPHA_) || \
+       defined(__alpha__)
+#  define OSPLAT "OSPLAT=AXP"
 
-#elif defined(hppa)     || \
-      defined(__hppa__)
-# define OSPLAT "OSPLAT=HPPA"
+# elif defined(hppa) || \
+       defined(__hppa__)
+#  define OSPLAT "OSPLAT=HPPA"
 
-#elif defined(_M_PPC)      || \
-      defined(PPC)         || \
-      defined(ppc)         || \
-      defined(__powerpc__) || \
-      defined(__POWERPC__) || \
-      defined(__ppc__)
-# define OSPLAT "OSPLAT=PPC"
+# elif defined(_M_PPC)      || \
+       defined(PPC)         || \
+       defined(ppc)         || \
+       defined(__powerpc__) || \
+       defined(__POWERPC__) || \
+       defined(__ppc__)
+#  define OSPLAT "OSPLAT=PPC"
 
-#elif defined(__sparc__)
-# if !defined( OS_SUNOS )
-#  define OSPLAT "OSPLAT=SPARC"
+# elif defined(__sparc__)
+#  if !defined(OS_SUNOS)
+#   define OSPLAT "OSPLAT=SPARC"
+#  endif
+
+# elif defined(__mips__)
+#  if !defined(OS_SGI)
+#   define OSPLAT "OSPLAT=MIPS"
+#  endif
+
+# elif defined(__arm__)
+#  define OSPLAT "OSPLAT=ARM"
+
+# elif defined(__ia64__) || \
+       defined(__IA64__) || \
+       defined(_M_IA64)
+#  define OSPLAT "OSPLAT=IA64"
+
+# elif defined(__s390__)
+#  define OSPLAT "OSPLAT=390"
+
+# else
+#  define OSPLAT ""
 # endif
-
-#elif defined(__mips__)
-# if !defined( OS_SGI )
-#  define OSPLAT "OSPLAT=MIPS"
-# endif
-
-#elif defined(__arm__)
-# define OSPLAT "OSPLAT=ARM"
-
-#elif defined( __ia64__ ) || \
-      defined( __IA64__ ) || \
-      defined( _M_IA64 )
-# define OSPLAT "OSPLAT=IA64"
-
-#elif defined(__s390__)
-# define OSPLAT "OSPLAT=390"
-
-#else
-# define OSPLAT ""
-#endif
 #endif /* !defined(OSPLAT) */
 
 /*
  * Jam implementation misc.
  */
 
-# ifndef MAXLINE
+#ifndef MAXLINE
 # define MAXLINE 10240  /* longest 'together' actions' */
-# endif
+#endif
 
-# ifndef EXITOK
-# define EXITOK 0
-# define EXITBAD 1
-# endif
+#ifndef EXITOK
+# define EXITOK   0
+# define EXITFAIL 1
+#endif
 
-# ifndef SPLITPATH
+#ifndef SPLITPATH
 # define SPLITPATH ':'
-# endif
+#endif
 
 #if !_mac_assert
 # define assert(ignore)
 #endif
 
 #ifndef MIN
-#define MIN(a,b) (((a)<(b))?(a):(b))
+# define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
 #ifndef MAX
-#define MAX(a,b) (((a)>(b))?(a):(b))
+# define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 /* You probably don't need to muck with these. */
 
-# define MAXSYM 1024    /* longest symbol in the environment */
-# define MAXJPATH 1024  /* longest filename */
+#define MAXSYM 1024     /* longest symbol in the environment */
+#define MAXJPATH 1024   /* longest filename */
 
-# define MAXJOBS 64     /* silently enforce -j limit */
-# define MAXARGC 32     /* words in $(JAMSHELL) */
+#define MAXJOBS 64      /* silently enforce -j limit */
+#define MAXARGC 32      /* words in $(JAMSHELL) */
 
 /* Jam private definitions below. */
 
-# define DEBUG_MAX      15
+#define DEBUG_MAX      15
 
 struct globs {
-        int     noexec;
-        int     jobs;
-        int     quitquick;
-        int     newestfirst;            /* build newest sources first */
-        char    debug[DEBUG_MAX];
-        FILE    *cmdout;                /* print cmds, not run them */
-} ;
+    int   noexec;
+    int   jobs;
+    int   quitquick;
+    int   newestfirst;                  /* build newest sources first */
+    char  debug[DEBUG_MAX];
+    FILE *cmdout;                       /* print cmds, not run them */
+};
 
-extern struct globs globs;
+extern struct globs  globs;
 
-# define DEBUG_MAKE     ( globs.debug[ 1 ] )    /* -da show actions when executed */
-# define DEBUG_MAKEPROG ( globs.debug[ 3 ] )    /* -dm show progress of make0 */
+#define DEBUG_MAKE     (globs.debug[ 1 ])       /* -da show actions when executed */
+#define DEBUG_MAKEPROG (globs.debug[ 3 ])       /* -dm show progress of make0 */
 
-# define DEBUG_EXECCMD  ( globs.debug[ 4 ] )    /* show execcmds()'s work */
+#define DEBUG_EXECCMD  (globs.debug[ 4 ])       /* show execcmds()'s work */
 
-# define DEBUG_COMPILE  ( globs.debug[ 5 ] )    /* show rule invocations */
+#define DEBUG_COMPILE  (globs.debug[ 5 ])       /* show rule invocations */
 
-# define DEBUG_HEADER   ( globs.debug[ 6 ] )    /* show result of header scan */
-# define DEBUG_BINDSCAN ( globs.debug[ 6 ] )    /* show result of dir scan */
-# define DEBUG_SEARCH   ( globs.debug[ 6 ] )    /* show attempts at binding */
+#define DEBUG_HEADER   (globs.debug[ 6 ])       /* show result of header scan */
+#define DEBUG_BINDSCAN (globs.debug[ 6 ])       /* show result of dir scan */
+#define DEBUG_SEARCH   (globs.debug[ 6 ])       /* show attempts at binding */
 
-# define DEBUG_VARSET   ( globs.debug[ 7 ] )    /* show variable settings */
-# define DEBUG_VARGET   ( globs.debug[ 8 ] )    /* show variable fetches */
-# define DEBUG_VAREXP   ( globs.debug[ 8 ] )    /* show variable expansions */
-# define DEBUG_IF       ( globs.debug[ 8 ] )    /* show 'if' calculations */
-# define DEBUG_LISTS    ( globs.debug[ 9 ] )    /* show list manipulation */
-# define DEBUG_SCAN     ( globs.debug[ 9 ] )    /* show scanner tokens */
-# define DEBUG_MEM      ( globs.debug[ 9 ] )    /* show memory use */
+#define DEBUG_VARSET   (globs.debug[ 7 ])       /* show variable settings */
+#define DEBUG_VARGET   (globs.debug[ 8 ])       /* show variable fetches */
+#define DEBUG_VAREXP   (globs.debug[ 8 ])       /* show variable expansions */
+#define DEBUG_IF       (globs.debug[ 8 ])       /* show 'if' calculations */
+#define DEBUG_LISTS    (globs.debug[ 9 ])       /* show list manipulation */
+#define DEBUG_SCAN     (globs.debug[ 9 ])       /* show scanner tokens */
+#define DEBUG_MEM      (globs.debug[ 9 ])       /* show memory use */
 
-# define DEBUG_MAKEQ    ( globs.debug[ 11 ] )   /* -da show even quiet actions */
-# define DEBUG_EXEC     ( globs.debug[ 12 ] )   /* -dx show text of actions */
-# define DEBUG_DEPENDS  ( globs.debug[ 13 ] )   /* -dd show dependency graph */
-# define DEBUG_CAUSES   ( globs.debug[ 14 ] )   /* -dc show dependency graph */
+#define DEBUG_MAKEQ    (globs.debug[ 11 ])      /* -da show even quiet actions */
+#define DEBUG_EXEC     (globs.debug[ 12 ])      /* -dx show text of actions */
+#define DEBUG_DEPENDS  (globs.debug[ 13 ])      /* -dd show dependency graph */
+#define DEBUG_CAUSES   (globs.debug[ 14 ])      /* -dc show dependency graph */
 
 #endif /* JAM_JAM_H */

@@ -17,7 +17,7 @@
 
 _BEGIN_EXTERNS_
 
-void load_builtins _ARG_((Void_t));
+void load_builtins _ARG_((voidT));
 
 _END_EXTERNS_
 

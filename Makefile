@@ -6,8 +6,7 @@
 #
 #    make
 #
-.POSIX:
-
+# NOTE: Including '.POSIX:' here will confuse Interix's make.
 SHELL   = /bin/sh
 CC      = cc
 DELETE  = rm -f
@@ -22,15 +21,15 @@ all: FEATURE/jam jam0
 	./jam0
 
 FEATURE/jam: iffe.sh jam.iff
-	$(SHELL) iffe.sh --cc=$(CC) -v jam.iff
+	$(SHELL) iffe.sh --cc="$(CC) $(CFLAGS)" -v jam.iff
 
 check:
 	@echo There is no validation suite for this package.
 
 clean:
-	@-$(DELETE) FEATURE/*
+	@-$(DELETE) FEATURE/jam
 	@-$(DELETE) -r tgt/*
-	@-$(DELETE) jam0
-	@-$(DELETE) *.o
+	@-$(DELETE) jam0 jam0.exe
+	@-$(DELETE) *.o *.obj
 
 include common.mk

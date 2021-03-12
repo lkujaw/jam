@@ -31,90 +31,96 @@
 #include "ansi.h"
 #include "glob.h"
 
-#define CHECK_BIT( tab, bit ) ( tab[ (bit)/8 ] & (1<<( (bit)%8 )) )
+#define CHECK_BIT(tab, bit) (tab[ (bit) / 8 ] & (1 << ((bit) % 8)))
 #define BITLISTSIZE 16 /* bytes used for [chars] in compiled expr */
 
-static void globchars _ARG_(( const char *s, const char *e, char *b ));
+static void globchars _ARG_((const char *s, const char *e, char *b));
 
 /*
  * glob() - match a string against a simple pattern
  */
 
 int
-glob( c, s )
+glob(c, s)
     const char *c;
     const char *s;
 {
-        char bitlist[ BITLISTSIZE ];
-        const char *here;
+    char        bitlist[ BITLISTSIZE ];
+    const char *here;
 
-        for( ;; )
-            switch( *c++ )
-        {
+    for( ;;) {
+        switch(*c++) {
         case '\0':
-                return *s ? -1 : 0;
+            return(*s ? -1 : 0);
 
         case '?':
-                if( !*s++ )
-                    return 1;
-                break;
+            if(!*s++) {
+                return(1);
+            }
+            break;
 
         case '[':
-                /* scan for matching ] */
+            /* scan for matching ] */
 
-                here = c;
-                do if( !*c++ )
-                        return 1;
-                while( here == c || *c != ']' );
-                c++;
+            here = c;
+            do{
+                if(!*c++) {
+                    return(1);
+                }
+            }while(here == c || *c != ']');
+            c++;
 
-                /* build character class bitlist */
+            /* build character class bitlist */
 
-                globchars( here, c, bitlist );
+            globchars(here, c, bitlist);
 
-                if( !CHECK_BIT( bitlist, *(unsigned char *)s ) )
-                        return 1;
-                s++;
-                break;
+            if(!CHECK_BIT(bitlist, *(unsigned char *)s)) {
+                return(1);
+            }
+            s++;
+            break;
 
         case '*':
-                here = s;
+            here = s;
 
-                while( *s )
-                        s++;
+            while(*s) {
+                s++;
+            }
 
-                /* Try to match the rest of the pattern in a recursive */
-                /* call.  If the match fails we'll back up chars, retrying. */
+            /* Try to match the rest of the pattern in a recursive */
+            /* call.  If the match fails we'll back up chars, retrying. */
 
-                while( s != here )
-                {
-                        int r;
+            while(s != here) {
+                int  r;
 
-                        /* A fast path for the last token in a pattern */
+                /* A fast path for the last token in a pattern */
 
-                        r = *c ? glob( c, s ) : *s ? -1 : 0;
+                r = *c ? glob(c, s) : *s ? -1 : 0;
 
-                        if( !r )
-                                return 0;
-                        else if( r < 0 )
-                                return 1;
-
-                        --s;
+                if(!r) {
+                    return(0);
+                } else if(r < 0) {
+                    return(1);
                 }
-                break;
+                --s;
+            }
+            break;
 
         case '\\':
-                /* Force literal match of next char. */
+            /* Force literal match of next char. */
 
-                if( !*c || *s++ != *c++ )
-                    return 1;
-                break;
+            if(!*c || *s++ != *c++) {
+                return(1);
+            }
+            break;
 
         default:
-                if( *s++ != c[-1] )
-                    return 1;
-                break;
+            if(*s++ != c[-1]) {
+                return(1);
+            }
+            break;
         }
+    }
 }
 
 /*
@@ -122,41 +128,41 @@ glob( c, s )
  */
 
 static void
-globchars( s, e, b )
+globchars(s, e, b)
     const char *s;
     const char *e;
     char *b;
 {
-        int neg = 0;
+    int  neg = 0;
 
-        memset( b, '\0', BITLISTSIZE  );
+    memset(b, '\0', BITLISTSIZE);
 
-        if( *s == '^')
-                neg++, s++;
+    if(*s == '^') {
+        neg++, s++;
+    }
 
-        while( s < e )
-        {
-                int c;
+    while(s < e) {
+        int  c;
 
-                if( s+2 < e && s[1] == '-' )
-                {
-                        for( c = s[0]; c <= s[2]; c++ )
-                                b[ c/8 ] |= (1<<(c%8));
-                        s += 3;
-                } else {
-                        c = *s++;
-                        b[ c/8 ] |= (1<<(c%8));
-                }
+        if(s + 2 < e && s[1] == '-') {
+            for(c = s[0]; c <= s[2]; c++) {
+                b[ c / 8 ] |= (1 << (c % 8));
+            }
+            s += 3;
+        } else {
+            c           = *s++;
+            b[ c / 8 ] |= (1 << (c % 8));
         }
+    }
 
-        if( neg )
-        {
-                int i;
-                for( i = 0; i < BITLISTSIZE; i++ )
-                        b[ i ] ^= 0377;
+    if(neg) {
+        int  i;
+        for(i = 0; i < BITLISTSIZE; i++) {
+            b[ i ] ^= 0377;
         }
+    }
 
-        /* Don't include \0 in either $[chars] or $[^chars] */
+    /* Don't include \0 in either $[chars] or $[^chars] */
 
-        b[0] &= 0376;
+    b[0] &= 0376;
 }

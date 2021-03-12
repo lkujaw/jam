@@ -48,26 +48,26 @@ _BEGIN_EXTERNS_
 
 void compile_builtins _ARG_((void));
 
-LIST *compile_append   _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_break    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_foreach  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_if       _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_eval     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_include  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_list     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_local    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_null     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_on       _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_rule     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_rules    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_set      _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_setcomp  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_setexec  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_settings _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_switch   _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *compile_while    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *compile_append   _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_break    _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_foreach  _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_if       _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_eval     _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_include  _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_list     _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_local    _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_null     _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_on       _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_rule     _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_rules    _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_set      _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_setcomp  _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_setexec  _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_settings _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_switch   _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *compile_while    _ARG_((PARSE *parse, LOL *args, int *jmp));
 
-LIST *evaluate_rule _ARG_(( const char *rulename, LOL *args, LIST *result ));
+LIST *evaluate_rule _ARG_((const char *rulename, LOL *args, LIST *result));
 
 _END_EXTERNS_
 

@@ -27,8 +27,8 @@
 #include "jam.h"  /* Includes system headers */
 
 #include "lists.h"
-#include "memory.h"
-#include "newstr.h"
+#include "str.h"
+#include "xmem.h"
 
 static LIST *freelist = NULL;      /* junkpile for list_free() */
 
@@ -37,26 +37,21 @@ static LIST *freelist = NULL;      /* junkpile for list_free() */
  */
 
 LIST *
-list_append ( l, nl )
+list_append(l, nl)
     LIST *l;
     LIST *nl;
 {
-        if( !nl )
-        {
-            /* Just return l */
-        }
-        else if( !l )
-        {
-            l = nl;
-        }
-        else
-        {
-            /* Graft two non-empty lists. */
-            l->tail->next = nl;
-            l->tail = nl->tail;
-        }
+    if(!nl) {
+        /* Just return l */
+    } else if(!l) {
+        l = nl;
+    } else   {
+        /* Graft two non-empty lists. */
+        l->tail->next = nl;
+        l->tail       = nl->tail;
+    }
 
-        return l;
+    return(l);
 }
 
 /*
@@ -64,47 +59,48 @@ list_append ( l, nl )
  */
 
 LIST *
-list_new( head, string, copy )
+list_new(head, string, copy)
     LIST       *head;
     const char *string;
     int         copy;
 {
-        LIST *l;
+    LIST *l = _NIL_(LIST *);
 
-        if( DEBUG_LISTS )
-            printf( "list > %s <\n", string );
+    if(DEBUG_LISTS) {
+        printf("list > %s <\n", string);
+    }
 
-        /* Copy/newstr as needed */
+    /* Copy/newstr as needed */
 
-        string = copy ? copystr( string ) : newstr( string );
+    string = copy ? copystr(string) : newstr(string);
 
-        /* Get list struct from freelist, if one available.  */
-        /* Otherwise allocate. */
-        /* If from freelist, must free string first */
+    /* Get list struct from freelist, if one available.  */
+    /* Otherwise allocate. */
+    /* If from freelist, must free string first */
 
-        if( freelist )
-        {
-            l = freelist;
-            freestr( l->string );
-            freelist = freelist->next;
-        }
-        else
-        {
-            l = (LIST *)xmalloc( sizeof( *l ) );
-        }
+    if(freelist) {
+        l = freelist;
+        freestr(l->string);
+        freelist = freelist->next;
+    } else   {
+        memoryAllocateOrFail((voidT **)&l, sizeof(*l));
+    }
 
-        /* If first on chain, head points here. */
-        /* If adding to chain, tack us on. */
-        /* Tail must point to this new, last element. */
+    /* If first on chain, head points here. */
+    /* If adding to chain, tack us on. */
+    /* Tail must point to this new, last element. */
 
-        if( !head ) head = l;
-        else head->tail->next = l;
-        head->tail = l;
-        l->next = 0;
+    if(!head) {
+        head = l;
+    } else {
+        head->tail->next = l;
+    }
+    head->tail = l;
+    l->next    = 0;
 
-        l->string = string;
+    l->string = string;
 
-        return head;
+    return(head);
 }
 
 /*
@@ -112,14 +108,15 @@ list_new( head, string, copy )
  */
 
 LIST *
-list_copy( l, nl )
+list_copy(l, nl)
     LIST *l;
     LIST *nl;
 {
-        for( ; nl; nl = list_next( nl ) )
-            l = list_new( l, nl->string, 1 );
+    for( ; nl; nl = list_next(nl)) {
+        l = list_new(l, nl->string, 1);
+    }
 
-        return l;
+    return(l);
 }
 
 /*
@@ -127,20 +124,22 @@ list_copy( l, nl )
  */
 
 LIST *
-list_sublist( l, start, count )
+list_sublist(l, start, count)
     LIST    *l;
     int     start;
     int     count;
 {
-        LIST    *nl = 0;
+    LIST *nl = 0;
 
-        for( ; l && start--; l = list_next( l ) )
-            ;
+    for( ; l && start--; l = list_next(l)) {
+        ;
+    }
 
-        for( ; l && count--; l = list_next( l ) )
-            nl = list_new( nl, l->string, 1 );
+    for( ; l && count--; l = list_next(l)) {
+        nl = list_new(nl, l->string, 1);
+    }
 
-        return nl;
+    return(nl);
 }
 
 /*
@@ -148,16 +147,15 @@ list_sublist( l, start, count )
  */
 
 void
-list_free( head )
+list_free(head)
     LIST *head;
 {
-        /* Just tack onto freelist. */
+    /* Just tack onto freelist. */
 
-        if( head )
-        {
-            head->tail->next = freelist;
-            freelist = head;
-        }
+    if(head) {
+        head->tail->next = freelist;
+        freelist         = head;
+    }
 }
 
 /*
@@ -165,11 +163,12 @@ list_free( head )
  */
 
 void
-list_print( l )
+list_print(l)
     LIST *l;
 {
-        for( ; l; l = list_next( l ) )
-            printf( "%s ", l->string );
+    for( ; l; l = list_next(l)) {
+        printf("%s ", l->string);
+    }
 }
 
 /*
@@ -177,15 +176,16 @@ list_print( l )
  */
 
 int
-list_length( l )
+list_length(l)
     LIST *l;
 {
-        int n = 0;
+    int  n = 0;
 
-        for( ; l; l = list_next( l ), ++n )
-            ;
+    for( ; l; l = list_next(l), ++n) {
+        ;
+    }
 
-        return n;
+    return(n);
 }
 
 /*
@@ -193,10 +193,10 @@ list_length( l )
  */
 
 void
-lol_init( lol )
+lol_init(lol)
     LOL *lol;
 {
-        lol->count = 0;
+    lol->count = 0;
 }
 
 /*
@@ -204,12 +204,13 @@ lol_init( lol )
  */
 
 void
-lol_add( lol, l )
+lol_add(lol, l)
     LOL     *lol;
     LIST    *l;
 {
-        if( lol->count < LOL_MAX )
-            lol->list[ lol->count++ ] = l;
+    if(lol->count < LOL_MAX) {
+        lol->list[ lol->count++ ] = l;
+    }
 }
 
 /*
@@ -217,15 +218,16 @@ lol_add( lol, l )
  */
 
 void
-lol_free( lol )
+lol_free(lol)
     LOL *lol;
 {
-        int i;
+    int  i;
 
-        for( i = 0; i < lol->count; i++ )
-            list_free( lol->list[i] );
+    for(i = 0; i < lol->count; i++) {
+        list_free(lol->list[i]);
+    }
 
-        lol->count = 0;
+    lol->count = 0;
 }
 
 /*
@@ -233,11 +235,11 @@ lol_free( lol )
  */
 
 LIST *
-lol_get( lol, i )
+lol_get(lol, i)
     LOL     *lol;
     int     i;
 {
-        return i < lol->count ? lol->list[i] : 0;
+    return(i < lol->count ? lol->list[i] : 0);
 }
 
 /*
@@ -245,15 +247,15 @@ lol_get( lol, i )
  */
 
 void
-lol_print( lol )
+lol_print(lol)
     LOL *lol;
 {
-        int i;
+    int  i;
 
-        for( i = 0; i < lol->count; i++ )
-        {
-            if( i )
-                printf( " : " );
-            list_print( lol->list[i] );
+    for(i = 0; i < lol->count; i++) {
+        if(i) {
+            printf(" : ");
         }
+        list_print(lol->list[i]);
+    }
 }

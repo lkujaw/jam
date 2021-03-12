@@ -50,15 +50,15 @@
 #include "ansi.h"
 
 #define LOL_MAX 9
-#define list_next( l ) ((l)->next)
+#define list_next(l) ((l)->next)
 #define L0 ((LIST *)0)
 
 typedef struct _list LIST;
 
 struct _list {
-    LIST        *next;
-    LIST        *tail;          /* only valid in head node */
-    const char  *string;        /* private copy */
+    LIST       *next;
+    LIST       *tail;           /* only valid in head node */
+    const char *string;         /* private copy */
 };
 
 /*
@@ -68,25 +68,25 @@ struct _list {
 typedef struct _lol LOL;
 
 struct _lol {
-    int    count;
-    LIST  *list[LOL_MAX];
+    int   count;
+    LIST *list[LOL_MAX];
 };
 
 _BEGIN_EXTERNS_
 
-LIST *  list_append   _ARG_(( LIST *l, LIST *nl ));
-LIST *  list_copy     _ARG_(( LIST *l, LIST  *nl ));
-void    list_free     _ARG_(( LIST *head ));
-LIST *  list_new      _ARG_(( LIST *head, const char *string, int copy ));
-void    list_print    _ARG_(( LIST *l ));
-int     list_length   _ARG_(( LIST *l ));
-LIST *  list_sublist  _ARG_(( LIST *l, int start, int count ));
+LIST *  list_append   _ARG_((LIST *l, LIST *nl));
+LIST *  list_copy     _ARG_((LIST *l, LIST  *nl));
+void    list_free     _ARG_((LIST *head));
+LIST *  list_new      _ARG_((LIST *head, const char *string, int copy));
+void    list_print    _ARG_((LIST *l));
+int     list_length   _ARG_((LIST *l));
+LIST *  list_sublist  _ARG_((LIST *l, int start, int count));
 
-void    lol_add    _ARG_(( LOL *lol, LIST *l ));
-void    lol_init   _ARG_(( LOL *lol ));
-void    lol_free   _ARG_(( LOL *lol ));
-LIST *  lol_get    _ARG_(( LOL *lol, int i ));
-void    lol_print  _ARG_(( LOL *lol ));
+void    lol_add    _ARG_((LOL *lol, LIST *l));
+void    lol_init   _ARG_((LOL *lol));
+void    lol_free   _ARG_((LOL *lol));
+LIST *  lol_get    _ARG_((LOL *lol, int i));
+void    lol_print  _ARG_((LOL *lol));
 
 _END_EXTERNS_
 

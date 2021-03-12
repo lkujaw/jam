@@ -14,6 +14,7 @@
 #define JAM_MAKE_H 1
 
 #include "ansi.h"
+#include "rules.h"
 
 _BEGIN_EXTERNS_
 

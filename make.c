@@ -58,10 +58,10 @@
 #include "headers.h"
 #include "lists.h"
 #include "make.h"
-#include "newstr.h"
 #include "parse.h"
 #include "rules.h"
 #include "search.h"
+#include "str.h"
 #include "variable.h"
 
 typedef struct {
@@ -73,10 +73,10 @@ typedef struct {
     int     made;
 } COUNTS;
 
-static void make0 _ARG_(( TARGET *t, TARGET *p, int depth,
-                          COUNTS *counts, int anyhow ));
+static void make0 _ARG_((TARGET *t, TARGET *p, int depth,
+                         COUNTS *counts, int anyhow));
 
-static TARGETS *make0sort _ARG_(( TARGETS *c ));
+static TARGETS *make0sort _ARG_((TARGETS *c));
 
 static const char *target_fate[] =
 {
@@ -102,53 +102,57 @@ static const char *target_bind[] =
     "exists",
 };
 
-static const char szSpaces[] =  "                ";
+static const char  szSpaces[] = "                ";
 
-#define spaces(x) (szSpaces + (16 - ( x > 16 ? 16 : x )))
+#define spaces(x) (szSpaces + (16 - (x > 16 ? 16 : x)))
 
 /*
  * make() - make a target, given its name
  */
 
 int
-make( n_targets, targets, anyhow )
+make(n_targets, targets, anyhow)
     int          n_targets;
     const char **targets;
     int          anyhow;
 {
-        int i;
-        COUNTS counts[1];
-        int status = 0;         /* 1 if anything fails */
+    int     i;
+    COUNTS  counts[1];
+    int     status = 0;         /* 1 if anything fails */
 
-        memset( (char *)counts, 0, sizeof( *counts ) );
+    memset((char *)counts, 0, sizeof(*counts));
 
-        for( i = 0; i < n_targets; i++ )
-        {
-            TARGET *t = bindtarget( targets[i] );
+    for(i = 0; i < n_targets; i++) {
+        TARGET *t = bindtarget(targets[i]);
 
-            make0( t, 0, 0, counts, anyhow );
+        make0(t, 0, 0, counts, anyhow);
+    }
+
+    if(DEBUG_MAKE) {
+        if(counts->targets) {
+            printf("...found %d target(s)...\n", counts->targets);
         }
-
-        if( DEBUG_MAKE )
-        {
-            if( counts->targets )
-                printf( "...found %d target(s)...\n", counts->targets );
-            if( counts->temp )
-                printf( "...using %d temp target(s)...\n", counts->temp );
-            if( counts->updating )
-                printf( "...updating %d target(s)...\n", counts->updating );
-            if( counts->cantfind )
-                printf( "...can't find %d target(s)...\n", counts->cantfind );
-            if( counts->cantmake )
-                printf( "...can't make %d target(s)...\n", counts->cantmake );
+        if(counts->temp) {
+            printf("...using %d temp target(s)...\n", counts->temp);
         }
+        if(counts->updating) {
+            printf("...updating %d target(s)...\n", counts->updating);
+        }
+        if(counts->cantfind) {
+            printf("...can't find %d target(s)...\n", counts->cantfind);
+        }
+        if(counts->cantmake) {
+            printf("...can't make %d target(s)...\n", counts->cantmake);
+        }
+    }
 
-        status = counts->cantfind || counts->cantmake;
+    status = counts->cantfind || counts->cantmake;
 
-        for( i = 0; i < n_targets; i++ )
-            status |= make1( bindtarget( targets[i] ) );
+    for(i = 0; i < n_targets; i++) {
+        status |= make1(bindtarget(targets[i]));
+    }
 
-        return status;
+    return(status);
 }
 
 /*
@@ -159,332 +163,313 @@ make( n_targets, targets, anyhow )
  */
 
 static void
-make0( t, p, depth, counts, anyhow )
+make0(t, p, depth, counts, anyhow)
     TARGET  *t;
     TARGET  *p;             /* parent */
     int     depth;          /* for display purposes */
     COUNTS  *counts;        /* for reporting */
     int     anyhow;         /* forcibly touch all (real) targets */
 {
-        TARGETS *c, *incs;
-        TARGET  *ptime = t;
-        time_t  last, leaf, hlast;
-        int     fate;
-        const char *flag = "";
-        SETTINGS *s;
+    TARGETS    *c, *incs;
+    TARGET     *ptime = t;
+    time_t      last, leaf, hlast;
+    int         fate;
+    const char *flag = "";
+    SETTINGS   *s;
 
-        /*
-         * Step 1: initialize
-         */
+    /*
+     * Step 1: initialize
+     */
 
-        if( DEBUG_MAKEPROG )
-            printf( "make\t--\t%s%s\n", spaces( depth ), t->name );
+    if(DEBUG_MAKEPROG) {
+        printf("make\t--\t%s%s\n", spaces(depth), t->name);
+    }
 
-        t->fate = T_FATE_MAKING;
+    t->fate = T_FATE_MAKING;
 
-        /*
-         * Step 2: under the influence of "on target" variables,
-         * bind the target and search for headers.
-         */
+    /*
+     * Step 2: under the influence of "on target" variables,
+     * bind the target and search for headers.
+     */
 
-        /* Step 2a: set "on target" variables. */
+    /* Step 2a: set "on target" variables. */
 
-        s = copysettings( t->settings );
-        pushsettings( s );
+    s = copysettings(t->settings);
+    pushsettings(s);
 
-        /* Step 2b: find and timestamp the target file (if it's a file). */
+    /* Step 2b: find and timestamp the target file (if it's a file). */
 
-        if( t->binding == T_BIND_UNBOUND && !( t->flags & T_FLAG_NOTFILE ) )
-        {
-            t->boundname = search( t->name, &t->time );
-            t->binding = t->time ? T_BIND_EXISTS : T_BIND_MISSING;
+    if(t->binding == T_BIND_UNBOUND && !(t->flags & T_FLAG_NOTFILE)) {
+        t->boundname = search(t->name, &t->time);
+        t->binding   = t->time ? T_BIND_EXISTS : T_BIND_MISSING;
+    }
+
+    /* INTERNAL, NOTFILE header nodes have the time of their parents */
+
+    if(p && t->flags & T_FLAG_INTERNAL) {
+        ptime = p;
+    }
+
+    /* If temp file doesn't exist but parent does, use parent */
+
+    if(p && t->flags & T_FLAG_TEMP &&
+       t->binding == T_BIND_MISSING &&
+       p->binding != T_BIND_MISSING) {
+        t->binding = T_BIND_PARENTS;
+        ptime      = p;
+    }
+
+    /* Step 2c: If its a file, search for headers. */
+
+    if(t->binding == T_BIND_EXISTS) {
+        headers(t);
+    }
+
+    /* Step 2d: reset "on target" variables */
+
+    popsettings(s);
+    freesettings(s);
+
+    /*
+     * Pause for a little progress reporting
+     */
+
+    if(DEBUG_MAKEPROG) {
+        if(strcmp(t->name, t->boundname)) {
+            printf("bind\t--\t%s%s: %s\n",
+                   spaces(depth), t->name, t->boundname);
         }
 
-        /* INTERNAL, NOTFILE header nodes have the time of their parents */
+        switch(t->binding) {
+        case T_BIND_UNBOUND:
+        case T_BIND_MISSING:
+        case T_BIND_PARENTS:
+            printf("time\t--\t%s%s: %s\n",
+                   spaces(depth), t->name, target_bind[ t->binding ]);
+            break;
 
-        if( p && t->flags & T_FLAG_INTERNAL )
-            ptime = p;
+        case T_BIND_EXISTS:
+            printf("time\t--\t%s%s: %s",
+                   spaces(depth), t->name, ctime(&t->time));
+            break;
+        }
+    }
 
-        /* If temp file doesn't exist but parent does, use parent */
+    /*
+     * Step 3: recursively make0() dependents & headers
+     */
 
-        if( p && t->flags & T_FLAG_TEMP &&
-            t->binding == T_BIND_MISSING &&
-            p->binding != T_BIND_MISSING )
-        {
-            t->binding = T_BIND_PARENTS;
-            ptime = p;
+    /* Step 3a: recursively make0() dependents */
+
+    for(c = t->depends; c; c = c->next) {
+        int  internal = t->flags & T_FLAG_INTERNAL;
+
+        if(DEBUG_DEPENDS) {
+            printf("%s \"%s\" : \"%s\" ;\n",
+                   internal ? "Includes" : "Depends",
+                   t->name, c->target->name);
         }
 
-        /* Step 2c: If its a file, search for headers. */
+        /* Warn about circular deps, except for includes, */
+        /* which include each other alot. */
 
-        if( t->binding == T_BIND_EXISTS )
-            headers( t );
-
-        /* Step 2d: reset "on target" variables */
-
-        popsettings( s );
-        freesettings( s );
-
-        /*
-         * Pause for a little progress reporting
-         */
-
-        if( DEBUG_MAKEPROG )
-        {
-            if( strcmp( t->name, t->boundname ) )
-            {
-                printf( "bind\t--\t%s%s: %s\n",
-                        spaces( depth ), t->name, t->boundname );
-            }
-
-            switch( t->binding )
-            {
-            case T_BIND_UNBOUND:
-            case T_BIND_MISSING:
-            case T_BIND_PARENTS:
-                printf( "time\t--\t%s%s: %s\n",
-                        spaces( depth ), t->name, target_bind[ t->binding ] );
-                break;
-
-            case T_BIND_EXISTS:
-                printf( "time\t--\t%s%s: %s",
-                        spaces( depth ), t->name, ctime( &t->time ) );
-                break;
-            }
+        if(c->target->fate == T_FATE_INIT) {
+            make0(c->target, ptime, depth + 1, counts, anyhow);
+        } else if(c->target->fate == T_FATE_MAKING && !internal) {
+            printf("warning: %s depends on itself\n", c->target->name);
         }
+    }
 
-        /*
-         * Step 3: recursively make0() dependents & headers
-         */
+    /* Step 3b: recursively make0() internal includes node */
 
-        /* Step 3a: recursively make0() dependents */
+    if(t->includes) {
+        make0(t->includes, p, depth + 1, counts, anyhow);
+    }
 
-        for( c = t->depends; c; c = c->next )
-        {
-            int internal = t->flags & T_FLAG_INTERNAL;
+    /* Step 3c: add dependents' includes to our direct dependencies */
 
-            if( DEBUG_DEPENDS )
-                printf( "%s \"%s\" : \"%s\" ;\n",
-                    internal ? "Includes" : "Depends",
-                    t->name, c->target->name );
+    incs = 0;
 
-            /* Warn about circular deps, except for includes, */
-            /* which include each other alot. */
-
-            if( c->target->fate == T_FATE_INIT )
-                make0( c->target, ptime, depth + 1, counts, anyhow );
-            else if( c->target->fate == T_FATE_MAKING && !internal )
-                printf( "warning: %s depends on itself\n", c->target->name );
-        }
-
-        /* Step 3b: recursively make0() internal includes node */
-
-        if( t->includes )
-            make0( t->includes, p, depth + 1, counts, anyhow );
-
-        /* Step 3c: add dependents' includes to our direct dependencies */
-
-        incs = 0;
-
-        for( c = t->depends; c; c = c->next )
-          if( c->target->includes ) {
-            incs = targetentry( incs, c->target->includes );
+    for(c = t->depends; c; c = c->next) {
+        if(c->target->includes) {
+            incs = targetentry(incs, c->target->includes);
             /* If the includes are newer than we are their original target
                also needs to be marked newer. This is needed so that 'updated'
                correctly will include the original target in the $(<) variable. */
-            if(c->target->includes->time > t->time)
-              c->target->fate = MAX(T_FATE_NEWER, c->target->fate);
-          }
+            if(c->target->includes->time > t->time) {
+                c->target->fate = MAX(T_FATE_NEWER, c->target->fate);
+            }
+        }
+    }
 
 
-        t->depends = targetchain( t->depends, incs );
+    t->depends = targetchain(t->depends, incs);
 
-        /*
-         * Step 4: compute time & fate
-         */
+    /*
+     * Step 4: compute time & fate
+     */
 
-        /* Step 4a: pick up dependents' time and fate */
+    /* Step 4a: pick up dependents' time and fate */
 
-        last = 0;
-        leaf = 0;
+    last = 0;
+    leaf = 0;
+    fate = T_FATE_STABLE;
+
+    for(c = t->depends; c; c = c->next) {
+        /* If LEAVES has been applied, we only heed the timestamps of */
+        /* the leaf source nodes. */
+
+        leaf = MAX(leaf, c->target->leaf);
+
+        if(t->flags & T_FLAG_LEAVES) {
+            last = leaf;
+            continue;
+        }
+
+        last = MAX(last, c->target->time);
+        fate = MAX(fate, c->target->fate);
+    }
+
+    /* Step 4b: pick up included headers time */
+
+    /*
+     * If a header is newer than a temp source that includes it,
+     * the temp source will need building.
+     */
+
+    hlast = t->includes ? t->includes->time : 0;
+
+    /* Step 4c: handle NOUPDATE oddity */
+
+    /*
+     * If a NOUPDATE file exists, make dependents eternally old.
+     * Don't inherit our fate from our dependents.  Decide fate
+     * based only upon other flags and our binding (done later).
+     */
+
+    if(t->flags & T_FLAG_NOUPDATE) {
+        last    = 0;
+        t->time = 0;
+        fate    = T_FATE_STABLE;
+    }
+
+    /* Step 4d: determine fate: rebuild target or what? */
+
+    /*
+        In English:
+            If can't find or make child, can't make target.
+            If children changed, make target.
+            If target missing, make it.
+            If children newer, make target.
+            If temp's children newer than parent, make temp.
+            If temp's headers newer than parent, make temp.
+            If deliberately touched, make it.
+            If up-to-date temp file present, use it.
+            If target newer than non-notfile parent, mark target newer.
+            Otherwise, stable!
+
+            Note this block runs from least to most stable:
+            as we make it further down the list, the target's
+            fate is getting stabler.
+     */
+
+    if(fate >= T_FATE_BROKEN) {
+        fate = T_FATE_CANTMAKE;
+    } else if(fate >= T_FATE_SPOIL) {
+        fate = T_FATE_UPDATE;
+    } else if(t->binding == T_BIND_MISSING) {
+        fate = T_FATE_MISSING;
+    } else if(t->binding == T_BIND_EXISTS && last > t->time) {
+        fate = T_FATE_OUTDATED;
+    } else if(t->binding == T_BIND_PARENTS && last > p->time) {
+        fate = T_FATE_NEEDTMP;
+    } else if(t->binding == T_BIND_PARENTS && hlast > p->time) {
+        fate = T_FATE_NEEDTMP;
+    } else if(t->flags & T_FLAG_TOUCHED) {
+        fate = T_FATE_TOUCHED;
+    } else if(anyhow && !(t->flags & T_FLAG_NOUPDATE)) {
+        fate = T_FATE_TOUCHED;
+    } else if(t->binding == T_BIND_EXISTS && t->flags & T_FLAG_TEMP) {
+        fate = T_FATE_ISTMP;
+    } else if(t->binding == T_BIND_EXISTS && p &&
+              p->binding != T_BIND_UNBOUND && t->time > p->time) {
+        fate = T_FATE_NEWER;
+    } else   {
         fate = T_FATE_STABLE;
+    }
 
-        for( c = t->depends; c; c = c->next )
-        {
-            /* If LEAVES has been applied, we only heed the timestamps of */
-            /* the leaf source nodes. */
+    /* Step 4e: handle missing files */
+    /* If it's missing and there are no actions to create it, boom. */
+    /* If we can't make a target we don't care about, 'sokay */
+    /* We could insist that there are updating actions for all missing */
+    /* files, but if they have dependents we just pretend it's NOTFILE. */
 
-            leaf = MAX( leaf, c->target->leaf );
-
-            if( t->flags & T_FLAG_LEAVES )
-            {
-                last = leaf;
-                continue;
-            }
-
-            last = MAX( last, c->target->time );
-            fate = MAX( fate, c->target->fate );
-        }
-
-        /* Step 4b: pick up included headers time */
-
-        /*
-         * If a header is newer than a temp source that includes it,
-         * the temp source will need building.
-         */
-
-        hlast = t->includes ? t->includes->time : 0;
-
-        /* Step 4c: handle NOUPDATE oddity */
-
-            /*
-         * If a NOUPDATE file exists, make dependents eternally old.
-             * Don't inherit our fate from our dependents.  Decide fate
-             * based only upon other flags and our binding (done later).
-             */
-
-        if( t->flags & T_FLAG_NOUPDATE )
-        {
-            last = 0;
-            t->time = 0;
+    if(fate == T_FATE_MISSING && !t->actions && !t->depends) {
+        if(t->flags & T_FLAG_NOCARE) {
             fate = T_FATE_STABLE;
+        } else   {
+            printf("don't know how to make %s\n", t->name);
+
+            fate = T_FATE_CANTFIND;
         }
+    }
 
-        /* Step 4d: determine fate: rebuild target or what? */
+    /* Step 4f: propagate dependents' time & fate. */
+    /* Set leaf time to be our time only if this is a leaf. */
 
-        /*
-            In English:
-                If can't find or make child, can't make target.
-                If children changed, make target.
-                If target missing, make it.
-                If children newer, make target.
-                If temp's children newer than parent, make temp.
-                If temp's headers newer than parent, make temp.
-                If deliberately touched, make it.
-                If up-to-date temp file present, use it.
-                If target newer than non-notfile parent, mark target newer.
-                Otherwise, stable!
+    t->time = MAX(t->time, last);
+    t->leaf = leaf ? leaf : t->time;
+    t->fate = fate;
 
-                Note this block runs from least to most stable:
-                as we make it further down the list, the target's
-                fate is getting stabler.
-        */
+    /*
+     * Step 5: sort dependents by their update time.
+     */
 
-        if( fate >= T_FATE_BROKEN )
-        {
-            fate = T_FATE_CANTMAKE;
-        }
-        else if( fate >= T_FATE_SPOIL )
-        {
-            fate = T_FATE_UPDATE;
-        }
-        else if( t->binding == T_BIND_MISSING )
-        {
-            fate = T_FATE_MISSING;
-        }
-        else if( t->binding == T_BIND_EXISTS && last > t->time )
-        {
-            fate = T_FATE_OUTDATED;
-        }
-        else if( t->binding == T_BIND_PARENTS && last > p->time )
-        {
-            fate = T_FATE_NEEDTMP;
-        }
-        else if( t->binding == T_BIND_PARENTS && hlast > p->time )
-        {
-            fate = T_FATE_NEEDTMP;
-        }
-        else if( t->flags & T_FLAG_TOUCHED )
-        {
-            fate = T_FATE_TOUCHED;
-        }
-        else if( anyhow && !( t->flags & T_FLAG_NOUPDATE ) )
-        {
-            fate = T_FATE_TOUCHED;
-        }
-        else if( t->binding == T_BIND_EXISTS && t->flags & T_FLAG_TEMP )
-        {
-            fate = T_FATE_ISTMP;
-        }
-        else if( t->binding == T_BIND_EXISTS && p &&
-                 p->binding != T_BIND_UNBOUND && t->time > p->time )
-        {
-            fate = T_FATE_NEWER;
-        }
-        else
-        {
-            fate = T_FATE_STABLE;
-        }
+    if(globs.newestfirst) {
+        t->depends = make0sort(t->depends);
+    }
 
-        /* Step 4e: handle missing files */
-        /* If it's missing and there are no actions to create it, boom. */
-        /* If we can't make a target we don't care about, 'sokay */
-        /* We could insist that there are updating actions for all missing */
-        /* files, but if they have dependents we just pretend it's NOTFILE. */
+    /*
+     * Step 6: a little harmless tabulating for tracing purposes
+     */
 
-        if( fate == T_FATE_MISSING && !t->actions && !t->depends )
-        {
-            if( t->flags & T_FLAG_NOCARE )
-            {
-                fate = T_FATE_STABLE;
-            }
-            else
-            {
-                printf( "don't know how to make %s\n", t->name );
+    /* Don't count or report interal includes nodes. */
 
-                fate = T_FATE_CANTFIND;
-            }
-        }
+    if(t->flags & T_FLAG_INTERNAL) {
+        return;
+    }
 
-        /* Step 4f: propagate dependents' time & fate. */
-        /* Set leaf time to be our time only if this is a leaf. */
+    if(!(++counts->targets % 1000) && DEBUG_MAKE) {
+        printf("...patience...\n");
+    }
 
-        t->time = MAX( t->time, last );
-        t->leaf = leaf ? leaf : t->time ;
-        t->fate = fate;
+    if(fate == T_FATE_ISTMP) {
+        counts->temp++;
+    } else if(fate == T_FATE_CANTFIND) {
+        counts->cantfind++;
+    } else if(fate == T_FATE_CANTMAKE && t->actions) {
+        counts->cantmake++;
+    } else if(fate >= T_FATE_BUILD && fate < T_FATE_BROKEN && t->actions) {
+        counts->updating++;
+    }
 
-        /*
-         * Step 5: sort dependents by their update time.
-         */
+    if(!(t->flags & T_FLAG_NOTFILE) && fate >= T_FATE_SPOIL) {
+        flag = "+";
+    } else if(t->binding == T_BIND_EXISTS && p && t->time > p->time) {
+        flag = "*";
+    }
 
-        if( globs.newestfirst )
-            t->depends = make0sort( t->depends );
+    if(DEBUG_MAKEPROG) {
+        printf("made%s\t%s\t%s%s\n",
+               flag, target_fate[ t->fate ],
+               spaces(depth), t->name);
+    }
 
-        /*
-         * Step 6: a little harmless tabulating for tracing purposes
-         */
-
-        /* Don't count or report interal includes nodes. */
-
-        if( t->flags & T_FLAG_INTERNAL )
-            return;
-
-        if( !( ++counts->targets % 1000 ) && DEBUG_MAKE )
-            printf( "...patience...\n" );
-
-        if( fate == T_FATE_ISTMP )
-            counts->temp++;
-        else if( fate == T_FATE_CANTFIND )
-            counts->cantfind++;
-        else if( fate == T_FATE_CANTMAKE && t->actions )
-            counts->cantmake++;
-        else if( fate >= T_FATE_BUILD && fate < T_FATE_BROKEN && t->actions )
-            counts->updating++;
-
-        if( !( t->flags & T_FLAG_NOTFILE ) && fate >= T_FATE_SPOIL )
-            flag = "+";
-        else if( t->binding == T_BIND_EXISTS && p && t->time > p->time )
-            flag = "*";
-
-        if( DEBUG_MAKEPROG )
-            printf( "made%s\t%s\t%s%s\n",
-                flag, target_fate[ t->fate ],
-                spaces( depth ), t->name );
-
-        if( DEBUG_CAUSES &&
-            t->fate >= T_FATE_NEWER &&
-            t->fate <= T_FATE_MISSING )
-                printf( "%s %s\n", target_fate[ t->fate ], t->name );
+    if(DEBUG_CAUSES &&
+       t->fate >= T_FATE_NEWER &&
+       t->fate <= T_FATE_MISSING) {
+        printf("%s %s\n", target_fate[ t->fate ], t->name);
+    }
 }
 
 /*
@@ -492,42 +477,48 @@ make0( t, p, depth, counts, anyhow )
  */
 
 static TARGETS *
-make0sort( chain )
+make0sort(chain)
     TARGETS *chain;
 {
-        TARGETS *result = 0;
+    TARGETS *result = 0;
 
-        /* We walk chain, taking each item and inserting it on the */
-        /* sorted result, with newest items at the front.  This involves */
-        /* updating each TARGETS' c->next and c->tail.  Note that we */
-        /* make c->tail a valid prev pointer for every entry.  Normally, */
-        /* it is only valid at the head, where prev == tail.  Note also */
-        /* that while tail is a loop, next ends at the end of the chain. */
+    /* We walk chain, taking each item and inserting it on the */
+    /* sorted result, with newest items at the front.  This involves */
+    /* updating each TARGETS' c->next and c->tail.  Note that we */
+    /* make c->tail a valid prev pointer for every entry.  Normally, */
+    /* it is only valid at the head, where prev == tail.  Note also */
+    /* that while tail is a loop, next ends at the end of the chain. */
 
-        /* Walk current target list */
+    /* Walk current target list */
 
-        while( chain )
-        {
-            TARGETS *c = chain;
-            TARGETS *s = result;
+    while(chain) {
+        TARGETS *c = chain;
+        TARGETS *s = result;
 
-            chain = chain->next;
+        chain = chain->next;
 
-            /* Find point s in result for c */
+        /* Find point s in result for c */
 
-            while( s && s->target->time > c->target->time )
-                s = s->next;
-
-            /* Insert c in front of s (might be 0). */
-            /* Don't even think of deciphering this. */
-
-            c->next = s;                        /* good even if s = 0 */
-            if( result == s ) result = c;       /* new head of chain? */
-            if( !s ) s = result;                /* wrap to ensure a next */
-            if( result != c ) s->tail->next = c; /* not head? be prev's next */
-            c->tail = s->tail;                  /* take on next's prev */
-            s->tail = c;                        /* make next's prev us */
+        while(s && s->target->time > c->target->time) {
+            s = s->next;
         }
 
-        return result;
+        /* Insert c in front of s (might be 0). */
+        /* Don't even think of deciphering this. */
+
+        c->next = s;                            /* good even if s = 0 */
+        if(result == s) {
+            result = c;                         /* new head of chain? */
+        }
+        if(!s) {
+            s = result;                         /* wrap to ensure a next */
+        }
+        if(result != c) {
+            s->tail->next = c;                   /* not head? be prev's next */
+        }
+        c->tail = s->tail;                      /* take on next's prev */
+        s->tail = c;                            /* make next's prev us */
+    }
+
+    return(result);
 }

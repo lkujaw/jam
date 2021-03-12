@@ -40,21 +40,21 @@
 #include "execcmd.h"
 #include <errno.h>
 
-# ifdef OS_MAC
+#ifdef OS_MAC
 
 /*
  * execcmd() - launch an async command execution
  */
 
 void
-execcmd( string, func, closure, shell )
+execcmd(string, func, closure, shell)
     char *string;
-    void (*func)( void *closure, int status );
+    void (*func)(void *closure, int status);
     void *closure;
     LIST *shell;
 {
-        printf( "%s", string );
-        (*func)( closure, EXEC_CMD_OK );
+    printf("%s", string);
+    (*func)(closure, EXEC_CMD_OK);
 }
 
 /*
@@ -62,9 +62,9 @@ execcmd( string, func, closure, shell )
  */
 
 int
-execwait( void )
+execwait(void)
 {
-        return 0;
+    return(0);
 }
 
-# endif /* OS_MAC */
+#endif  /* OS_MAC */

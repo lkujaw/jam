@@ -1,10 +1,4 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * jamgram.yy - jam grammar
  *
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
@@ -40,15 +34,15 @@
 #include "jam.h"
 
 #include "ansi.h"
-#include "lists.h"
-#include "variable.h"
-#include "parse.h"
-#include "scan.h"
 #include "compile.h"
-#include "newstr.h"
+#include "lists.h"
+#include "parse.h"
 #include "rules.h"
+#include "scan.h"
+#include "str.h"
+#include "variable.h"
 
-#define YYMAXDEPTH 10000       /* for OSF and other less endowed yaccs */
+#define YYMAXDEPTH 10000  /* increase depth for OSF and similar system */
 
 #if __STD_C
 # define F0 (LIST *(*)(PARSE *, LOL *, int *))0

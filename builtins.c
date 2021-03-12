@@ -39,90 +39,90 @@
 #include "glob.h"
 #include "hdrmacro.h"
 #include "lists.h"
-#include "memory.h"
-#include "newstr.h"
 #include "parse.h"
 #include "pathsys.h"
 #include "regexp.h"
 #include "rules.h"
+#include "str.h"
+#include "xmem.h"
 
 /*
  * compile_builtin() - define builtin rules
  */
 
-# define P0 (PARSE *)0
-# define C0 (char *)0
+#define P0 (PARSE *)0
+#define C0 (char *)0
 
-LIST *builtin_depends  _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_echo     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_exit     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_flags    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_glob     _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_match    _ARG_(( PARSE *parse, LOL *args, int *jmp ));
-LIST *builtin_hdrmacro _ARG_(( PARSE *parse, LOL *args, int *jmp ));
+LIST *builtin_depends  _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_echo     _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_exit     _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_flags    _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_glob     _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_match    _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_hdrmacro _ARG_((PARSE *parse, LOL *args, int *jmp));
 
-static void builtin_glob_back _ARG_(( Void_t     *closure,
-                                      const char *file,
-                                      int         status,
-                                      time_t      time ));
+static void builtin_glob_back _ARG_((voidT      *closure,
+                                     const char *file,
+                                     int         status,
+                                     time_t      time));
 
 void
 load_builtins _ARG_((void))
 {
-    bindrule( "Always" )->procedure =
-    bindrule( "ALWAYS" )->procedure =
-        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TOUCHED );
+    bindrule("Always")->procedure =
+    bindrule("ALWAYS")->procedure =
+        parse_make(builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TOUCHED);
 
-    bindrule( "Depends" )->procedure =
-    bindrule( "DEPENDS" )->procedure =
-        parse_make( builtin_depends, P0, P0, P0, C0, C0, 0 );
+    bindrule("Depends")->procedure =
+    bindrule("DEPENDS")->procedure =
+        parse_make(builtin_depends, P0, P0, P0, C0, C0, 0);
 
-    bindrule( "echo" )->procedure =
-    bindrule( "Echo" )->procedure =
-    bindrule( "ECHO" )->procedure =
-        parse_make( builtin_echo, P0, P0, P0, C0, C0, 0 );
+    bindrule("echo")->procedure =
+    bindrule("Echo")->procedure =
+    bindrule("ECHO")->procedure =
+        parse_make(builtin_echo, P0, P0, P0, C0, C0, 0);
 
-    bindrule( "exit" )->procedure =
-    bindrule( "Exit" )->procedure =
-    bindrule( "EXIT" )->procedure =
-        parse_make( builtin_exit, P0, P0, P0, C0, C0, 0 );
+    bindrule("exit")->procedure =
+    bindrule("Exit")->procedure =
+    bindrule("EXIT")->procedure =
+        parse_make(builtin_exit, P0, P0, P0, C0, C0, 0);
 
-    bindrule( "Glob" )->procedure =
-    bindrule( "GLOB" )->procedure =
-        parse_make( builtin_glob, P0, P0, P0, C0, C0, 0 );
+    bindrule("Glob")->procedure =
+    bindrule("GLOB")->procedure =
+        parse_make(builtin_glob, P0, P0, P0, C0, C0, 0);
 
-    bindrule( "Includes" )->procedure =
-    bindrule( "INCLUDES" )->procedure =
-        parse_make( builtin_depends, P0, P0, P0, C0, C0, 1 );
+    bindrule("Includes")->procedure =
+    bindrule("INCLUDES")->procedure =
+        parse_make(builtin_depends, P0, P0, P0, C0, C0, 1);
 
-    bindrule( "Leaves" )->procedure =
-    bindrule( "LEAVES" )->procedure =
-        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_LEAVES );
+    bindrule("Leaves")->procedure =
+    bindrule("LEAVES")->procedure =
+        parse_make(builtin_flags, P0, P0, P0, C0, C0, T_FLAG_LEAVES);
 
-    bindrule( "Match" )->procedure =
-    bindrule( "MATCH" )->procedure =
-        parse_make( builtin_match, P0, P0, P0, C0, C0, 0 );
+    bindrule("Match")->procedure =
+    bindrule("MATCH")->procedure =
+        parse_make(builtin_match, P0, P0, P0, C0, C0, 0);
 
-    bindrule( "NoCare" )->procedure =
-    bindrule( "NOCARE" )->procedure =
-        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOCARE );
+    bindrule("NoCare")->procedure =
+    bindrule("NOCARE")->procedure =
+        parse_make(builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOCARE);
 
-    bindrule( "NOTIME" )->procedure =
-    bindrule( "NotFile" )->procedure =
-    bindrule( "NOTFILE" )->procedure =
-        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOTFILE );
+    bindrule("NOTIME")->procedure  =
+    bindrule("NotFile")->procedure =
+    bindrule("NOTFILE")->procedure =
+        parse_make(builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOTFILE);
 
-    bindrule( "NoUpdate" )->procedure =
-    bindrule( "NOUPDATE" )->procedure =
-        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOUPDATE );
+    bindrule("NoUpdate")->procedure =
+    bindrule("NOUPDATE")->procedure =
+        parse_make(builtin_flags, P0, P0, P0, C0, C0, T_FLAG_NOUPDATE);
 
-    bindrule( "Temporary" )->procedure =
-    bindrule( "TEMPORARY" )->procedure =
-        parse_make( builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TEMP );
+    bindrule("Temporary")->procedure =
+    bindrule("TEMPORARY")->procedure =
+        parse_make(builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TEMP);
 
-    bindrule( "HdrMacro" )->procedure =
-    bindrule( "HDRMACRO" )->procedure =
-        parse_make( builtin_hdrmacro, P0, P0, P0, C0, C0, 0 );
+    bindrule("HdrMacro")->procedure =
+    bindrule("HDRMACRO")->procedure =
+        parse_make(builtin_hdrmacro, P0, P0, P0, C0, C0, 0);
 }
 
 /*
@@ -134,34 +134,34 @@ load_builtins _ARG_((void))
  */
 
 LIST *
-builtin_depends( parse, args, jmp )
+builtin_depends(parse, args, jmp)
     PARSE   *parse;
     LOL     *args;
     int     *jmp;
 {
-        LIST *targets = lol_get( args, 0 );
-        LIST *sources = lol_get( args, 1 );
-        LIST *l;
+    LIST *targets = lol_get(args, 0);
+    LIST *sources = lol_get(args, 1);
+    LIST *l;
 
-        for( l = targets; l; l = list_next( l ) )
-        {
-            TARGET *t = bindtarget( l->string );
+    for(l = targets; l; l = list_next(l)) {
+        TARGET *t = bindtarget(l->string);
 
-            /* If doing INCLUDES, switch to the TARGET's include */
-            /* TARGET, creating it if needed.  The internal include */
-            /* TARGET shares the name of its parent. */
+        /* If doing INCLUDES, switch to the TARGET's include */
+        /* TARGET, creating it if needed.  The internal include */
+        /* TARGET shares the name of its parent. */
 
-            if( parse->num )
-            {
-                if( !t->includes )
-                    t->includes = copytarget( t );
-                t = t->includes;
+        if(parse->num) {
+            if(!t->includes) {
+                t->includes = copytarget(t);
             }
 
-            t->depends = targetlist( t->depends, sources );
+            t = t->includes;
         }
 
-        return L0;
+        t->depends = targetlist(t->depends, sources);
+    }
+
+    return(L0);
 }
 
 /*
@@ -172,14 +172,14 @@ builtin_depends( parse, args, jmp )
  */
 
 LIST *
-builtin_echo( parse, args, jmp )
+builtin_echo(parse, args, jmp)
     PARSE   *parse;
     LOL     *args;
     int     *jmp;
 {
-        list_print( lol_get( args, 0 ) );
-        printf( "\n" );
-        return L0;
+    list_print(lol_get(args, 0));
+    printf("\n");
+    return(L0);
 }
 
 /*
@@ -190,15 +190,15 @@ builtin_echo( parse, args, jmp )
  */
 
 LIST *
-builtin_exit( parse, args, jmp )
+builtin_exit(parse, args, jmp)
     PARSE   *parse;
     LOL     *args;
     int     *jmp;
 {
-        list_print( lol_get( args, 0 ) );
-        printf( "\n" );
-        exit( EXITBAD ); /* yeech */
-        return L0;
+    list_print(lol_get(args, 0));
+    printf("\n");
+    exit(EXITFAIL); /* yeech */
+    return(L0);
 }
 
 /*
@@ -209,17 +209,18 @@ builtin_exit( parse, args, jmp )
  */
 
 LIST *
-builtin_flags( parse, args, jmp )
+builtin_flags(parse, args, jmp)
     PARSE   *parse;
     LOL     *args;
     int     *jmp;
 {
-        LIST *l = lol_get( args, 0 );
+    LIST *l = lol_get(args, 0);
 
-        for( ; l; l = list_next( l ) )
-            bindtarget( l->string )->flags |= parse->num;
+    for( ; l; l = list_next(l)) {
+        bindtarget(l->string)->flags |= parse->num;
+    }
 
-        return L0;
+    return(L0);
 }
 
 /*
@@ -227,55 +228,56 @@ builtin_flags( parse, args, jmp )
  */
 
 struct globbing {
-        LIST    *patterns;
-        LIST    *results;
-} ;
+    LIST *patterns;
+    LIST *results;
+};
 
 static void
-builtin_glob_back( closure, file, status, time )
-    Void_t     *closure;
+builtin_glob_back(closure, file, status, time)
+    voidT      *closure;
     const char *file;
     int         status;
     time_t      time;
 {
-        struct globbing *globbing = (struct globbing *)closure;
-        LIST            *l;
-        PATHNAME        f;
-        char            buf[ MAXJPATH ];
+    struct globbing *globbing = (struct globbing *)closure;
+    LIST            *l;
+    PATHNAME         f;
+    char             buf[ MAXJPATH ];
 
-        /* Null out directory for matching. */
-        /* We wish we had file_dirscan() pass up a PATHNAME. */
+    /* Null out directory for matching. */
+    /* We wish we had file_dirscan() pass up a PATHNAME. */
 
-        path_parse( file, &f );
-        f.f_dir.len = 0;
-        path_build( &f, buf, 0 );
+    path_parse(file, &f);
+    f.f_dir.len = 0;
+    path_build(&f, buf, 0);
 
-        for( l = globbing->patterns; l; l = l->next )
-            if( !glob( l->string, buf ) )
-        {
-            globbing->results = list_new( globbing->results, file, 0 );
+    for(l = globbing->patterns; l; l = l->next) {
+        if(!glob(l->string, buf)) {
+            globbing->results = list_new(globbing->results, file, 0);
             break;
         }
+    }
 }
 
 LIST *
-builtin_glob( parse, args, jmp )
+builtin_glob(parse, args, jmp)
     PARSE   *parse;
     LOL     *args;
     int     *jmp;
 {
-        LIST *l = lol_get( args, 0 );
-        LIST *r = lol_get( args, 1 );
+    LIST *l = lol_get(args, 0);
+    LIST *r = lol_get(args, 1);
 
-        struct globbing globbing;
+    struct globbing  globbing;
 
-        globbing.results = L0;
-        globbing.patterns = r;
+    globbing.results  = L0;
+    globbing.patterns = r;
 
-        for( ; l; l = list_next( l ) )
-            file_dirscan( l->string, builtin_glob_back, &globbing );
+    for( ; l; l = list_next(l)) {
+        file_dirscan(l->string, builtin_glob_back, &globbing);
+    }
 
-        return globbing.results;
+    return(globbing.results);
 }
 
 /*
@@ -283,72 +285,72 @@ builtin_glob( parse, args, jmp )
  */
 
 LIST *
-builtin_match( parse, args, jmp )
+builtin_match(parse, args, jmp)
     PARSE   *parse;
     LOL     *args;
     int     *jmp;
 {
-        LIST *l, *r;
-        LIST *result = 0;
+    LIST *l, *r;
+    LIST *result = 0;
 
-        /* For each pattern */
+    /* For each pattern */
 
-        for( l = lol_get( args, 0 ); l; l = l->next )
-        {
-            regexp *re = regcomp( l->string );
+    for(l = lol_get(args, 0); l; l = l->next) {
+        regexp *re = regcomp(l->string);
 
-            /* For each string to match against */
+        /* For each string to match against */
 
-            for( r = lol_get( args, 1 ); r; r = r->next )
-                if( regexec( re, r->string ) )
-            {
-                int i, top;
+        for(r = lol_get(args, 1); r; r = r->next) {
+            if(regexec(re, r->string)) {
+                int  i, top;
 
                 /* Find highest parameter */
 
-                for( top = NSUBEXP; top-- > 1; )
-                    if( re->startp[top] )
+                for(top = NSUBEXP; top-- > 1;) {
+                    if(re->startp[top]) {
                         break;
+                    }
+                }
 
                 /* And add all parameters up to highest onto list. */
                 /* Must have parameters to have results! */
 
-                for( i = 1; i <= top; i++ )
-                {
-                    char buf[ MAXSYM ];
-                    int l = re->endp[i] - re->startp[i];
-                    memcpy( buf, re->startp[i], l );
+                for(i = 1; i <= top; i++) {
+                    char  buf[ MAXSYM ];
+                    int   l = re->endp[i] - re->startp[i];
+                    memcpy(buf, re->startp[i], l);
                     buf[ l ] = 0;
-                    result = list_new( result, buf, 0 );
+                    result   = list_new(result, buf, 0);
                 }
             }
-
-            xfree( (char *)re );
         }
 
-        return result;
+        memoryRelease((voidT **)&re);
+    }
+
+    return(result);
 }
 
 
 LIST *
-builtin_hdrmacro( parse, args, jmp )
-    PARSE    *parse;
-    LOL      *args;
-    int      *jmp;
+builtin_hdrmacro(parse, args, jmp)
+    PARSE  *parse;
+    LOL    *args;
+    int    *jmp;
 {
-  LIST*  l = lol_get( args, 0 );
+    LIST *l = lol_get(args, 0);
 
-  for ( ; l; l = list_next(l) )
-  {
-    TARGET*  t = bindtarget( l->string );
+    for( ; l; l = list_next(l)) {
+        TARGET *t = bindtarget(l->string);
 
-    /* scan file for header filename macro definitions */
-    if ( DEBUG_HEADER )
-      printf( "scanning '%s' for header file macro definitions\n",
-              l->string );
+        /* scan file for header filename macro definitions */
+        if(DEBUG_HEADER) {
+            printf("scanning '%s' for header file macro definitions\n",
+                   l->string);
+        }
 
-    macro_headers( t );
-  }
+        macro_headers(t);
+    }
 
-  return L0;
+    return(L0);
 }

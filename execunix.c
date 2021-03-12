@@ -46,50 +46,50 @@
 
 #ifdef USE_EXECUNIX
 
-#ifdef OS_OS2
-# define USE_EXECNT
-# include <process.h>
-#endif
-
-#ifdef OS_NT
-# define USE_EXECNT
-# include <process.h>
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>           /* do the ugly deed */
-# define USE_MYWAIT
-# if !defined( __BORLANDC__ )
-#  define wait my_wait
-static int my_wait _ARG_(( int *status ));
+# ifdef OS_OS2
+#  define USE_EXECNT
+#  include <process.h>
 # endif
-#endif
 
-static int intr = 0;
-static int cmdsrunning = 0;
-static void onintr _ARG_(( int ));
-static void (*istat)_ARG_(( int ));
+# ifdef OS_NT
+#  define USE_EXECNT
+#  include <process.h>
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>          /* do the ugly deed */
+#  define USE_MYWAIT
+#  if !defined(__BORLANDC__)
+#   define pid_t int
+#   define wait my_wait
+static int my_wait _ARG_((int *status));
+#  endif
+# endif
 
-static struct
-{
-        int      pid; /* on win32, a real process handle */
-        void   (*func)_ARG_(( Void_t *closure, int status ));
-        Void_t  *closure;
+static int  intr        = 0;
+static int  cmdsrunning = 0;
+static void onintr _ARG_((int));
+static void (*istat)_ARG_((int));
+
+static struct {
+    int pid;          /* on win32, a real process handle */
+    void   (*func)_ARG_((voidT * closure, int status));
+    voidT *closure;
 
 # ifdef USE_EXECNT
-        char    *tempfile;
+    char *tempfile;
 # endif
 
-} cmdtab[ MAXJOBS ] = {{0}};
+} cmdtab[ MAXJOBS ] = { { 0 } };
 
 /*
  * onintr() - bump intr to note command interruption
  */
 
 static void
-onintr( disp )
+onintr(disp)
     int disp;
 {
     intr++;
-    printf( "...interrupted\n" );
+    printf("...interrupted\n");
 }
 
 /*
@@ -97,166 +97,165 @@ onintr( disp )
  */
 
 void
-execcmd( string, func, closure, shell )
+execcmd(string, func, closure, shell)
     const char *string;
-    void      (*func)_ARG_(( Void_t *closure, int status ));
-    Void_t     *closure;
+    void      (*func)_ARG_((voidT *closure, int status));
+    voidT      *closure;
     LIST       *shell;
 {
-        int pid;
-        int slot;
-        const char *argv[ MAXARGC + 1 ];        /* +1 for NULL */
+    int         pid;
+    int         slot;
+    const char *argv[ MAXARGC + 1 ];        /* +1 for NULL */
 
 # ifdef USE_EXECNT
-        char *p;
+    char *p;
 # endif
 
-        assert(string && func);
+    assert(string && func);
 
-        /* Find a slot in the running commands table for this one. */
+    /* Find a slot in the running commands table for this one. */
 
-        for( slot = 0; slot < MAXJOBS; slot++ )
-            if( !cmdtab[ slot ].pid )
-                break;
-
-        if( slot == MAXJOBS )
-        {
-            printf( "no slots for child!\n" );
-            exit( EXITBAD );
+    for(slot = 0; slot < MAXJOBS; slot++) {
+        if(!cmdtab[ slot ].pid) {
+            break;
         }
+    }
+
+    if(slot == MAXJOBS) {
+        printf("no slots for child!\n");
+        exit(EXITFAIL);
+    }
 
 # ifdef USE_EXECNT
-        if( !cmdtab[ slot ].tempfile )
-        {
-            char *tempdir;
+    if(!cmdtab[ slot ].tempfile) {
+        char *tempdir;
 
-            if( !( tempdir = getenv( "TEMP" ) ) &&
-                !( tempdir = getenv( "TMP" ) ) )
-                    tempdir = "\\temp";
-
-            /* +32 is room for \jamXXXXXtSS.bat (at least) */
-
-            cmdtab[ slot ].tempfile = xmalloc( strlen( tempdir ) + 32 );
-
-            sprintf( cmdtab[ slot ].tempfile, "%s\\jam%dt%d.bat",
-                                tempdir, GetCurrentProcessId(), slot );
+        if(!(tempdir = getenv("TEMP")) &&
+           !(tempdir = getenv("TMP"))) {
+            tempdir = "\\temp";
         }
 
-        /* Trim leading, ending white space */
+        /* +32 is room for \jamXXXXXtSS.bat (at least) */
+        memoryAllocateOrFail((voidT**)&cmdtab[slot].tempfile,
+                             strlen(tempdir) + 32);
 
-        while( isspace( *string ) )
-                ++string;
+        sprintf(cmdtab[slot].tempfile, "%s\\jam%dt%d.bat",
+                tempdir, GetCurrentProcessId(), slot);
+    }
 
-        p = strchr( string, '\n' );
+    /* Trim leading, ending white space */
 
-        while( p && isspace( *p ) )
-                ++p;
+    while(isspace(*string)) {
+        ++string;
+    }
 
-        /* If multi line, or too long, or JAMSHELL is set, write to bat file. */
-        /* Otherwise, exec directly. */
-        /* Frankly, if it is a single long line I don't think the */
-        /* command interpreter will do any better -- it will fail. */
+    p = strchr(string, '\n');
 
-        if( p && *p || strlen( string ) > MAXLINE || shell )
-        {
-            FILE *f;
+    while(p && isspace(*p)) {
+        ++p;
+    }
 
-            /* Write command to bat file. */
+    /* If multi line, or too long, or JAMSHELL is set, write to bat file. */
+    /* Otherwise, exec directly. */
+    /* Frankly, if it is a single long line I don't think the */
+    /* command interpreter will do any better -- it will fail. */
 
-            f = fopen( cmdtab[ slot ].tempfile, "w" );
-            fputs( string, f );
-            fclose( f );
+    if(p && *p || strlen(string) > MAXLINE || shell) {
+        FILE *f;
 
-            string = cmdtab[ slot ].tempfile;
-        }
+        /* Write command to bat file. */
+
+        f = fopen(cmdtab[ slot ].tempfile, "w");
+        fputs(string, f);
+        fclose(f);
+
+        string = cmdtab[ slot ].tempfile;
+    }
 # endif
 
-        /* Forumulate argv */
-        /* If shell was defined, be prepared for % and ! subs. */
-        /* Otherwise, use stock /bin/sh (on unix) or cmd.exe (on NT). */
+    /* Forumulate argv */
+    /* If shell was defined, be prepared for % and ! subs. */
+    /* Otherwise, use stock /bin/sh (on unix) or cmd.exe (on NT). */
 
-        if( shell )
-        {
-            int i;
-            char jobno[4];
-            int gotpercent = 0;
+    if(shell) {
+        int   i;
+        char  jobno[4];
+        int   gotpercent = 0;
 
-            sprintf( jobno, "%d", slot + 1 );
+        sprintf(jobno, "%d", slot + 1);
 
-            for( i = 0; shell && i < MAXARGC; i++, shell = list_next( shell ) )
-            {
-                switch( shell->string[0] )
-                {
-                case '%':       argv[i] = string; gotpercent++; break;
-                case '!':       argv[i] = jobno; break;
-                default:        argv[i] = shell->string;
-                }
-                if( DEBUG_EXECCMD )
-                    printf( "argv[%d] = '%s'\n", i, argv[i] );
+        for(i = 0; shell && i < MAXARGC; i++, shell = list_next(shell)) {
+            switch(shell->string[0]) {
+            case '%':       argv[i] = string; gotpercent++; break;
+            case '!':       argv[i] = jobno; break;
+            default:        argv[i] = shell->string;
             }
-
-            if( !gotpercent )
-                argv[i++] = string;
-
-            argv[i] = NULL;
+            if(DEBUG_EXECCMD) {
+                printf("argv[%d] = '%s'\n", i, argv[i]);
+            }
         }
-        else
-        {
+
+        if(!gotpercent) {
+            argv[i++] = string;
+        }
+
+        argv[i] = NULL;
+    } else   {
 # ifdef USE_EXECNT
-            argv[0] = "cmd.exe";
-            argv[1] = "/Q/C";           /* anything more is non-portable */
+        argv[0] = "cmd.exe";
+        argv[1] = "/Q/C";           /* anything more is non-portable */
 # else
-            argv[0] = "/bin/sh";
-            argv[1] = "-c";
+        argv[0] = "/bin/sh";
+        argv[1] = "-c";
 # endif
-            argv[2] = string;
-            argv[3] = 0;
-        }
+        argv[2] = string;
+        argv[3] = 0;
+    }
 
-        /* Catch interrupts whenever commands are running. */
+    /* Catch interrupts whenever commands are running. */
 
-        if( !cmdsrunning++ ) {
-            istat = signal( SIGINT, onintr );
-        }
+    if(!cmdsrunning++) {
+        istat = signal(SIGINT, onintr);
+    }
 
-        /* Start the command */
+    /* Start the command */
 
-#ifdef USE_EXECNT
-        if( ( pid = spawnvp( P_NOWAIT, argv[0], argv ) ) == -1 )
-        {
-            perror( "spawn" );
-            exit( EXITBAD );
-        }
-#else
-# if _lib_vfork
-        if ((pid = vfork()) == 0)
+# ifdef USE_EXECNT
+    if((pid = spawnvp(P_NOWAIT, argv[0], argv)) == -1) {
+        perror("spawn");
+        exit(EXITFAIL);
+    }
 # else
-        if ((pid = fork()) == 0)
+#  if _lib_vfork
+    if((pid = vfork()) == 0)
+#  else
+    if((pid = fork()) == 0)
+#  endif
+    {
+        /* POSIX states that argv should not be modified */
+        execvp(argv[0], (char*const *)argv);
+        _exit(127);
+    }
+
+    if(pid == -1) {
+        perror("vfork");
+        exit(EXITFAIL);
+    }
 # endif
-        {
-            /* POSIX states that argv should not be modified */
-            execvp( argv[0], (char* const *)argv );
-            _exit(127);
+    /* Save the operation for execwait() to find. */
+
+    cmdtab[slot].pid     = pid;
+    cmdtab[slot].func    = func;
+    cmdtab[slot].closure = closure;
+
+    /* Wait until we're under the limit of concurrent commands. */
+    /* Don't trust globs.jobs alone.                            */
+
+    while(cmdsrunning >= MAXJOBS || cmdsrunning >= globs.jobs) {
+        if(!execwait()) {
+            break;
         }
-
-        if( pid == -1 )
-        {
-            perror( "vfork" );
-            exit( EXITBAD );
-        }
-#endif
-        /* Save the operation for execwait() to find. */
-
-        cmdtab[ slot ].pid = pid;
-        cmdtab[ slot ].func = func;
-        cmdtab[ slot ].closure = closure;
-
-        /* Wait until we're under the limit of concurrent commands. */
-        /* Don't trust globs.jobs alone. */
-
-        while( cmdsrunning >= MAXJOBS || cmdsrunning >= globs.jobs )
-            if( !execwait() )
-                break;
+    }
 }
 
 /*
@@ -266,125 +265,126 @@ execcmd( string, func, closure, shell )
 int
 execwait _ARG_((void))
 {
-        int i;
-        int status, w;
-        int rstat;
+    int    i;
+    int    status;
+    int    rstat;
+    pid_t  w;
 
-        /* Handle naive make1() which doesn't know if cmds are running. */
+    /* Handle naive make1() which doesn't know if cmds are running. */
+    if(!cmdsrunning) {
+        return(0);
+    }
 
-        if( !cmdsrunning )
-            return 0;
+    /* Pick up process pid and status */
+    while((w = wait(&status)) == -1 && errno == EINTR) {}
 
-        /* Pick up process pid and status */
+    if(w == -1) {
+        printf("child process(es) lost!\n");
+        perror("wait");
+        exit(EXITFAIL);
+    }
 
-        while( ( w = wait( &status ) ) == -1 && errno == EINTR )
-                ;
-
-        if( w == -1 )
-        {
-            printf( "child process(es) lost!\n" );
-            perror("wait");
-            exit( EXITBAD );
+    /* Find the process in the cmdtab. */
+    for(i = 0; i < MAXJOBS; ++i) {
+        if(w == cmdtab[i].pid) {
+            break;
         }
+    }
 
-        /* Find the process in the cmdtab. */
-
-        for( i = 0; i < MAXJOBS; i++ )
-            if( w == cmdtab[ i ].pid )
-                break;
-
-        if( i == MAXJOBS )
-        {
-            printf( "waif child found!\n" );
-            exit( EXITBAD );
-        }
+    if(i == MAXJOBS) {
+        printf("waif child found!\n");
+        exit(EXITFAIL);
+    }
 
 # ifdef USE_EXECNT
-        /* Clear the temp file */
-
-        unlink( cmdtab[ i ].tempfile );
+    /* Clear the temp file */
+    unlink(cmdtab[i].tempfile);
 # endif
 
-        /* Drive the completion */
+    /* Drive the completion */
 
-        if( !--cmdsrunning )
-            signal( SIGINT, istat );
+    if(!--cmdsrunning) {
+        signal(SIGINT, istat);
+    }
 
-        if( intr )
-            rstat = EXEC_CMD_INTR;
-        else if( w == -1 || status != 0 )
-            rstat = EXEC_CMD_FAIL;
-        else
-            rstat = EXEC_CMD_OK;
+    if(intr) {
+        rstat = EXEC_CMD_INTR;
+    } else if(w == -1 || status != 0) {
+        rstat = EXEC_CMD_FAIL;
+    } else {
+        rstat = EXEC_CMD_OK;
+    }
 
-        cmdtab[ i ].pid = 0;
+    cmdtab[i].pid = 0;
 
-        (*cmdtab[ i ].func)( cmdtab[ i ].closure, rstat );
+    (*cmdtab[i].func)(cmdtab[i].closure, rstat);
 
-        return 1;
+    return(1);
 }
 
 # ifdef USE_MYWAIT
 
 static int
-my_wait( status )
+my_wait(status)
     int *status;
 {
-        int i, num_active = 0;
-        DWORD exitcode, waitcode;
-        static HANDLE *active_handles = 0;
+    int            i, num_active = 0;
+    DWORD          exitcode, waitcode;
+    static HANDLE *active_handles = _NIL_(HANDLE *);
 
-        if (!active_handles) {
-            active_handles = (HANDLE *)xmalloc(globs.jobs * sizeof(HANDLE) );
-        }
-
-        /* first see if any non-waited-for processes are dead,
-         * and return if so.
-         */
-        for ( i = 0; i < globs.jobs; i++ ) {
-            if ( cmdtab[i].pid ) {
-                if ( GetExitCodeProcess((HANDLE)cmdtab[i].pid, &exitcode) ) {
-                    if ( exitcode == STILL_ACTIVE )
-                        active_handles[num_active++] = (HANDLE)cmdtab[i].pid;
-                    else {
-                        CloseHandle((HANDLE)cmdtab[i].pid);
-                        *status = (int)((exitcode & 0xff) << 8);
-                        return cmdtab[i].pid;
-                    }
-                }
-                else
-                    goto FAILED;
-                }
+    if(!active_handles) {
+        memoryAllocateOrFail((voidT**)&active_handles,
+                             globs.jobs * sizeof(HANDLE));
     }
 
-        /* if a child exists, wait for it to die */
-        if ( !num_active ) {
-            errno = ECHILD;
-            return -1;
-        }
-        waitcode = WaitForMultipleObjects( num_active,
-                                           active_handles,
-                                           FALSE,
-                                           INFINITE );
-        if ( waitcode != WAIT_FAILED ) {
-            if ( waitcode >= WAIT_ABANDONED_0
-                && waitcode < WAIT_ABANDONED_0 + num_active )
-                i = waitcode - WAIT_ABANDONED_0;
-            else
-                i = waitcode - WAIT_OBJECT_0;
-            if ( GetExitCodeProcess(active_handles[i], &exitcode) ) {
-                CloseHandle(active_handles[i]);
-                *status = (int)((exitcode & 0xff) << 8);
-                return (int)active_handles[i];
+    /* first see if any non-waited-for processes are dead,
+     * and return if so.
+     */
+    for(i = 0; i < globs.jobs; i++) {
+        if(cmdtab[i].pid) {
+            if(GetExitCodeProcess((HANDLE)cmdtab[i].pid, &exitcode)) {
+                if(exitcode == STILL_ACTIVE) {
+                    active_handles[num_active++] = (HANDLE)cmdtab[i].pid;
+                } else {
+                    CloseHandle((HANDLE)cmdtab[i].pid);
+                    *status = (int)((exitcode & 0xff) << 8);
+                    return(cmdtab[i].pid);
+                }
+            } else {
+                goto FAILED;
             }
         }
+    }
+
+    /* if a child exists, wait for it to die */
+    if(!num_active) {
+        errno = ECHILD;
+        return(-1);
+    }
+    waitcode = WaitForMultipleObjects(num_active,
+                                      active_handles,
+                                      FALSE,
+                                      INFINITE);
+    if(waitcode != WAIT_FAILED) {
+        if(waitcode >= WAIT_ABANDONED_0
+           && waitcode < WAIT_ABANDONED_0 + num_active) {
+            i = waitcode - WAIT_ABANDONED_0;
+        } else {
+            i = waitcode - WAIT_OBJECT_0;
+        }
+        if(GetExitCodeProcess(active_handles[i], &exitcode)) {
+            CloseHandle(active_handles[i]);
+            *status = (int)((exitcode & 0xff) << 8);
+            return((int)active_handles[i]);
+        }
+    }
 
 FAILED:
-        errno = GetLastError();
-        return -1;
+    errno = GetLastError();
+    return(-1);
 
 }
 
 # endif /* USE_MYWAIT */
 
-# endif /* USE_EXECUNIX */
+#endif  /* USE_EXECUNIX */

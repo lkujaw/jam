@@ -29,7 +29,7 @@
 
 #include "pathsys.h"
 
-# ifdef OS_VMS
+#ifdef OS_VMS
 
 # define DEBUG
 
@@ -38,68 +38,65 @@
  */
 
 void
-path_parse( file, f )
+path_parse(file, f)
     const char *file;
     PATHNAME   *f;
 {
-        const char *p, *q;
-        const char *end;
+    const char *p, *q;
+    const char *end;
 
-        memset( (char *)f, 0, sizeof( *f ) );
+    memset((char *)f, 0, sizeof(*f));
 
-        /* Look for <grist> */
+    /* Look for <grist> */
 
-        if( file[0] == '<' && ( p = strchr( file, '>' ) ) )
-        {
-            f->f_grist.ptr = file;
-            f->f_grist.len = p - file;
-            file = p + 1;
-        }
+    if(file[0] == '<' && (p = strchr(file, '>'))) {
+        f->f_grist.ptr = file;
+        f->f_grist.len = p - file;
+        file           = p + 1;
+    }
 
-        /* Look for dev:[dir] or dev: */
+    /* Look for dev:[dir] or dev: */
 
-        if( ( p = strchr( file, ']' ) ) || ( p = strchr( file, ':' ) ) )
-        {
-            f->f_dir.ptr = file;
-            f->f_dir.len = p + 1 - file;
-            file = p + 1;
-        }
+    if((p = strchr(file, ']')) || (p = strchr(file, ':'))) {
+        f->f_dir.ptr = file;
+        f->f_dir.len = p + 1 - file;
+        file         = p + 1;
+    }
 
-        end = file + strlen( file );
+    end = file + strlen(file);
 
-        /* Look for (member) */
+    /* Look for (member) */
 
-        if( ( p = strchr( file, '(' ) ) && end[-1] == ')' )
-        {
-            f->f_member.ptr = p + 1;
-            f->f_member.len = end - p - 2;
-            end = p;
-        }
+    if((p = strchr(file, '(')) && end[-1] == ')') {
+        f->f_member.ptr = p + 1;
+        f->f_member.len = end - p - 2;
+        end             = p;
+    }
 
-        /* Look for .suffix */
-        /* This would be memrchr() */
+    /* Look for .suffix */
+    /* This would be memrchr() */
 
-        p = 0;
-        q = file;
+    p = 0;
+    q = file;
 
-        while( q = (char *)memchr( q, '.', end - q ) )
-            p = q++;
+    while(q = (char *)memchr(q, '.', end - q)) {
+        p = q++;
+    }
 
-        if( p )
-        {
-            f->f_suffix.ptr = p;
-            f->f_suffix.len = end - p;
-            end = p;
-        }
+    if(p) {
+        f->f_suffix.ptr = p;
+        f->f_suffix.len = end - p;
+        end             = p;
+    }
 
-        /* Leaves base */
+    /* Leaves base */
 
-        f->f_base.ptr = file;
-        f->f_base.len = end - file;
+    f->f_base.ptr = file;
+    f->f_base.len = end - file;
 
-        /* Is this a directory without a file spec? */
+    /* Is this a directory without a file spec? */
 
-        f->parent = 0;
+    f->parent = 0;
 }
 
 /*
@@ -144,7 +141,7 @@ path_parse( file, f )
 # define G_VRD          4       /* root's dev: + [.rel] made [abs] */
 # define G_DDD          5       /* root's dev:[dir] + . + [dir] */
 
-static int grid[7][7] = {
+static int  grid[7][7] = {
 
 /* root/dir     EMPTY   DEV     DEVDIR  DOTDIR  DASH,   ABSDIR  ROOT */
 /* EMPTY */     G_DIR,  G_DIR,  G_DIR,  G_DIR,  G_DIR,  G_DIR,  G_DIR,
@@ -158,72 +155,71 @@ static int grid[7][7] = {
 } ;
 
 struct dirinf {
-        int     flags;
+    int flags;
 
-        struct {
-                char    *ptr;
-                int     len;
-        } dev, dir;
-} ;
+    struct {
+        char *ptr;
+        int   len;
+    } dev, dir;
+};
 
 static char *
-strnchr( buf, c, len )
+strnchr(buf, c, len)
     char *buf;
     int   c;
     int   len;
 {
-        while( len-- )
-            if( *buf && *buf++ == c )
-                return buf - 1;
+    while(len--) {
+        if(*buf && *buf++ == c) {
+            return(buf - 1);
+        }
+    }
 
-        return 0;
+    return(0);
 }
 
 static void
-dir_flags( buf, len, i )
+dir_flags(buf, len, i)
     const char    *buf;
     int            len;
     struct dirinf *i;
 {
-        const char *p;
+    const char *p;
 
-        if( !buf || !len )
-        {
-            i->flags = DIR_EMPTY;
-            i->dev.ptr =
+    if(!buf || !len) {
+        i->flags       = DIR_EMPTY;
+        i->dev.ptr     =
             i->dir.ptr = 0;
-            i->dev.len =
+        i->dev.len     =
             i->dir.len = 0;
-        }
-        else if( p = strnchr( (char *)buf, ':', len ) )
-        {
-            i->dev.ptr = (char *)buf;
-            i->dev.len = p + 1 - buf;
-            i->dir.ptr = (char *)buf + i->dev.len;
-            i->dir.len = len - i->dev.len;
-            i->flags = i->dir.len && *i->dir.ptr == '[' ? DIR_DEVDIR : DIR_DEV;
-        }
-        else
-        {
-            i->dev.ptr = (char *)buf;
-            i->dev.len = 0;
-            i->dir.ptr = (char *)buf;
-            i->dir.len = len;
+    } else if(p = strnchr((char *)buf, ':', len)) {
+        i->dev.ptr = (char *)buf;
+        i->dev.len = p + 1 - buf;
+        i->dir.ptr = (char *)buf + i->dev.len;
+        i->dir.len = len - i->dev.len;
+        i->flags   = i->dir.len && *i->dir.ptr == '[' ? DIR_DEVDIR : DIR_DEV;
+    } else   {
+        i->dev.ptr = (char *)buf;
+        i->dev.len = 0;
+        i->dir.ptr = (char *)buf;
+        i->dir.len = len;
 
-            if( *buf == '[' && buf[1] == ']' )
-                i->flags = DIR_EMPTY;
-            else if( *buf == '[' && buf[1] == '.' )
-                i->flags = DIR_DOTDIR;
-            else if( *buf == '[' && buf[1] == '-' )
-                i->flags = DIR_DASHDIR;
-            else
-                i->flags = DIR_ABSDIR;
+        if(*buf == '[' && buf[1] == ']') {
+            i->flags = DIR_EMPTY;
+        } else if(*buf == '[' && buf[1] == '.') {
+            i->flags = DIR_DOTDIR;
+        } else if(*buf == '[' && buf[1] == '-') {
+            i->flags = DIR_DASHDIR;
+        } else {
+            i->flags = DIR_ABSDIR;
         }
+    }
 
-        /* But if its rooted in any way */
+    /* But if its rooted in any way */
 
-        if( i->dir.len == 8 && !strncmp( i->dir.ptr, "[000000]", 8 ) )
-            i->flags = DIR_ROOT;
+    if(i->dir.len == 8 && !strncmp(i->dir.ptr, "[000000]", 8)) {
+        i->flags = DIR_ROOT;
+    }
 }
 
 /*
@@ -231,178 +227,168 @@ dir_flags( buf, len, i )
  */
 
 void
-path_build( f, file, binding )
+path_build(f, file, binding)
     PATHNAME *f;
     char     *file;
     int       binding;
 {
-        char *ofile = file;
-        struct dirinf root, dir;
-        int g;
+    char          *ofile = file;
+    struct dirinf  root, dir;
+    int            g;
 
-        /* Start with the grist.  If the current grist isn't */
-        /* surrounded by <>'s, add them. */
+    /* Start with the grist.  If the current grist isn't */
+    /* surrounded by <>'s, add them. */
 
-        if( f->f_grist.len )
-        {
-            if( f->f_grist.ptr[0] != '<' ) *file++ = '<';
-            memcpy( file, f->f_grist.ptr, f->f_grist.len );
-            file += f->f_grist.len;
-            if( file[-1] != '>' ) *file++ = '>';
+    if(f->f_grist.len) {
+        if(f->f_grist.ptr[0] != '<') {
+            *file++ = '<';
+        }
+        memcpy(file, f->f_grist.ptr, f->f_grist.len);
+        file += f->f_grist.len;
+        if(file[-1] != '>') {
+            *file++ = '>';
+        }
+    }
+
+    /* Get info on root and dir for combining. */
+
+    dir_flags(f->f_root.ptr, f->f_root.len, &root);
+    dir_flags(f->f_dir.ptr, f->f_dir.len, &dir);
+
+    /* Combine */
+
+    switch(g = grid[ root.flags ][ dir.flags ]) {
+    case G_DIR:
+        /* take dir */
+        memcpy(file, f->f_dir.ptr, f->f_dir.len);
+        file += f->f_dir.len;
+        break;
+
+    case G_ROOT:
+        /* take root */
+        memcpy(file, f->f_root.ptr, f->f_root.len);
+        file += f->f_root.len;
+        break;
+
+    case G_VAD:
+        /* root's dev + abs directory */
+        memcpy(file, root.dev.ptr, root.dev.len);
+        file += root.dev.len;
+        memcpy(file, dir.dir.ptr, dir.dir.len);
+        file += dir.dir.len;
+        break;
+
+    case G_DRD:
+    case G_DDD:
+        /* root's dev:[dir] + rel directory */
+        memcpy(file, f->f_root.ptr, f->f_root.len);
+        file += f->f_root.len;
+
+        /* sanity checks: root ends with ] */
+
+        if(file[-1] == ']') {
+            --file;
         }
 
-        /* Get info on root and dir for combining. */
+        /* Add . if separating two -'s */
 
-        dir_flags( f->f_root.ptr, f->f_root.len, &root );
-        dir_flags( f->f_dir.ptr, f->f_dir.len, &dir );
-
-        /* Combine */
-
-        switch( g = grid[ root.flags ][ dir.flags ] )
-        {
-        case G_DIR:
-                /* take dir */
-                memcpy( file, f->f_dir.ptr, f->f_dir.len );
-                file += f->f_dir.len;
-                break;
-
-        case G_ROOT:
-                /* take root */
-                memcpy( file, f->f_root.ptr, f->f_root.len );
-                file += f->f_root.len;
-                break;
-
-        case G_VAD:
-                /* root's dev + abs directory */
-                memcpy( file, root.dev.ptr, root.dev.len );
-                file += root.dev.len;
-                memcpy( file, dir.dir.ptr, dir.dir.len );
-                file += dir.dir.len;
-                break;
-
-        case G_DRD:
-        case G_DDD:
-                /* root's dev:[dir] + rel directory */
-                memcpy( file, f->f_root.ptr, f->f_root.len );
-                file += f->f_root.len;
-
-                /* sanity checks: root ends with ] */
-
-                if( file[-1] == ']' )
-                     --file;
-
-                /* Add . if separating two -'s */
-
-                if( g == G_DDD )
-                    *file++ = '.';
-
-                /* skip [ of dir */
-                memcpy( file, dir.dir.ptr + 1, dir.dir.len - 1 );
-                file += dir.dir.len - 1;
-                break;
-
-        case G_VRD:
-                /* root's dev + rel directory made abs */
-                memcpy( file, root.dev.ptr, root.dev.len );
-                file += root.dev.len;
-                *file++ = '[';
-                /* skip [. of rel dir */
-                memcpy( file, dir.dir.ptr + 2, dir.dir.len - 2 );
-                file += dir.dir.len - 2;
-                break;
-        }
-
-# ifdef DEBUG
-        if( DEBUG_SEARCH && ( root.flags || dir.flags ) )
-        {
-                *file = 0;
-                printf( "%d x %d = %d (%s)\n", root.flags, dir.flags,
-                        grid[ root.flags ][ dir.flags ], ofile );
-        }
-# endif
-
-        /*
-         * Now do the special :P modifier when no file was present.
-         *      (none)          (none)
-         *      [dir1.dir2]     [dir1]
-         *      [dir]           [000000]
-         *      [.dir]          []
-         *      []              []
-         */
-
-        if( file[-1] == ']' && f->parent )
-        {
-            while( file-- > ofile )
-            {
-                if( *file == '.' )
-                {
-                    *file++ = ']';
-                    break;
-                }
-                else if( *file == '-' )
-                {
-                    /* handle .- or - */
-                    if( file > ofile && file[-1] == '.' )
-                        --file;
-                    *file++ = ']';
-                    break;
-                }
-                else if( *file == '[' )
-                {
-                    if( file[1] == ']' )
-                    {
-                        file += 2;
-                    }
-                    else
-                    {
-                        strcpy( file, "[000000]" );
-                        file += 8;
-                    }
-                    break;
-                }
-            }
-        }
-
-        /* Now copy the file pieces. */
-
-        if( f->f_base.len )
-        {
-            memcpy( file, f->f_base.ptr, f->f_base.len );
-            file += f->f_base.len;
-        }
-
-        /* If there is no suffix, we append a "." onto all generated */
-        /* names.  This keeps VMS from appending its own (wrong) idea */
-        /* of what the suffix should be. */
-
-        if( f->f_suffix.len )
-        {
-            memcpy( file, f->f_suffix.ptr, f->f_suffix.len );
-            file += f->f_suffix.len;
-        }
-        else if( binding && f->f_base.len )
-        {
+        if(g == G_DDD) {
             *file++ = '.';
         }
 
-        if( f->f_member.len )
-        {
-            *file++ = '(';
-            memcpy( file, f->f_member.ptr, f->f_member.len );
-            file += f->f_member.len;
-            *file++ = ')';
-        }
-        *file = 0;
+        /* skip [ of dir */
+        memcpy(file, dir.dir.ptr + 1, dir.dir.len - 1);
+        file += dir.dir.len - 1;
+        break;
+
+    case G_VRD:
+        /* root's dev + rel directory made abs */
+        memcpy(file, root.dev.ptr, root.dev.len);
+        file   += root.dev.len;
+        *file++ = '[';
+        /* skip [. of rel dir */
+        memcpy(file, dir.dir.ptr + 2, dir.dir.len - 2);
+        file += dir.dir.len - 2;
+        break;
+    }
 
 # ifdef DEBUG
-        if( DEBUG_SEARCH )
-            printf("built %.*s + %.*s / %.*s suf %.*s mem %.*s -> %s\n",
-                    f->f_root.len, f->f_root.ptr,
-                    f->f_dir.len, f->f_dir.ptr,
-                    f->f_base.len, f->f_base.ptr,
-                    f->f_suffix.len, f->f_suffix.ptr,
-                    f->f_member.len, f->f_member.ptr,
-                    ofile );
+    if(DEBUG_SEARCH && (root.flags || dir.flags)) {
+        *file = 0;
+        printf("%d x %d = %d (%s)\n", root.flags, dir.flags,
+               grid[ root.flags ][ dir.flags ], ofile);
+    }
+# endif
+
+    /*
+     * Now do the special :P modifier when no file was present.
+     *      (none)          (none)
+     *      [dir1.dir2]     [dir1]
+     *      [dir]           [000000]
+     *      [.dir]          []
+     *      []              []
+     */
+
+    if(file[-1] == ']' && f->parent) {
+        while(file-- > ofile) {
+            if(*file == '.') {
+                *file++ = ']';
+                break;
+            } else if(*file == '-') {
+                /* handle .- or - */
+                if(file > ofile && file[-1] == '.') {
+                    --file;
+                }
+                *file++ = ']';
+                break;
+            } else if(*file == '[') {
+                if(file[1] == ']') {
+                    file += 2;
+                } else   {
+                    strcpy(file, "[000000]");
+                    file += 8;
+                }
+                break;
+            }
+        }
+    }
+
+    /* Now copy the file pieces. */
+
+    if(f->f_base.len) {
+        memcpy(file, f->f_base.ptr, f->f_base.len);
+        file += f->f_base.len;
+    }
+
+    /* If there is no suffix, we append a "." onto all generated */
+    /* names.  This keeps VMS from appending its own (wrong) idea */
+    /* of what the suffix should be. */
+
+    if(f->f_suffix.len) {
+        memcpy(file, f->f_suffix.ptr, f->f_suffix.len);
+        file += f->f_suffix.len;
+    } else if(binding && f->f_base.len) {
+        *file++ = '.';
+    }
+
+    if(f->f_member.len) {
+        *file++ = '(';
+        memcpy(file, f->f_member.ptr, f->f_member.len);
+        file   += f->f_member.len;
+        *file++ = ')';
+    }
+    *file = 0;
+
+# ifdef DEBUG
+    if(DEBUG_SEARCH) {
+        printf("built %.*s + %.*s / %.*s suf %.*s mem %.*s -> %s\n",
+               f->f_root.len, f->f_root.ptr,
+               f->f_dir.len, f->f_dir.ptr,
+               f->f_base.len, f->f_base.ptr,
+               f->f_suffix.len, f->f_suffix.ptr,
+               f->f_member.len, f->f_member.ptr,
+               ofile);
+    }
 # endif
 }
 
@@ -411,23 +397,20 @@ path_build( f, file, binding )
  */
 
 void
-path_parent( f )
+path_parent(f)
     PATHNAME *f;
 {
-        if( f->f_base.len )
-        {
-            f->f_base.ptr =
-            f->f_suffix.ptr =
-            f->f_member.ptr = "";
+    if(f->f_base.len) {
+        f->f_base.ptr           =
+            f->f_suffix.ptr     =
+                f->f_member.ptr = "";
 
-            f->f_base.len =
-            f->f_suffix.len =
-            f->f_member.len = 0;
-        }
-        else
-        {
-            f->parent = 1;
-        }
+        f->f_base.len           =
+            f->f_suffix.len     =
+                f->f_member.len = 0;
+    } else   {
+        f->parent = 1;
+    }
 }
 
-# endif /* VMS */
+#endif  /* VMS */

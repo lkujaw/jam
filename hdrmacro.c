@@ -6,15 +6,16 @@
 
 #include "jam.h"  /* Includes system headers */
 
+#include "compile.h"
+#include "hash.h"
+#include "hdrmacro.h"
 #include "lists.h"
 #include "parse.h"
-#include "compile.h"
-#include "rules.h"
-#include "variable.h"
 #include "regexp.h"
-#include "hdrmacro.h"
-#include "hash.h"
-#include "newstr.h"
+#include "rules.h"
+#include "str.h"
+#include "variable.h"
+
 
 /*
  * hdrmacro.c - handle header files that define macros used in
@@ -41,31 +42,30 @@
  */
 
 /* this type is used to store a dictionary of file header macros */
-typedef struct header_macro
-{
-  const char*  symbol;
-  const char*  filename;  /* we could maybe use a LIST here ?? */
+typedef struct header_macro {
+    const char*symbol;
+    const char*filename;  /* we could maybe use a LIST here ?? */
 
 } HEADER_MACRO;
 
-static struct hash*   header_macros_hash = 0;
+static struct hash *header_macros_hash = 0;
 
 /*
  * headers() - scan a target for include files and call HDRRULE
  */
 
-# define MAXINC 10
+#define MAXINC 10
 
 void
-macro_headers( t )
+macro_headers(t)
     TARGET *t;
 {
-    regexp  *re;
-    FILE    *f;
+    regexp *re;
+    FILE   *f;
     char    buf[ 1024 ];
 
-    if ( DEBUG_HEADER ) {
-        printf( "macro header scan for %s\n", t->name );
+    if(DEBUG_HEADER) {
+        printf("macro header scan for %s\n", t->name);
     }
 
     /* This regexp is used to detect lines of the form       */
@@ -77,16 +77,14 @@ macro_headers( t )
 [<\"]([^\">]*)[\">].*$\
 ");
 
-    if( ( f = fopen( t->boundname, "r" ) ) == 0 ) {
+    if((f = fopen(t->boundname, "r")) == 0) {
         return;
     }
 
-    while( fgets( buf, sizeof( buf ), f ) )
-    {
+    while(fgets(buf, sizeof(buf), f)) {
         HEADER_MACRO  var, *v = &var;
 
-        if ( regexec( re, buf ) && re->startp[1] )
-        {
+        if(regexec(re, buf) && re->startp[1]) {
             char  buf1[ MAXSYM ], buf2[ MAXSYM ];
             int   l1, l2;
 
@@ -96,29 +94,28 @@ macro_headers( t )
             l1 = (int)(re->endp[1] - re->startp[1]);
             l2 = (int)(re->endp[2] - re->startp[2]);
 
-            memcpy( buf1, re->startp[1], l1 );
-            memcpy( buf2, re->startp[2], l2 );
+            memcpy(buf1, re->startp[1], l1);
+            memcpy(buf2, re->startp[2], l2);
             buf1[l1] = '\0';
             buf2[l2] = '\0';
 
             /* we detected a line that looks like "#define  MACRO  filename */
-            if ( DEBUG_HEADER ) {
-                printf( "macro '%s' used to define filename '%s' in '%s'\n",
-                        buf1, buf2, t->boundname );
+            if(DEBUG_HEADER) {
+                printf("macro '%s' used to define filename '%s' in '%s'\n",
+                       buf1, buf2, t->boundname);
             }
 
             /* add macro definition to hash table */
-            if ( !header_macros_hash ) {
-                header_macros_hash = hashinit( sizeof( HEADER_MACRO ),
-                                               "hdrmacros" );
+            if(!header_macros_hash) {
+                header_macros_hash = hashinit(sizeof(HEADER_MACRO),
+                                              "hdrmacros");
             }
 
             v->symbol   = (const char*)buf1;
             v->filename = 0;
-            if ( hashenter( header_macros_hash, (HASHDATA **)&v ) )
-            {
-                v->symbol   = newstr( buf1 );  /* never freed */
-                v->filename = newstr( buf2 );  /* never freed */
+            if(hashenter(header_macros_hash, (HASHDATA **)&v)) {
+                v->symbol   = newstr(buf1);    /* never freed */
+                v->filename = newstr(buf2);    /* never freed */
             }
             /* XXXX: FOR NOW, WE IGNORE MULTIPLE MACRO DEFINITIONS !! */
             /*       WE MIGHT AS WELL USE A LIST TO STORE THEM..      */
@@ -131,18 +128,18 @@ macro_headers( t )
 
 
 const char*
-macro_header_get( macro_name )
+macro_header_get(macro_name)
     const char*  macro_name;
 {
-  HEADER_MACRO  var, *v = &var;
+    HEADER_MACRO  var, *v = &var;
 
-  v->symbol = (char*)macro_name;
+    v->symbol = (char*)macro_name;
 
-  if( header_macros_hash && hashcheck( header_macros_hash, (HASHDATA **)&v ) )
-  {
-    if ( DEBUG_HEADER )
-      printf( "### macro '%s' evaluated to '%s'\n", macro_name, v->filename );
-    return (const char*) v->filename;
-  }
-  return 0;
+    if(header_macros_hash && hashcheck(header_macros_hash, (HASHDATA **)&v)) {
+        if(DEBUG_HEADER) {
+            printf("### macro '%s' evaluated to '%s'\n", macro_name, v->filename);
+        }
+        return((const char*)v->filename);
+    }
+    return(0);
 }

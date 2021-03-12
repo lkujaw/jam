@@ -35,8 +35,8 @@
 #include "expand.h"
 #include "hash.h"
 #include "lists.h"
-#include "newstr.h"
 #include "parse.h"
+#include "str.h"
 #include "variable.h"
 
 static struct hash *varhash = 0;
@@ -45,16 +45,16 @@ static struct hash *varhash = 0;
  * VARIABLE - a user defined multi-value variable
  */
 
-typedef struct _variable VARIABLE ;
+typedef struct _variable VARIABLE;
 
 struct _variable {
-        const char *symbol;
-        LIST       *value;
-} ;
+    const char *symbol;
+    LIST       *value;
+};
 
-static VARIABLE *var_enter _ARG_(( const char *symbol ));
-static void var_dump _ARG_(( const char *symbol, LIST *value,
-                             const char *what ));
+static VARIABLE *var_enter _ARG_((const char *symbol));
+static void var_dump _ARG_((const char *symbol, LIST *value,
+                            const char *what));
 
 /*
  * var_defines() - load a bunch of variable=value settings
@@ -64,77 +64,77 @@ static void var_dump _ARG_(( const char *symbol, LIST *value,
  */
 
 void
-var_defines( e )
+var_defines(e)
     const char **e;
 {
-        for( ; *e; e++ )
-        {
-            const char *val;
+    for( ; *e; e++) {
+        const char *val;
 
-            /* Just say "no": windows defines this in the env, */
-            /* but we don't want it to override our notion of OS. */
+        /* Just say "no": windows defines this in the env, */
+        /* but we don't want it to override our notion of OS. */
 
-            if( !strcmp( *e, "OS=Windows_NT" ) )
-                continue;
-
-           /* Just say "no": on Unix, variables can contain function
-            * definitions. their value begins with "()"
-            */
-            if( ( val = strchr( *e, '=' ) ) && val[1] == '(' && val[2] == ')' )
-                continue;
-
-#ifdef OS_MAC
-            /* On the mac (MPW), the var=val is actually var\0val */
-            /* Think different. */
-
-            if(( val = strchr( *e, '=' )) || ( val = *e + strlen( *e ) ) )
-#else
-            if(( val = strchr( *e, '=' ) ))
-#endif
-            {
-                LIST *l = L0;
-                const char *pp, *p;
-#ifdef OS_MAC
-                char split = ',';
-#else
-                char split = ' ';
-#endif
-                char buf[ MAXSYM ];
-
-                /* Split *PATH at :'s, not spaces */
-
-                if( val - 4 >= *e )
-                {
-                    if( !strncmp( val - 4, "PATH", 4 ) ||
-                        !strncmp( val - 4, "Path", 4 ) ||
-                        !strncmp( val - 4, "path", 4 ) )
-                            split = SPLITPATH;
-                }
-
-                /* Do the split */
-
-                for( pp = val + 1; (p = strchr( pp, split )); pp = p + 1 )
-                {
-                    int  len = p - pp;
-
-                    if ( len >= sizeof(buf) )
-                      len = sizeof(buf)-1;
-
-                    strncpy( buf, pp, len );
-                    buf[ len ] = '\0';
-                    l = list_new( l, buf, 0 );
-                }
-
-                l = list_new( l, pp, 0 );
-
-                /* Get name */
-
-                strncpy( buf, *e, val - *e );
-                buf[ val - *e ] = '\0';
-
-                var_set( buf, l, VAR_SET );
-            }
+        if(!strcmp(*e, "OS=Windows_NT")) {
+            continue;
         }
+
+        /* Just say "no": on Unix, variables can contain function
+         * definitions. their value begins with "()"
+         */
+        if((val = strchr(*e, '=')) && val[1] == '(' && val[2] == ')') {
+            continue;
+        }
+
+#ifdef OS_MAC
+        /* On the mac (MPW), the var=val is actually var\0val */
+
+        if((val = strchr(*e, '=')) || (val = *e + strlen(*e)))
+#else
+        if((val = strchr(*e, '=')))
+#endif
+        {
+            LIST       *l = L0;
+            const char *pp, *p;
+#ifdef OS_MAC
+            char  split = ',';
+#else
+            char  split = ' ';
+#endif
+            char  buf[ MAXSYM ];
+
+            /* Split *PATH at :'s, not spaces */
+
+            if(val - 4 >= *e) {
+                if(!strncmp(val - 4, "PATH", 4) ||
+                   !strncmp(val - 4, "Path", 4) ||
+                   !strncmp(val - 4, "path", 4)) {
+                    split = SPLITPATH;
+                }
+            }
+
+            /* Do the split */
+
+            for(pp = val + 1; (p = strchr(pp, split)); pp = p + 1) {
+                int  len = p - pp;
+
+                if(len >= sizeof(buf)) {
+                    len = sizeof(buf) - 1;
+                }
+
+                strncpy(buf, pp, len);
+                buf[ len ] = '\0';
+                l          = list_new(l, buf, 0);
+            }
+
+            l = list_new(l, pp, 0);
+
+            /* Get name */
+
+            strncpy(buf, *e, val - *e);
+            buf[ val - *e ] = '\0';
+
+            var_set(buf, l, VAR_SET);
+        }
+    }
 }
 
 /*
@@ -144,80 +144,81 @@ var_defines( e )
  */
 
 int
-var_string( in, out, outsize, lol )
+var_string(in, out, outsize, lol)
     const char  *in;
           char  *out;
            int   outsize;
            LOL  *lol;
 {
-        char    *out0 = out;
-        char    *oute = out + outsize - 1;
+    char *out0 = out;
+    char *oute = out + outsize - 1;
 
-        while( *in )
-        {
-            char        *lastword;
-            int         dollar = 0;
+    while(*in) {
+        char *lastword;
+        int   dollar = 0;
 
-            /* Copy white space */
+        /* Copy white space */
 
-            while( isspace( *in ) )
-            {
-                if( out >= oute )
-                    return -1;
-
-                *out++ = *in++;
+        while(isspace(*in)) {
+            if(out >= oute) {
+                return(-1);
             }
 
-            lastword = out;
-
-            /* Copy non-white space, watching for variables */
-
-            while( *in && !isspace( *in ) )
-            {
-                if( out >= oute )
-                    return -1;
-
-                if( in[0] == '$' && in[1] == '(' )
-                    dollar++;
-
-                *out++ = *in++;
-            }
-
-            /* If a variable encountered, expand it and and embed the */
-            /* space-separated members of the list in the output. */
-
-            if( dollar )
-            {
-                LIST *l = var_expand( L0, lastword, out, lol, 0 );
-
-                out = lastword;
-
-                while( l )
-                {
-                    int so = strlen( l->string );
-
-                    if( out + so >= oute )
-                        return -1;
-
-                    strcpy( out, l->string );
-                    out += so;
-
-                    /* Separate with space */
-
-                    if(( l = list_next( l ) ))
-                       *out++ = ' ';
-                }
-
-                list_free( l );
-            }
+            *out++ = *in++;
         }
 
-        if( out >= oute )
-            return -1;
+        lastword = out;
 
-        *out++ = '\0';
+        /* Copy non-white space, watching for variables */
 
-        return out - out0;
+        while(*in && !isspace(*in)) {
+            if(out >= oute) {
+                return(-1);
+            }
+
+            if(in[0] == '$' && in[1] == '(') {
+                dollar++;
+            }
+
+            *out++ = *in++;
+        }
+
+        /* If a variable encountered, expand it and and embed the */
+        /* space-separated members of the list in the output. */
+
+        if(dollar) {
+            LIST *l = var_expand(L0, lastword, out, lol, 0);
+
+            out = lastword;
+
+            while(l) {
+                int  so = strlen(l->string);
+
+                if(out + so >= oute) {
+                    return(-1);
+                }
+
+                strcpy(out, l->string);
+                out += so;
+
+                /* Separate with space */
+
+                if((l = list_next(l))) {
+                    *out++ = ' ';
+                }
+            }
+
+            list_free(l);
+        }
+    }
+    if(out >= oute) {
+        return(-1);
+    }
+
+
+    *out++ = '\0';
+
+    return(out - out0);
 }
 
 /*
@@ -227,21 +228,21 @@ var_string( in, out, outsize, lol )
  */
 
 LIST *
-var_get( symbol )
+var_get(symbol)
     const char *symbol;
 {
-        VARIABLE var, *v = &var;
+    VARIABLE  var, *v = &var;
 
-        v->symbol = symbol;
+    v->symbol = symbol;
 
-        if( varhash && hashcheck( varhash, (HASHDATA **)&v ) )
-        {
-            if( DEBUG_VARGET )
-                var_dump( v->symbol, v->value, "get" );
-            return v->value;
+    if(varhash && hashcheck(varhash, (HASHDATA **)&v)) {
+        if(DEBUG_VARGET) {
+            var_dump(v->symbol, v->value, "get");
         }
+        return(v->value);
+    }
 
-        return 0;
+    return(0);
 }
 
 /*
@@ -256,37 +257,38 @@ var_get( symbol )
  */
 
 void
-var_set( symbol, value, flag )
+var_set(symbol, value, flag)
     const char  *symbol;
           LIST  *value;
            int   flag;
 {
-        VARIABLE *v = var_enter( symbol );
+    VARIABLE *v = var_enter(symbol);
 
-        if( DEBUG_VARSET )
-            var_dump( symbol, value, "set" );
+    if(DEBUG_VARSET) {
+        var_dump(symbol, value, "set");
+    }
 
-        switch( flag )
-        {
-        case VAR_SET:
-            /* Replace value */
-            list_free( v->value );
+    switch(flag) {
+    case VAR_SET:
+        /* Replace value */
+        list_free(v->value);
+        v->value = value;
+        break;
+
+    case VAR_APPEND:
+        /* Append value */
+        v->value = list_append(v->value, value);
+        break;
+
+    case VAR_DEFAULT:
+        /* Set only if unset */
+        if(!v->value) {
             v->value = value;
-            break;
-
-        case VAR_APPEND:
-            /* Append value */
-            v->value = list_append( v->value, value );
-            break;
-
-        case VAR_DEFAULT:
-            /* Set only if unset */
-            if( !v->value )
-                v->value = value;
-            else
-                list_free( value );
-            break;
+        } else {
+            list_free(value);
         }
+        break;
+    }
 }
 
 /*
@@ -294,43 +296,43 @@ var_set( symbol, value, flag )
  */
 
 LIST *
-var_swap( symbol, value )
+var_swap(symbol, value)
     const char *symbol;
           LIST *value;
 {
-        VARIABLE *v = var_enter( symbol );
-        LIST     *oldvalue = v->value;
+    VARIABLE *v        = var_enter(symbol);
+    LIST     *oldvalue = v->value;
 
-        if( DEBUG_VARSET )
-            var_dump( symbol, value, "set" );
+    if(DEBUG_VARSET) {
+        var_dump(symbol, value, "set");
+    }
 
-        v->value = value;
+    v->value = value;
 
-        return oldvalue;
+    return(oldvalue);
 }
-
-
 
 /*
  * var_enter() - make new var symbol table entry, returning var ptr
  */
 
 static VARIABLE *
-var_enter( symbol )
+var_enter(symbol)
     const char *symbol;
 {
-        VARIABLE var, *v = &var;
+    VARIABLE  var, *v = &var;
 
-        if( !varhash )
-            varhash = hashinit( sizeof( VARIABLE ), "variables" );
+    if(!varhash) {
+        varhash = hashinit(sizeof(VARIABLE), "variables");
+    }
 
-        v->symbol = symbol;
-        v->value = 0;
+    v->symbol = symbol;
+    v->value  = 0;
 
-        if( hashenter( varhash, (HASHDATA **)&v ) )
-            v->symbol = newstr( symbol );       /* never freed */
-
-        return v;
+    if(hashenter(varhash, (HASHDATA **)&v)) {
+        v->symbol = newstr(symbol);             /* never freed */
+    }
+    return(v);
 }
 
 /*
@@ -338,14 +340,14 @@ var_enter( symbol )
  */
 
 static void
-var_dump( symbol, value, what )
+var_dump(symbol, value, what)
     const char  *symbol;
           LIST  *value;
     const char  *what;
 {
-        printf( "%s %s = ", what, symbol );
-        list_print( value );
-        printf( "\n" );
+    printf("%s %s = ", what, symbol);
+    list_print(value);
+    printf("\n");
 }
 
 /*
@@ -353,7 +355,7 @@ var_dump( symbol, value, what )
  */
 
 void
-var_done _ARG_(( void ))
+var_done _ARG_((void))
 {
-        hashdone( varhash );
+    hashdone(varhash);
 }

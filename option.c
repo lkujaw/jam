@@ -21,95 +21,78 @@
 #include "option.h"
 
 int
-getoptions( argc, argv, opts, optv, targets )
+getoptions(argc, argv, opts, optv, targets)
     int         argc;
     char      **argv;
     const char *opts;
     option     *optv;
     char      **targets;
 {
-    int i, n;
-    int optc = N_OPTS;
+    int  i, n;
+    int  optc = N_OPTS;
 
-    memset( (char *)optv, '\0', sizeof( *optv ) * N_OPTS );
+    memset((char *)optv, '\0', sizeof(*optv) * N_OPTS);
 
     n = 0;
-    for( i = 0; i < argc; i++ )
-    {
+    for(i = 0; i < argc; i++) {
         char *arg;
 
-        if ( argv[i][0] == '-' )
-        {
-            if( !optc-- )
-            {
-                printf( "too many options (%d max)\n", N_OPTS );
-                return -1;
+        if(argv[i][0] == '-') {
+            if(!optc--) {
+                printf("too many options (%d max)\n", N_OPTS);
+                return(-1);
             }
 
-            for( arg = &argv[i][1]; *arg; arg++ )
-            {
+            for(arg = &argv[i][1]; *arg; arg++) {
                 const char *f;
 
-                for( f = opts; *f; f++ )
-                    if( *f == *arg )
+                for(f = opts; *f; f++) {
+                    if(*f == *arg) {
                         break;
+                    }
+                }
 
-                if( !*f )
-                {
-                    printf( "Invalid option: -%c\n", *arg );
-                    return -1;
+                if(!*f) {
+                    printf("Invalid option: -%c\n", *arg);
+                    return(-1);
                 }
 
                 optv->flag = *f;
 
-                if( f[1] != ':' )
-                {
+                if(f[1] != ':') {
                     optv++->val = "true";
-                }
-                else if( arg[1] )
-                {
+                } else if(arg[1]) {
                     optv++->val = &arg[1];
                     break;
-                }
-                else if( ++i < argc )
-                {
+                } else if(++i < argc) {
                     optv++->val = argv[i];
                     break;
-                }
-                else
-                {
-                    printf( "option: -%c needs argument\n", *f );
-                    return -1;
+                } else   {
+                    printf("option: -%c needs argument\n", *f);
+                    return(-1);
                 }
             }
-        }
-        else
-        {
-        /* something like VARNAME=.... is treated as an implicit '-s' flag */
-            if ( argv[i][0] != '=' && strchr( argv[i],'=' ) )
-            {
-                if ( !optc-- )
-                {
-                    printf( "too many options (%d max)\n", N_OPTS );
-                    return -1;
+        } else   {
+            /* something like VARNAME=.... is treated as an implicit '-s' flag */
+            if(argv[i][0] != '=' && strchr(argv[i], '=')) {
+                if(!optc--) {
+                    printf("too many options (%d max)\n", N_OPTS);
+                    return(-1);
                 }
 
                 optv->flag  = 's';
                 optv++->val = argv[i];
-            }
-            else
-            {
-                if ( n >= N_TARGETS )
-                {
-                    printf( "too many targets (%d max)\n", N_TARGETS );
-                    return -1;
+            } else   {
+                if(n >= N_TARGETS) {
+                    printf("too many targets (%d max)\n", N_TARGETS);
+                    return(-1);
                 }
                 targets[n++] = argv[i];
             }
         }
     }
 
-    return n;
+    return(n);
 }
 
 /*
@@ -117,16 +100,18 @@ getoptions( argc, argv, opts, optv, targets )
  */
 
 const char *
-getoptval( optv, opt, subopt )
+getoptval(optv, opt, subopt)
     option *optv;
     int     opt;
     int     subopt;
 {
-        int i;
+    int  i;
 
-        for( i = 0; i < N_OPTS; i++, optv++ )
-            if( optv->flag == opt && !subopt-- )
-                return optv->val;
+    for(i = 0; i < N_OPTS; i++, optv++) {
+        if(optv->flag == opt && !subopt--) {
+            return(optv->val);
+        }
+    }
 
-        return 0;
+    return(0);
 }
