@@ -421,13 +421,17 @@ typedef long int iMaxT;
 #endif
 
 #ifndef OSPLAT
-# if defined(_M_PPC)       || \
-        defined(PPC)       || \
-        defined(ppc)       || \
-      defined(__ppc__)     || \
-     defined(__POWERPC__)  || \
-     defined(__powerpc__)
-#  define OSPLAT "OSPLAT=PPC"
+# if defined(__powerpc64__)
+#  define OSPLAT "OSPLAT=PPC64"
+# else
+#  if defined(_M_PPC)       || \
+         defined(PPC)       || \
+         defined(ppc)       || \
+       defined(__ppc__)     || \
+      defined(__POWERPC__)  || \
+      defined(__powerpc__)
+#   define OSPLAT "OSPLAT=PPC"
+#  endif
 # endif
 #endif
 
