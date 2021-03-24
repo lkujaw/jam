@@ -367,10 +367,12 @@ typedef long int iMaxT;
  * OSPLAT definitions - suppressed when it's a one-of-a-kind
  */
 #ifndef OSPLAT
-# if defined(_M_IA64)    || \
-      defined(__IA64__)  || \
-      defined(__ia64__)
-#  define OSPLAT "OSPLAT=IA64"
+# if defined(__aarch64__)
+#  define OSPLAT "OSPLAT=ARM64"
+# else
+#  if defined(__arm__)
+#   define OSPLAT "OSPLAT=ARM"
+#  endif
 # endif
 #endif
 
@@ -405,17 +407,31 @@ typedef long int iMaxT;
      defined(__x86_64)    || \
      defined(__x86_64__)
 #  define OSPLAT "OSPLAT=I386-64"
+# else
+#  if defined(_M_IX86)    || \
+         defined(i386)    || \
+        defined(_i386_)   || \
+       defined(__i386)    || \
+       defined(__i386__)
+#   if !defined(OS_OS2)
+#    define OSPLAT "OSPLAT=I386"
+#   endif
+#  endif
 # endif
 #endif
 
 #ifndef OSPLAT
-# if defined(_M_IX86)    || \
-        defined(i386)    || \
-       defined(_i386_)   || \
-      defined(__i386)    || \
-      defined(__i386__)
-#  if !defined(OS_OS2)
-#   define OSPLAT "OSPLAT=I386"
+# if defined(_M_IA64)    || \
+      defined(__IA64__)  || \
+      defined(__ia64__)
+#  define OSPLAT "OSPLAT=IA64"
+# endif
+#endif
+
+#ifndef OSPLAT
+# if defined(__mips__)
+#  if !defined(OS_SGI)
+#   define OSPLAT "OSPLAT=MIPS"
 #  endif
 # endif
 #endif
@@ -445,20 +461,6 @@ typedef long int iMaxT;
 #    define OSPLAT "OSPLAT=SPARC"
 #   endif
 #  endif
-# endif
-#endif
-
-#ifndef OSPLAT
-# if defined(__mips__)
-#  if !defined(OS_SGI)
-#   define OSPLAT "OSPLAT=MIPS"
-#  endif
-# endif
-#endif
-
-#ifndef OSPLAT
-# if defined(__arm__)
-#  define OSPLAT "OSPLAT=ARM"
 # endif
 #endif
 
