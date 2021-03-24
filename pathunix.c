@@ -1,10 +1,4 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * pathunix.c - manipulate file names on UNIX, NT, OS2, AmigaOS
  *
  * External routines:
@@ -35,6 +29,7 @@
 
 #include "jam.h"  /* Includes system headers */
 
+#include "bool.h"
 #include "pathsys.h"
 
 #ifdef USE_PATHUNIX
@@ -44,25 +39,24 @@
  */
 
 void
-path_parse(file, f)
-    const char *file;
-    PATHNAME *f;
-{
-    const char *p, *q;
-    const char *end;
+path_parse DECLARE((file, f))
+    const char  *file  NP
+    PATHNAME    *f     EP
+BEGIN
+    const char  *p, *q;
+    const char  *end;
 
     memset((char *)f, 0, sizeof(*f));
 
     /* Look for <grist> */
-
     if(file[0] == '<' && (p = strchr(file, '>'))) {
         f->f_grist.ptr = file;
-        f->f_grist.len = p - file;
-        file           = p + 1;
+        assert(p >= file);
+        f->f_grist.len = (sizeT)(p - file);
+        file = p + 1;
     }
 
     /* Look for dir/ */
-
     p = strrchr(file, '/');
 
 # if PATH_DELIM == '\\'
@@ -75,17 +69,16 @@ path_parse(file, f)
 
     if(p) {
         f->f_dir.ptr = file;
-        f->f_dir.len = p - file;
+        assert(p >= file);
+        f->f_dir.len = (sizeT)(p - file);
 
         /* Special case for / - dirname is /, not "" */
-
         if(!f->f_dir.len) {
             f->f_dir.len = 1;
         }
 
 # if PATH_DELIM == '\\'
         /* Special case for D:/ - dirname is D:/, not "D:" */
-
         if(f->f_dir.len == 2 && file[1] == ':') {
             f->f_dir.len = 3;
         }
@@ -97,7 +90,6 @@ path_parse(file, f)
     end = file + strlen(file);
 
     /* Look for (member) */
-
     if((p = strchr(file, '(')) && end[-1] == ')') {
         f->f_member.ptr = p + 1;
         f->f_member.len = end - p - 2;
@@ -106,39 +98,42 @@ path_parse(file, f)
 
     /* Look for .suffix */
     /* This would be memrchr() */
-
-    p = 0;
+    p = NIL(char*);
     q = file;
 
-    while((q = (char *)memchr(q, '.', end - q))) {
+    while(TRUE) {
+        assert(end >= q);
+        q = (char*)memchr(q, '.', (sizeT)(end - q));
+        if(q == NIL(char*)) break;
         p = q++;
     }
 
-    if(p) {
+    if(p != NIL(char*)) {
         f->f_suffix.ptr = p;
-        f->f_suffix.len = end - p;
-        end             = p;
+        assert(end >= p);
+        f->f_suffix.len = (sizeT)(end - p);
+        end = p;
     }
 
     /* Leaves base */
-
     f->f_base.ptr = file;
-    f->f_base.len = end - file;
-}
+    assert(end >= file);
+    f->f_base.len = (sizeT)(end - file);
+END_FUNCTION(path_parse)
+
 
 /*
  * path_build() - build a filename given dir/base/suffix/member
  */
-
 void
-path_build(f, file, binding)
-    PATHNAME *f;
-    char     *file;
-    int       binding;
-{
+path_build DECLARE((f, file, binding))
+    PATHNAME  *f        NP
+    char      *file     NP
+    int        binding  EP
+BEGIN
+    UNUSED(binding);  /* Other platforms (e.g., VMS) need this. */
     /* Start with the grist.  If the current grist isn't */
     /* surrounded by <>'s, add them. */
-
     if(f->f_grist.len) {
         if(f->f_grist.ptr[0] != '<') {
             *file++ = '<';
@@ -151,23 +146,17 @@ path_build(f, file, binding)
     }
 
     /* Don't prepend root if it's . or directory is rooted */
-
 # if PATH_DELIM == '/'
-
     if(f->f_root.len
        && !(f->f_root.len == 1 && f->f_root.ptr[0] == '.')
        && !(f->f_dir.len && f->f_dir.ptr[0] == '/'))
-
 # else /* unix */
-
     if(f->f_root.len
        && !(f->f_root.len == 1 && f->f_root.ptr[0] == '.')
        && !(f->f_dir.len && f->f_dir.ptr[0] == '/')
        && !(f->f_dir.len && f->f_dir.ptr[0] == '\\')
        && !(f->f_dir.len && f->f_dir.ptr[1] == ':'))
-
 # endif /* unix */
-
     {
         memcpy(file, f->f_root.ptr, f->f_root.len);
         file   += f->f_root.len;
@@ -181,11 +170,9 @@ path_build(f, file, binding)
 
     /* UNIX: Put / between dir and file */
     /* NT:   Put \ between dir and file */
-
     if(f->f_dir.len && (f->f_base.len || f->f_suffix.len)) {
         /* UNIX: Special case for dir \ : don't add another \ */
         /* NT:   Special case for dir / : don't add another / */
-
 # if PATH_DELIM == '\\'
         if(!(f->f_dir.len == 3 && f->f_dir.ptr[1] == ':'))
 # endif
@@ -211,25 +198,20 @@ path_build(f, file, binding)
         *file++ = ')';
     }
     *file = 0;
-}
+END_FUNCTION(path_build)
+
 
 /*
  *      path_parent() - make a PATHNAME point to its parent dir
  */
-
 void
-path_parent(f)
-    PATHNAME *f;
-{
+path_parent DECLARE((f))
+    PATHNAME  *f  EP
+BEGIN
     /* just set everything else to nothing */
+    f->f_base.ptr = f->f_suffix.ptr = f->f_member.ptr = "";
+    f->f_base.len = f->f_suffix.len = f->f_member.len = 0;
+END_FUNCTION(path_parent)
 
-    f->f_base.ptr           =
-        f->f_suffix.ptr     =
-            f->f_member.ptr = "";
-
-    f->f_base.len           =
-        f->f_suffix.len     =
-            f->f_member.len = 0;
-}
 
 #endif  /* unix, NT, OS/2, AmigaOS */

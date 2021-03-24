@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * lists.c - maintain lists of strings
  *
  * This implementation essentially uses a singly linked list, but
@@ -30,17 +24,16 @@
 #include "str.h"
 #include "xmem.h"
 
-static LIST *freelist = NULL;      /* junkpile for list_free() */
+static LIST *freelist = NIL(LIST*);  /* junkpile for list_free() */
 
 /*
  * list_append() - append a list onto another one, returning total
  */
-
 LIST *
-list_append(l, nl)
-    LIST *l;
-    LIST *nl;
-{
+list_append DECLARE((l, nl))
+    LIST  *l   NP
+    LIST  *nl  EP
+BEGIN
     if(!nl) {
         /* Just return l */
     } else if(!l) {
@@ -52,26 +45,25 @@ list_append(l, nl)
     }
 
     return(l);
-}
+END_FUNCTION(list_append)
+
 
 /*
  * list_new() - tack a string onto the end of a list of strings
  */
-
 LIST *
-list_new(head, string, copy)
-    LIST       *head;
-    const char *string;
-    int         copy;
-{
-    LIST *l = _NIL_(LIST *);
+list_new DECLARE((head, string, copy))
+    LIST        *head    NP
+    const char  *string  NP
+    int          copy    EP
+BEGIN
+    LIST        *l = NIL(LIST *);
 
     if(DEBUG_LISTS) {
         printf("list > %s <\n", string);
     }
 
     /* Copy/newstr as needed */
-
     string = copy ? copystr(string) : newstr(string);
 
     /* Get list struct from freelist, if one available.  */
@@ -101,155 +93,154 @@ list_new(head, string, copy)
     l->string = string;
 
     return(head);
-}
+END_FUNCTION(list_new)
+
 
 /*
  * list_copy() - copy a whole list of strings (nl) onto end of another (l)
  */
-
 LIST *
-list_copy(l, nl)
-    LIST *l;
-    LIST *nl;
-{
-    for( ; nl; nl = list_next(nl)) {
+list_copy DECLARE((l, nl))
+    LIST  *l   NP
+    LIST  *nl  EP
+BEGIN
+    for(; nl; nl = list_next(nl)) {
         l = list_new(l, nl->string, 1);
     }
 
     return(l);
-}
+END_FUNCTION(list_copy)
+
 
 /*
  * list_sublist() - copy a subset of a list of strings
  */
-
 LIST *
-list_sublist(l, start, count)
-    LIST    *l;
-    int     start;
-    int     count;
-{
-    LIST *nl = 0;
+list_sublist DECLARE((l, start, count))
+    LIST  *l      NP
+    int    start  NP
+    int    count  EP
+BEGIN
+    LIST  *nl = NIL(LIST*);
 
-    for( ; l && start--; l = list_next(l)) {
+    for(; l && start--; l = list_next(l)) {
         ;
     }
 
-    for( ; l && count--; l = list_next(l)) {
+    for(; l && count--; l = list_next(l)) {
         nl = list_new(nl, l->string, 1);
     }
 
     return(nl);
-}
+END_FUNCTION(list_sublist)
+
 
 /*
  * list_free() - free a list of strings
  */
-
 void
-list_free(head)
-    LIST *head;
-{
+list_free DECLARE((head))
+    LIST  *head  EP
+BEGIN
     /* Just tack onto freelist. */
-
     if(head) {
         head->tail->next = freelist;
         freelist         = head;
     }
-}
+END_FUNCTION(list_free)
+
 
 /*
  * list_print() - print a list of strings to stdout
  */
-
 void
-list_print(l)
-    LIST *l;
-{
-    for( ; l; l = list_next(l)) {
+list_print DECLARE((l))
+    LIST  *l  EP
+BEGIN
+    for(; l; l = list_next(l)) {
         printf("%s ", l->string);
     }
-}
+END_FUNCTION(list_print)
+
 
 /*
  * list_length() - return the number of items in the list
  */
-
 int
-list_length(l)
-    LIST *l;
-{
-    int  n = 0;
+list_length DECLARE((l))
+    LIST  *l  EP
+BEGIN
+    int    n = 0;
 
-    for( ; l; l = list_next(l), ++n) {
+    for(; l; l = list_next(l), ++n) {
         ;
     }
 
     return(n);
-}
+END_FUNCTION(list_length)
+
 
 /*
  * lol_init() - initialize a LOL (list of lists)
  */
-
 void
-lol_init(lol)
-    LOL *lol;
-{
+lol_init DECLARE((lol))
+    LOL  *lol  EP
+BEGIN
     lol->count = 0;
-}
+END_FUNCTION(lol_init)
+
 
 /*
  * lol_add() - append a LIST onto an LOL
  */
-
 void
-lol_add(lol, l)
-    LOL     *lol;
-    LIST    *l;
-{
+lol_add DECLARE((lol, l))
+    LOL    *lol  NP
+    LIST   *l    EP
+BEGIN
     if(lol->count < LOL_MAX) {
-        lol->list[ lol->count++ ] = l;
+        lol->list[lol->count++] = l;
     }
-}
+END_FUNCTION(lol_add)
+
 
 /*
  * lol_free() - free the LOL and its LISTs
  */
-
 void
-lol_free(lol)
-    LOL *lol;
-{
-    int  i;
+lol_free DECLARE((lol))
+    LOL  *lol  EP
+BEGIN
+    int   i;
 
     for(i = 0; i < lol->count; i++) {
         list_free(lol->list[i]);
     }
 
     lol->count = 0;
-}
+END_FUNCTION(lol_free)
+
 
 /*
  * lol_get() - return one of the LISTs in the LOL
  */
-
 LIST *
-lol_get(lol, i)
-    LOL     *lol;
-    int     i;
-{
+lol_get DECLARE((lol, i))
+    LOL  *lol  NP
+    int   i    EP
+BEGIN
     return(i < lol->count ? lol->list[i] : 0);
-}
+END_FUNCTION(lol_get)
+
 
 /*
  * lol_print() - debug print LISTS separated by ":"
  */
-
 void
-lol_print(lol)
-    LOL *lol;
-{
+lol_print DECLARE((lol))
+    LOL  *lol  EP
+BEGIN
     int  i;
 
     for(i = 0; i < lol->count; i++) {
@@ -258,4 +249,4 @@ lol_print(lol)
         }
         list_print(lol->list[i]);
     }
-}
+END_FUNCTION(lol_print)

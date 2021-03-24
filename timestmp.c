@@ -38,7 +38,7 @@ struct _binding {
 };
 
 static struct hash *bindhash = 0;
-static void time_enter _ARG_((voidT *, const char *, int, time_t));
+static void time_enter PARAM((voidT *, const char *, int, time_t));
 
 static const char *time_progress[] =
 {
@@ -53,18 +53,17 @@ static const char *time_progress[] =
 /*
  * timestamp() - return timestamp on a file, if present
  */
-
 void
-timestamp(target, time)
-    char    *target;
-    time_t  *time;
-{
+timestamp DECLARE((target, time))
+    char     *target  NP
+    time_t   *time    EP
+BEGIN
     PATHNAME  f1, f2;
     BINDING   binding, *b = &binding;
     char      buf[ MAXJPATH ];
 
 #ifdef DOWNSHIFT_PATHS
-    char  path[ MAXJPATH ];
+    char  path[MAXJPATH];
     char *p = path;
 
     do{
@@ -144,7 +143,6 @@ timestamp(target, time)
     }
 
 afterscanning:
-
     if(b->progress == BIND_SPOTTED) {
         if(file_time(b->name, &b->time) < 0) {
             b->progress = BIND_MISSING;
@@ -154,15 +152,16 @@ afterscanning:
     }
 
     *time = b->progress == BIND_FOUND ? b->time : 0;
-}
+END_FUNCTION(timestamp)
+
 
 static void
-time_enter(closure, target, found, time)
-    voidT       *closure;
-    const char  *target;
-    int          found;
-    time_t       time;
-{
+time_enter DECLARE((closure, target, found, time))
+    voidT       *closure  NP
+    const char  *target   NP
+    int          found    NP
+    time_t       time     EP
+BEGIN
     BINDING      binding, *b = &binding;
     struct hash *bindhash = (struct hash *)closure;
 
@@ -189,14 +188,14 @@ time_enter(closure, target, found, time)
     if(DEBUG_BINDSCAN) {
         printf("time ( %s ) : %s\n", target, time_progress[b->progress]);
     }
-}
+END_FUNCTION(time_enter)
+
 
 /*
  * donestamps() - free timestamp tables
  */
-
 void
-donestamps _ARG_((void))
-{
+donestamps NULLARY
+BEGIN
     hashdone(bindhash);
-}
+END_FUNCTION(donestamps)

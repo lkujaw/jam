@@ -7,19 +7,12 @@
 
 # TODO: Use this to generate the non-bootstrap version.h
 VERSION = ftjam-2.5.2 ;
-include Jamrules ;
 
 if $(VMS)  { LOCATE_TARGET ?= [.binvms] ; }
 else       { LOCATE_TARGET ?= [ FDirName tgt $(OSFULL[1]:L) ] ; }
 
-# Leave generated source in current directory; it would be nice to use
-# these lines below to build the source into the platform-specific
-# directory, but getting scan.c to include the right jambase.h is
-# hard: with ""'s, it always gets the bootstrap version; with <>'s,
-# it won't find the bootstrap version.
-
-# SEARCH_SOURCE ?= $(LOCATE_TARGET) $(DOT) ;
-# LOCATE_SOURCE ?= $(LOCATE_TARGET) ;
+SEARCH_SOURCE ?= $(LOCATE_TARGET) $(DOT) ;
+LOCATE_SOURCE ?= $(LOCATE_TARGET) ;
 
 #
 # We have some different files for UNIX, VMS, and NT.
@@ -41,8 +34,8 @@ else if $(OS2)
         code += fileos2.c ;
     }
 }
-else if $(VMS)  { code = execvms.c filevms.c pathvms.c ; }
-else if $(MAC)  { code = execmac.c filemac.c pathmac.c ; }
+else if $(VMS)  { code = execvms.c  filevms.c  pathvms.c ; }
+else if $(MAC)  { code = execmac.c  filemac.c  pathmac.c ; }
 else            { code = execunix.c fileunix.c pathunix.c ; }
 
 if $(UNIX) && $(OS) = CYGWIN
@@ -72,10 +65,10 @@ if $(OS) = NT
 {
     switch $(JAM_TOOLSET)
     {
-        case MINGW       : CCFLAGS += -DNT -D__STD_C ;
-        case LCC         : CCFLAGS += -DNT -D__STD_C ;
-        case DIGITALMARS : CCFLAGS += -DNT -D__STD_C ;
-        case *           : CCFLAGS += /DNT /D__STD_C ;
+        case MINGW       : CCFLAGS += -DNT -DCSTD ;
+        case LCC         : CCFLAGS += -DNT -DCSTD ;
+        case DIGITALMARS : CCFLAGS += -DNT -DCSTD ;
+        case *           : CCFLAGS += /DNT /DCSTD ;
     }
 }
 
@@ -160,13 +153,6 @@ ALLSOURCE =
         common.mk
         [ GLOB builds : *.mk ]
         [ GLOB builds/unix : *.in ]
-        builds/unix/configure
-        builds/unix/configure.ac
-        builds/unix/config.sub
-        builds/unix/config.guess
-        builds/unix/install-sh
-        builds/unix/mkinstalldirs
-        configure
         ;
 
 

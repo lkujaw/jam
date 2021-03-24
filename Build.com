@@ -1,4 +1,5 @@
-! Bootstrap build script for Jam
+$ ! Bootstrap build script for Jam
+$ vf = 'f$verify(1)'
 $ cxx /define=VMS builtins.c
 $ cxx /define=VMS command.c
 $ cxx /define=VMS compile.c
@@ -29,3 +30,4 @@ $ cxxlink/exe=jam.exe command.obj, compile.obj, execvms.obj, expand.obj, -
     make1.obj, newstr.obj, option.obj, parse.obj, pathvms.obj, regexp.obj, -
     rules.obj, scan.obj, search.obj, timestmp.obj, variable.obj, jam.obj, -
     jamgram.obj, jambase.obj, builtins.obj
+$ exit 1 .or. f$verify(vf)

@@ -10,7 +10,7 @@
 #
 
 CC       = cl /nologo
-CFLAGS   = -DNT -D__STD_C
+CFLAGS   = -DNT -DCSTD
 TARGET   = /Fejam0
 LINKLIBS = oldnames.lib kernel32.lib
 

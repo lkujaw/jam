@@ -13,14 +13,14 @@
 #ifndef JAM_MAKE_H
 #define JAM_MAKE_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 #include "rules.h"
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-int make  _ARG_((int n_targets, const char **targets, int anyhow));
-int make1 _ARG_((TARGET *t));
+int make  PARAM((int n_targets, const char **targets, int anyhow));
+int make1 PARAM((TARGET *t));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_MAKE_H */

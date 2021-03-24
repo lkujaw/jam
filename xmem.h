@@ -3,19 +3,19 @@
 #ifndef JAM_XMEM_H
 #define JAM_XMEM_H 1
 
-#include "ansi.h"
 #include "bool.h"
+#include "cstd.h"
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-boolT fMemoryAllocate       _ARG_((voidT **ppMemory, sizeT mBytesC));
-void   memoryAllocateOrFail _ARG_((voidT **ppMemory, sizeT mBytesC));
-void   memoryRelease        _ARG_((voidT **ppMemory));
+boolT  fMemoryAllocate        PARAM((voidT **ppMemory, sizeT mBytesC));
+void    memoryAllocateOrFail  PARAM((voidT **ppMemory, sizeT mBytesC));
+void    memoryRelease         PARAM((voidT **ppMemory));
 
-boolT fValidPointer         _ARG_((voidT *pMemory));
+boolT  fValidPointer          PARAM((voidT *pMemory));
 
-void   xmemTerminate        _ARG_((void));
+void    xmemTerminate         PARAM((void));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_XMEM_H */

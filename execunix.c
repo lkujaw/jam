@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * execunix.c - execute a shell script on UNIX/WinNT/OS2/AmigaOS
  *
  * If $(JAMSHELL) is defined, uses that to formulate execvp()/spawnvp().
@@ -36,6 +30,7 @@
  * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  * 11/04/02 (seiwald) - const-ing for string literals
  * 12/27/02 (seiwald) - grist .bat file with pid for system uniqueness
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
 
 #include <errno.h>
@@ -60,52 +55,106 @@
 #  if !defined(__BORLANDC__)
 #   define pid_t int
 #   define wait my_wait
-static int my_wait _ARG_((int *status));
+static int my_wait PARAM((int *status));
 #  endif
 # endif
 
 static int  intr        = 0;
 static int  cmdsrunning = 0;
-static void onintr _ARG_((int));
-static void (*istat)_ARG_((int));
+static void onintr PARAM((int));
+static void (*istat)PARAM((int));
 
 static struct {
     int pid;          /* on win32, a real process handle */
-    void   (*func)_ARG_((voidT * closure, int status));
+    void   (*func)PARAM((voidT * closure, int status));
     voidT *closure;
-
 # ifdef USE_EXECNT
     char *tempfile;
 # endif
-
-} cmdtab[ MAXJOBS ] = { { 0 } };
+} cmdtab[MAXJOBS] = { { 0 } };
 
 /*
  * onintr() - bump intr to note command interruption
  */
-
 static void
-onintr(disp)
-    int disp;
-{
+onintr DECLARE((disp))
+    int  disp  EP
+BEGIN
+    UNUSED(disp);
     intr++;
     printf("...interrupted\n");
-}
+END_FUNCTION(onintr)
+
+# ifdef OS_NT
+int
+execmax NULLARY
+BEGIN
+    static int maxline = 0;
+    OSVERSIONINFO o;
+
+    if(maxline) {
+        return maxline;
+    }
+
+    /* Get from OS */
+
+    /* Beyond Win 2003?  (6+?) -- 8191 */
+    /* WinXP (5/0) or Win 2003 (5/1) -- 8191 */
+    /* Win 2k (5/0) or Win NT 4 (4/0) -- 2047 */
+    /* older -- 996 */
+
+   o.dwOSVersionInfoSize = sizeof(o);
+
+   if(!GetVersionEx(&o)) {
+       maxline = MAXLINE;
+   } else if(o.dwMajorVersion >= 6) {
+       maxline = 8191;
+   } else if(o.dwMajorVersion == 5 && o.dwMinorVersion >= 1) {
+       maxline = 8191;
+   } else if(o.dwMajorVersion == 5 && o.dwMinorVersion == 0) {
+       maxline = 2047;
+   } else if(o.dwMajorVersion == 4 && o.dwMinorVersion == 0) {
+       maxline = 2047;
+   } else {
+       maxline = MAXLINE;
+   }
+
+   if(DEBUG_EXECCMD) {
+       printf("Windows %d/%d maxline %d\n",
+              o.dwMajorVersion,
+              o.dwMinorVersion,
+              maxline);
+   }
+
+   return maxline;
+END_FUNCTION(execmax)
+
+# else
+
+/*
+ * execmax() - max permitted string to execcmd()
+ */
+int
+execmax NULLARY
+BEGIN
+    return MAXLINE;
+END_FUNCTION(execmax)
+
+#endif
 
 /*
  * execcmd() - launch an async command execution
  */
-
 void
-execcmd(string, func, closure, shell)
-    const char *string;
-    void      (*func)_ARG_((voidT *closure, int status));
-    voidT      *closure;
-    LIST       *shell;
-{
+execcmd DECLARE((string, func, closure, shell))
+    const char *string                                    NP
+    void      (*func)PARAM((voidT *closure, int status))  NP
+    voidT      *closure                                   NP
+    LIST       *shell                                     EP
+BEGIN
     int         pid;
     int         slot;
-    const char *argv[ MAXARGC + 1 ];        /* +1 for NULL */
+    const char *argv[MAXARGC + 1];        /* +1 for NULL */
 
 # ifdef USE_EXECNT
     char *p;
@@ -127,7 +176,7 @@ execcmd(string, func, closure, shell)
     }
 
 # ifdef USE_EXECNT
-    if(!cmdtab[ slot ].tempfile) {
+    if(!cmdtab[slot].tempfile) {
         char *tempdir;
 
         if(!(tempdir = getenv("TEMP")) &&
@@ -165,11 +214,11 @@ execcmd(string, func, closure, shell)
 
         /* Write command to bat file. */
 
-        f = fopen(cmdtab[ slot ].tempfile, "w");
+        f = fopen(cmdtab[slot].tempfile, "w");
         fputs(string, f);
         fclose(f);
 
-        string = cmdtab[ slot ].tempfile;
+        string = cmdtab[slot].tempfile;
     }
 # endif
 
@@ -233,7 +282,7 @@ execcmd(string, func, closure, shell)
 #  endif
     {
         /* POSIX states that argv should not be modified */
-        execvp(argv[0], (char*const *)argv);
+        execvp(argv[0], (char *const *)argv);
         _exit(127);
     }
 
@@ -256,15 +305,15 @@ execcmd(string, func, closure, shell)
             break;
         }
     }
-}
+END_FUNCTION(execcmd)
+
 
 /*
  * execwait() - wait and drive at most one execution completion
  */
-
 int
-execwait _ARG_((void))
-{
+execwait NULLARY
+BEGIN
     int    i;
     int    status;
     int    rstat;
@@ -320,17 +369,17 @@ execwait _ARG_((void))
     (*cmdtab[i].func)(cmdtab[i].closure, rstat);
 
     return(1);
-}
+END_FUNCTION(execwait)
+
 
 # ifdef USE_MYWAIT
-
 static int
-my_wait(status)
-    int *status;
-{
+my_wait DECLARE((status))
+    int  *status  EP
+BEGIN
     int            i, num_active = 0;
     DWORD          exitcode, waitcode;
-    static HANDLE *active_handles = _NIL_(HANDLE *);
+    static HANDLE *active_handles = NIL(HANDLE *);
 
     if(!active_handles) {
         memoryAllocateOrFail((voidT**)&active_handles,
@@ -382,9 +431,7 @@ my_wait(status)
 FAILED:
     errno = GetLastError();
     return(-1);
-
-}
+END_FUNCTION(my_wait)
 
 # endif /* USE_MYWAIT */
-
 #endif  /* USE_EXECUNIX */

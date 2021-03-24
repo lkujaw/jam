@@ -47,8 +47,8 @@
 # define STRING 303
 #include "jam.h"
 
-#include "ansi.h"
 #include "compile.h"
+#include "cstd.h"
 #include "lists.h"
 #include "parse.h"
 #include "rules.h"
@@ -58,7 +58,7 @@
 
 #define YYMAXDEPTH 10000  /* increase depth for OSF and similar system */
 
-#if __STD_C
+#if CSTD
 # define F0 (LIST *(*)(PARSE *, LOL *, int *))0
 #else
 # define F0 (LIST *(*)())0

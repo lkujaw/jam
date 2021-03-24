@@ -13,12 +13,12 @@
 #ifndef JAM_BUILTINS_H
 #define JAM_BUILTINS_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-void load_builtins _ARG_((voidT));
+void load_builtins PARAM((voidT));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_BUILTINS_H */

@@ -25,14 +25,14 @@
 #ifndef JAM_PATHSYS_H
 #define JAM_PATHSYS_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
 typedef struct _pathname PATHNAME;
 typedef struct _pathpart PATHPART;
 
 struct _pathpart {
     const char *ptr;
-    int         len;
+    sizeT       len;
 };
 
 struct _pathname {
@@ -48,12 +48,12 @@ struct _pathname {
 #define f_member       part[5]
 };
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-void path_build  _ARG_((PATHNAME *f, char *file, int binding));
-void path_parse  _ARG_((const char *file, PATHNAME *f));
-void path_parent _ARG_((PATHNAME *f));
+void path_build   PARAM((PATHNAME *f, char *file, int binding));
+void path_parse   PARAM((const char *file, PATHNAME *f));
+void path_parent  PARAM((PATHNAME *f));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_PATHSYS_H */

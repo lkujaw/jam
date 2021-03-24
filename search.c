@@ -1,10 +1,4 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * search.c - find a target along $(SEARCH) or $(LOCATE)
  *
  * 11/04/02 (seiwald) - const-ing for string literals
@@ -21,16 +15,15 @@
 
 
 const char *
-search(target, time)
-    const char *target;
-    time_t     *time;
-{
+search DECLARE((target, time))
+    const char  *target  NP
+    time_t      *time    EP
+BEGIN
     PATHNAME  f[1];
     LIST     *varlist;
-    char      buf[ MAXJPATH ];
+    char      buf[MAXJPATH];
 
     /* Parse the filename */
-
     path_parse(target, f);
 
     f->f_grist.ptr = 0;
@@ -86,4 +79,4 @@ search(target, time)
     timestamp(buf, time);
 
     return(newstr(buf));
-}
+END_FUNCTION(search)

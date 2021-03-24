@@ -37,6 +37,8 @@
 # 11/21/96 (peterk) - Support for BeOS
 # 07/19/99 (sickel) - Support for Mac OS X Server (and maybe client)
 # 02/18/00 (belmonte)- Support for Cygwin.
+# 12/08/03 (seiwald) - New YaccHdr to attribute #includes to generated .c.
+# 11/22/13 (brett)   - Support for Darwin.
 
 # Special targets defined in this file:
 #
@@ -154,7 +156,7 @@
 
 # for perforce use -- jambase version
 
-JAMBASEDATE = 2004.10.07 ;
+JAMBASEDATE = 2005.05.05 ;
 
 # Initialize variables
 #
@@ -318,12 +320,10 @@ if $(NT)
     }
     else if $(JAM_TOOLSET) = VISUALC
     {
-        # Visual C++ 6.0 uses MSVCDIR
-
+        # Visual C++ 6.0 and .NET 2003 uses MSVCDIR
         MSVCNT      ?= $(MSVCDIR) ;
 
         # bury IA64 in the path for the SDK
-
         local I ; if $(OSPLAT) = IA64 { I = ia64\\ ; } else { I = "" ; }
 
         AR          ?= lib ;
@@ -400,7 +400,7 @@ if $(NT)
         AR              ?= ar -ru ;
         CC              ?= gcc ;
         CCFLAGS         ?= "" ;
-        C++             ?= $(CC) ;
+        C++             ?= g++ ;
         C++FLAGS        ?= $(CCFLAGS) ;
         LINK            ?= $(CC) ;
         LINKFLAGS       ?= "" ;
@@ -589,6 +589,21 @@ else if $(OS2)
         Exit  "Sorry, but the $(JAM_TOOLSET) toolset isn't supported for now" ;
     }
 }
+else if $(AS400)
+{
+    C++         ?= icc ;
+    C++FLAGS    ?= -DAS400 ;
+    CC          ?= icc ;
+    CCFLAGS     ?= -DAS400 ;
+    LINK        ?= icc ;
+    LINKFLAGS   ?= -qDUPPROC ;
+    NOARSCAN    ?= true ;
+    AR          ?= qar -cru ;
+    RM          ?= del ;
+    CRELIB      ?= true ;
+    # QSYS Library to use for build output
+    QSYSLIB     ?= jam ;
+}
 else if $(VMS)
 {
     C++         ?= cxx ;
@@ -617,12 +632,6 @@ else if $(VMS)
     SUFEXE      ?= .exe ;
     SUFLIB      ?= .olb ;
     SUFOBJ      ?= .obj ;
-
-    switch $(OS)
-    {
-    case OPENVMS : CCFLAGS ?= /stand=vaxc ;
-    case VMS     : LINKLIBS ?= sys$library:vaxcrtl.olb/lib ;
-    }
 }
 else if $(MAC)
 {
@@ -726,6 +735,7 @@ else if $(UNIX)
     switch $(OS)
     {
     case AIX :
+    CCFLAGS     += -D_AIX ;
     LINKLIBS    ?= -lbsd ;
 
     case AMIGA :
@@ -765,13 +775,16 @@ else if $(UNIX)
 
     case MVS :
     RANLIB      ?= "" ;
+    YACC        ?= "" ;
 
     case NEXT :
     AR          ?= libtool -o ;
     RANLIB      ?= "" ;
 
-    case MACOSX :
+    case DARWIN :
     C++         ?= c++ ;
+    CCFLAGS     += -D__DARWIN__ ;
+    C++FLAGS    += -D__DARWIN__ ;
     MANDIR      ?= /usr/local/share/man ;
 
     case NCR :
@@ -826,6 +839,7 @@ else if $(UNIX)
     LINKLIBS    ?= ;
     OPTIM       ?= ;
     RANLIB      ?= ranlib ;
+    SHELL       ?= sh ;
     YACC        ?= [ YaccFind ] ;
     YACCGEN     ?= .c ;
     YACCFILES   ?= y.tab ;
@@ -1110,8 +1124,18 @@ rule HdrMacroFile
 
 rule Iffe
 {
-    local cmdIffe = iffe.sh ;
-    local _s = $(>:BS=.iff) ;
+    local cmdIffe = [ Glob $(SEARCH_SOURCE) $(TOP) : iffe.sh ] ;
+    cmdIffe ?= iffe.sh ;
+    # Support the classic AT&T convention of feature/$test_name.
+    local _s = [ Glob features :
+                 $(>:BS=.iffe) $(>:BS=.iff) $(>:B) $(>:BS=.sh) $(>:BS=.c) ] ;
+    # If C source files and iffe feature tests are interspersed, require that
+    # the latter have a unique suffix.
+    _s += [ Glob $(DOT) : $(>:BS=.iffe) $(>:BS=.iff) ] ;
+    _s  = $(_s[1]) ;
+    # Check if the feature test relies upon other feature tests.
+    HDRRULE on $(_s) = HdrRule ;
+    HDRSCAN on $(_s) = $(HDRPATTERN) ;
     Depends $(<) : $(>) ;
     Depends $(>) : $(cmdIffe) $(_s) ;
     Iffe1 $(>) : $(cmdIffe) $(_s) ;
@@ -1120,13 +1144,17 @@ rule Iffe
 
 rule Iffe1
 {
-    SEARCH on $(>) = $(SEARCH_SOURCE) ;
+    LOCATE on $(<) = $(LOCATE_SOURCE) ;
+    local _d = [ FDirName $(LOCATE_SOURCE[1]) FEATURE ] ;
+    Depends $(<) : $(_d:G=dir) ;
+    MkDir $(_d:G=dir) ;
+    SEARCH on $(>[2]) = $(SEARCH_SOURCE) ;
+    IFFEHDRS on $(<)  = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
 }
 
 actions Iffe1
 {
-    PATH="$PATH:."
-    sh $(>[1]) -v $(>[2-])
+    $(SHELL) $(>[1]) - -v -c $(CC) $(IFFEHDRS) run $(>[2]) > $(<)
 }
 
 # /HdrRule source : headers ;
@@ -1159,7 +1187,7 @@ rule HdrRule
         {
             switch $(i)
             {
-            case FEATURE/* : Iffe $(<) : $(i) ;
+                case FEATURE/* : Iffe $(<) : $(i) ;
             }
         }
     }
@@ -1167,15 +1195,44 @@ rule HdrRule
     local s = $(>:G=$(HDRGRIST:E)) ;
 
     Includes $(<) : $(s) ;
-    SEARCH on $(s) = $(HDRSEARCH) ;
     NoCare $(s) ;
 
     # Propagate on $(<) to $(>)
 
-    HDRSEARCH on $(s) = $(HDRSEARCH) ;
     HDRSCAN on $(s) = $(HDRSCAN) ;
     HDRRULE on $(s) = $(HDRRULE) ;
     HDRGRIST on $(s) = $(HDRGRIST) ;
+    HDRSEARCH on $(s) = $(HDRSEARCH) ;
+    SEARCH on $(s) = $(HDRSEARCH) ;
+
+    # If the including file has a hard-coded directory path $(<:D),
+    # we need to add that, as a subdirectory of the existing header
+    # search path, to SEARCH/HDRSEARCH.  We try to be careful not to
+    # add duplicates.
+
+    local d = $(<:D) ;
+    local h ;
+
+    if $(d)
+    {
+        # Build unique list h = $(HDRSEARCH)/$(<:D)
+
+        for i in $(d:R=$(HDRSEARCH))
+        {
+            if ! $(i) in $(HDRSEARCH) $(h) { h += $(i) ; }
+        }
+
+        # For each included file whose directory doesn't match the
+        # including file, add new subdirectories h to the search.
+        for i in $(s)
+        {
+            if $(d) != $(i:D)
+            {
+                HDRSEARCH on $(i) += $(h) ;
+                SEARCH on $(i) += $(h) ;
+            }
+        }
+    }
 }
 
 
@@ -1812,18 +1869,16 @@ rule MkDir
 
         if $(s) = $(<)
         {
-        # The parent is the same as the dir.
-        # We're at the root, which some OS's can't stat, so we mark
-        # it as NotFile.
-
+            # The parent is the same as the dir.
+            # We're at the root, which some OS's can't stat, so we mark
+            # it as NotFile.
             NotFile $(s) ;
         }
         else if $(s:G=)
         {
-        # There's a parent; recurse.
-
-        Depends $(<) : $(s) ;
-        MkDir $(s) ;
+            # There's a parent; recurse.
+            Depends $(<) : $(s) ;
+            MkDir $(s) ;
         }
     }
 }
@@ -1895,6 +1950,8 @@ rule Object
         case .f :   Fortran $(<) : $(>) ;
         case .l :   Cc $(<) : $(<:S=.c) ;
                     Lex $(<:S=.c) : $(>) ;
+        case .m :   Cc $(<) : $(>) ;
+        case .mm :  Cc $(<) : $(>) ;
         case .s :   As $(<) : $(>) ;
         case .y :   Cc $(<) : $(<:S=$(YACCGEN)) ;
                     Yacc $(<:S=$(YACCGEN)) : $(>) ;
@@ -2331,8 +2388,18 @@ rule Yacc
 
     # make sure someone includes $(_h) else it will be
     # a deadly independent target
-
     Includes $(<) : $(_h) ;
+
+    # Handle #includes in .y file
+    HDRRULE on $(>) = YaccHdr ;
+}
+
+rule YaccHdr
+{
+    # YaccHdr .y : hdrs ;
+    # For yacc, includes are actually on the generated
+    # .c file, not on the source .y.
+    HdrRule $(<:S=$(YACCGEN)) : $(>) ;
 }
 
 #
@@ -2717,17 +2784,17 @@ if $(RELOCATE)
 {
     actions C++
     {
-    $(C++) -c $(C++FLAGS) $(OPTIM) $(CCDEFS) $(CCHDRS) $(>)
+        $(C++) -c $(C++FLAGS) $(OPTIM) $(CCDEFS) $(CCHDRS) $(>)
     }
 
     actions Cc
     {
-    $(CC) -c $(CCFLAGS) $(OPTIM) $(CCDEFS) $(CCHDRS) $(>)
+        $(CC) -c $(CCFLAGS) $(OPTIM) $(CCDEFS) $(CCHDRS) $(>)
     }
 
     actions ignore CcMv
     {
-    [ $(<) != $(>:BS=$(SUFOBJ)) ] && $(MV) $(>:BS=$(SUFOBJ)) $(<)
+        [ $(<) != $(>:BS=$(SUFOBJ)) ] && $(MV) $(>:BS=$(SUFOBJ)) $(<)
     }
 }
 
@@ -2751,8 +2818,49 @@ if $(UNIX)
 {
     actions GenFile1
     {
-    PATH="$PATH:."
+    PATH="${PATH}:."
     $(>[1]) $(<) $(>[2-])
+    }
+}
+
+if $(AS400)
+{
+    #
+    # AS/400's unix-style compiler, linker and archiver use the OUTPUTDIR
+    # environment variable to decide which QSYS library the output file
+    # should be placed in. These actions make sure that variable is
+    # set when the command is run.
+    #
+
+    actions updated piecemeal Archive
+    {
+        OUTPUTDIR=$(QSYSLIB) $(AR) $(<) $(>)
+    }
+
+    actions Cc
+    {
+        OUTPUTDIR=$(QSYSLIB) $(CC) -c -o $(<) $(CCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+    }
+
+    actions C++
+    {
+        OUTPUTDIR=$(QSYSLIB) $(C++) -c -o $(<) $(C++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+    }
+
+    actions Link bind NEEDLIBS
+    {
+        OUTPUTDIR=$(QSYSLIB) $(LINK) $(LINKFLAGS) -o $(<) $(UNDEFS) $(>) $(NEEDLIBS) $(LINKLIBS)
+    }
+
+    #
+    # On AS/400 we pre-create libraries by creating a symlink to a
+    # Bound Directory in the QSYS library where the output goes. This
+    # helps qar get the library name right.
+    #
+    actions CreLib
+    {
+        dest=`echo $(<) | sed -e 's#.*/\([^/]*\)\.a$#/qsys.lib/$(QSYSLIB).lib/\1.bnddir#'`
+        [ -h $(<) ] || ln -s $dest $(<)
     }
 }
 
@@ -3148,17 +3256,17 @@ if $(WIN98)
 # Backwards compatibility with jam 1, where rules were uppercased.
 #
 
-rule BULK { Bulk $(<) : $(>) ; }
-rule FILE { File $(<) : $(>) ; }
-rule HDRRULE { HdrRule $(<) : $(>) ; }
-rule INSTALL { Install $(<) : $(>) ; }
-rule LIBRARY { Library $(<) : $(>) ; }
-rule LIBS { LinkLibraries $(<) : $(>) ; }
-rule LINK { Link $(<) : $(>) ; }
-rule MAIN { Main $(<) : $(>) ; }
-rule SETUID { Setuid $(<) ; }
-rule SHELL { Shell $(<) : $(>) ; }
-rule UNDEFINES { Undefines $(<) : $(>) ; }
+rule BULK      { Bulk          $(<) : $(>) ; }
+rule FILE      { File          $(<) : $(>) ; }
+rule HDRRULE   { HdrRule       $(<) : $(>) ; }
+rule INSTALL   { Install       $(<) : $(>) ; }
+rule LIBRARY   { Library       $(<) : $(>) ; }
+rule LIBS      { LinkLibraries $(<) : $(>) ; }
+rule LINK      { Link          $(<) : $(>) ; }
+rule MAIN      { Main          $(<) : $(>) ; }
+rule SETUID    { Setuid        $(<) ; }
+rule SHELL     { Shell         $(<) : $(>) ; }
+rule UNDEFINES { Undefines     $(<) : $(>) ; }
 
 # Old INSTALL* didn't take dest directory.
 
@@ -3168,16 +3276,16 @@ rule INSTALLMAN { InstallMan $(MANDIR) : $(<) ; }
 
 # Compatibility with jam 2.2.
 
-rule addDirName { $(<) += [ FDirName $(>) ] ; }
-rule makeCommon { FStripCommon $(<) : $(>) ; }
-rule _makeCommon { FStripCommon $(<) : $(>) ; }
-rule makeDirName { $(<) = [ FDirName $(>) ] ; }
-rule makeGrist { $(<) = [ FGrist $(>) ] ; }
+rule addDirName      { $(<) += [ FDirName $(>) ] ; }
+rule makeCommon      { FStripCommon $(<) : $(>) ; }
+rule _makeCommon     { FStripCommon $(<) : $(>) ; }
+rule makeDirName     { $(<) = [ FDirName $(>) ] ; }
+rule makeGrist       { $(<) = [ FGrist $(>) ] ; }
 rule makeGristedName { $(<) = [ FGristSourceFiles $(>) ] ; }
-rule makeRelPath { $(<[1]) = [ FRelPath $(<[2-]) : $(>) ] ; }
-rule makeString { $(<) = $(>:J) ; }
-rule makeSubDir { $(<) = [ FSubDir $(>) ] ; }
-rule makeSuffixed { $(<[1]) = [ FAppendSuffix $(>) : $(<[2]) ] ; }
+rule makeRelPath     { $(<[1]) = [ FRelPath $(<[2-]) : $(>) ] ; }
+rule makeString      { $(<) = $(>:J) ; }
+rule makeSubDir      { $(<) = [ FSubDir $(>) ] ; }
+rule makeSuffixed    { $(<[1]) = [ FAppendSuffix $(>) : $(<[2]) ] ; }
 
 
 #

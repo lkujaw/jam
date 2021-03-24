@@ -13,15 +13,16 @@ typedef struct {
     unsigned short mGuard;
 } XMemHeader;
 
+
 boolT
-fValidPointer(pMemory)
-    voidT      *pMemory;
-{
+fValidPointer DECLARE((pMemory))
+    voidT      *pMemory  EP
+BEGIN
     XMemHeader *pHeader;
 
     assert(fInitialized);
 
-    if(pMemory == _NIL_(voidT*)) {
+    if(pMemory == NIL(voidT*)) {
         return(FALSE);
     }
 
@@ -31,7 +32,7 @@ fValidPointer(pMemory)
 
     pHeader = (XMemHeader*)pMemory - 1;
 
-    if(pHeader == _NIL_(XMemHeader*)) {
+    if(pHeader == NIL(XMemHeader*)) {
         return(FALSE);
     }
 
@@ -48,11 +49,12 @@ fValidPointer(pMemory)
      */
 
     return(TRUE);
-}
+END_FUNCTION(fValidPointer)
+
 
 void
-xmemTerminate()
-{
+xmemTerminate NULLARY
+BEGIN
     assert(fInitialized);
     fInitialized = FALSE;
 
@@ -65,19 +67,20 @@ xmemTerminate()
 
     mAllocatedC     = 0;
     mHighWaterMarkC = 0;
-}
+END_FUNCTION(xmemTerminate)
+
 
 boolT
-fMemoryAllocate(ppMemory, mBytesC)
-    voidT     **ppMemory;
-    sizeT       mBytesC;
-{
+fMemoryAllocate DECLARE((ppMemory, mBytesC))
+    voidT     **ppMemory  NP
+    sizeT       mBytesC   EP
+BEGIN
     XMemHeader *pAllocMem;
     sizeT       mBytesPlusHeaderC;
 
     assert(fInitialized);
-    assert( ppMemory != _NIL_(voidT**));
-    assert(*ppMemory == _NIL_(voidT*));
+    assert( ppMemory != NIL(voidT**));
+    assert(*ppMemory == NIL(voidT*));
 
     mAdd(mBytesPlusHeaderC, mBytesC, sizeof(XMemHeader));
 
@@ -96,7 +99,7 @@ fMemoryAllocate(ppMemory, mBytesC)
 
     pAllocMem = (XMemHeader*)malloc(mBytesPlusHeaderC);
 
-    if(pAllocMem == _NIL_(XMemHeader*)) {
+    if(pAllocMem == NIL(XMemHeader*)) {
         return(FALSE);
     }
 
@@ -113,16 +116,17 @@ fMemoryAllocate(ppMemory, mBytesC)
 
     *ppMemory = (void*)(pAllocMem + 1);
     return(TRUE);
-}
+END_FUNCTION(fMemoryAllocate)
+
 
 void
-memoryAllocateOrFail(ppMemory, mBytesC)
-    voidT  **ppMemory;
-    sizeT    mBytesC;
-{
+memoryAllocateOrFail DECLARE((ppMemory, mBytesC))
+    voidT  **ppMemory  NP
+    sizeT    mBytesC   EP
+BEGIN
     assert(fInitialized);
-    assert( ppMemory != _NIL_(voidT**));
-    assert(*ppMemory == _NIL_(voidT*));
+    assert( ppMemory != NIL(voidT**));
+    assert(*ppMemory == NIL(voidT*));
 
     if(!fMemoryAllocate(ppMemory, mBytesC)) {
         /* Flawfinder: ignore */
@@ -132,17 +136,18 @@ memoryAllocateOrFail(ppMemory, mBytesC)
                 szBytes);
         exit(EXITFAIL);
     }
-}
+END_FUNCTION(memoryAllocateOrFail)
+
 
 void
-memoryRelease(ppMemory)
-    voidT      **ppMemory;
-{
+memoryRelease DECLARE((ppMemory))
+    voidT      **ppMemory  EP
+BEGIN
     XMemHeader  *pAllocMem;
     sizeT        mBytesC;
 
     assert(fInitialized);
-    assert(ppMemory != _NIL_(voidT**));
+    assert(ppMemory != NIL(voidT**));
     assert(fValidPointer(*ppMemory));
 
     pAllocMem = (XMemHeader*)*ppMemory - 1;
@@ -153,5 +158,5 @@ memoryRelease(ppMemory)
     memset((voidT*)pAllocMem, MEMORY_FILL, mBytesC + sizeof(XMemHeader));
 
     free((voidT*)pAllocMem);
-    *ppMemory = _NIL_(voidT*);
-}
+    *ppMemory = NIL(voidT*);
+END_FUNCTION(memoryRelease)

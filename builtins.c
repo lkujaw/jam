@@ -1,10 +1,4 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * builtins.c - builtin jam rules
  *
  * External routines:
@@ -13,13 +7,13 @@
  *
  * Internal routines:
  *
- *      builtin_depends() - DEPENDS/INCLUDES rule
- *      builtin_echo() - ECHO rule
- *      builtin_exit() - EXIT rule
- *      builtin_flags() - NOCARE, NOTFILE, TEMPORARY rule
- *      builtin_glob() - GLOB rule
- *      builtin_match() - MATCH rule
- *  builtin_hdrmacro() - HDRMACRO rule
+ *      builtin_depends()  - DEPENDS/INCLUDES rule
+ *      builtin_echo()     - ECHO rule
+ *      builtin_exit()     - EXIT rule
+ *      builtin_flags()    - NOCARE, NOTFILE, TEMPORARY rule
+ *      builtin_glob()     - GLOB rule
+ *      builtin_match()    - MATCH rule
+ *      builtin_hdrmacro() - HDRMACRO rule
  *
  * 01/10/01 (seiwald) - split from compile.c
  * 01/08/01 (seiwald) - new 'Glob' (file expansion) builtin
@@ -50,25 +44,25 @@
  * compile_builtin() - define builtin rules
  */
 
-#define P0 (PARSE *)0
-#define C0 (char *)0
+#define P0 NIL(PARSE*)
+#define C0 NIL(char*)
 
-LIST *builtin_depends  _ARG_((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_echo     _ARG_((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_exit     _ARG_((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_flags    _ARG_((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_glob     _ARG_((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_match    _ARG_((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_hdrmacro _ARG_((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_depends  PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_echo     PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_exit     PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_flags    PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_glob     PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_match    PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_hdrmacro PARAM((PARSE *parse, LOL *args, int *jmp));
 
-static void builtin_glob_back _ARG_((voidT      *closure,
+static void builtin_glob_back PARAM((voidT      *closure,
                                      const char *file,
                                      int         status,
                                      time_t      time));
 
 void
-load_builtins _ARG_((void))
-{
+load_builtins NULLARY
+BEGIN
     bindrule("Always")->procedure =
     bindrule("ALWAYS")->procedure =
         parse_make(builtin_flags, P0, P0, P0, C0, C0, T_FLAG_TOUCHED);
@@ -123,7 +117,8 @@ load_builtins _ARG_((void))
     bindrule("HdrMacro")->procedure =
     bindrule("HDRMACRO")->procedure =
         parse_make(builtin_hdrmacro, P0, P0, P0, C0, C0, 0);
-}
+END_FUNCTION(load_builtins)
+
 
 /*
  * builtin_depends() - DEPENDS/INCLUDES rule
@@ -132,13 +127,13 @@ load_builtins _ARG_((void))
  * dependency list of each of the listed targets.  It binds both the
  * targets and sources as TARGETs.
  */
-
 LIST *
-builtin_depends(parse, args, jmp)
-    PARSE   *parse;
-    LOL     *args;
-    int     *jmp;
-{
+builtin_depends DECLARE((parse, args, jmp))
+    PARSE  *parse  NP
+    LOL    *args   NP
+    int    *jmp    EP
+BEGIN
+    UNUSED(jmp);
     LIST *targets = lol_get(args, 0);
     LIST *sources = lol_get(args, 1);
     LIST *l;
@@ -162,7 +157,8 @@ builtin_depends(parse, args, jmp)
     }
 
     return(L0);
-}
+END_FUNCTION(builtin_depends)
+
 
 /*
  * builtin_echo() - ECHO rule
@@ -170,17 +166,18 @@ builtin_depends(parse, args, jmp)
  * The ECHO builtin rule echoes the targets to the user.  No other
  * actions are taken.
  */
-
 LIST *
-builtin_echo(parse, args, jmp)
-    PARSE   *parse;
-    LOL     *args;
-    int     *jmp;
-{
+builtin_echo DECLARE((parse, args, jmp))
+    PARSE  *parse  NP
+    LOL    *args   NP
+    int    *jmp    EP
+BEGIN
+    UNUSED(parse); UNUSED(jmp);
     list_print(lol_get(args, 0));
     printf("\n");
     return(L0);
-}
+END_FUNCTION(builtin_echo)
+
 
 /*
  * builtin_exit() - EXIT rule
@@ -188,18 +185,19 @@ builtin_echo(parse, args, jmp)
  * The EXIT builtin rule echoes the targets to the user and exits
  * the program with a failure status.
  */
-
 LIST *
-builtin_exit(parse, args, jmp)
-    PARSE   *parse;
-    LOL     *args;
-    int     *jmp;
-{
+builtin_exit DECLARE((parse, args, jmp))
+    PARSE  *parse  NP
+    LOL    *args   NP
+    int    *jmp    EP
+BEGIN
+    UNUSED(parse); UNUSED(jmp);
     list_print(lol_get(args, 0));
     printf("\n");
-    exit(EXITFAIL); /* yeech */
+    exit(EXITFAIL);
     return(L0);
-}
+END_FUNCTION(builtin_exit)
+
 
 /*
  * builtin_flags() - NOCARE, NOTFILE, TEMPORARY rule
@@ -207,13 +205,13 @@ builtin_exit(parse, args, jmp)
  * Builtin_flags() marks the target with the appropriate flag, for use
  * by make0().  It binds each target as a TARGET.
  */
-
 LIST *
-builtin_flags(parse, args, jmp)
-    PARSE   *parse;
-    LOL     *args;
-    int     *jmp;
-{
+builtin_flags DECLARE((parse, args, jmp))
+    PARSE  *parse  NP
+    LOL    *args   NP
+    int    *jmp    EP
+BEGIN
+    UNUSED(jmp);
     LIST *l = lol_get(args, 0);
 
     for( ; l; l = list_next(l)) {
@@ -221,28 +219,30 @@ builtin_flags(parse, args, jmp)
     }
 
     return(L0);
-}
+END_FUNCTION(builtin_flags)
+
 
 /*
  * builtin_globbing() - GLOB rule
  */
-
 struct globbing {
     LIST *patterns;
     LIST *results;
 };
 
+
 static void
-builtin_glob_back(closure, file, status, time)
-    voidT      *closure;
-    const char *file;
-    int         status;
-    time_t      time;
-{
+builtin_glob_back DECLARE((closure, file, status, time))
+    voidT       *closure  NP
+    const char  *file     NP
+    int          status   NP
+    time_t       time     EP
+BEGIN
+    UNUSED(status); UNUSED(time);
     struct globbing *globbing = (struct globbing *)closure;
     LIST            *l;
     PATHNAME         f;
-    char             buf[ MAXJPATH ];
+    char             buf[MAXJPATH];
 
     /* Null out directory for matching. */
     /* We wish we had file_dirscan() pass up a PATHNAME. */
@@ -257,14 +257,16 @@ builtin_glob_back(closure, file, status, time)
             break;
         }
     }
-}
+END_FUNCTION(builtin_glob_back)
+
 
 LIST *
-builtin_glob(parse, args, jmp)
-    PARSE   *parse;
-    LOL     *args;
-    int     *jmp;
-{
+builtin_glob DECLARE((parse, args, jmp))
+    PARSE  *parse  NP
+    LOL    *args   NP
+    int    *jmp    EP
+BEGIN
+    UNUSED(parse); UNUSED(jmp);
     LIST *l = lol_get(args, 0);
     LIST *r = lol_get(args, 1);
 
@@ -278,34 +280,32 @@ builtin_glob(parse, args, jmp)
     }
 
     return(globbing.results);
-}
+END_FUNCTION(builtin_glob)
+
 
 /*
  * builtin_match() - MATCH rule, regexp matching
  */
-
 LIST *
-builtin_match(parse, args, jmp)
-    PARSE   *parse;
-    LOL     *args;
-    int     *jmp;
-{
+builtin_match DECLARE((parse, args, jmp))
+    PARSE  *parse  NP
+    LOL    *args   NP
+    int    *jmp    EP
+BEGIN
+    UNUSED(parse); UNUSED(jmp);
     LIST *l, *r;
-    LIST *result = 0;
+    LIST *result = NIL(LIST*);
 
     /* For each pattern */
-
     for(l = lol_get(args, 0); l; l = l->next) {
         regexp *re = regcomp(l->string);
 
         /* For each string to match against */
-
         for(r = lol_get(args, 1); r; r = r->next) {
             if(regexec(re, r->string)) {
                 int  i, top;
 
                 /* Find highest parameter */
-
                 for(top = NSUBEXP; top-- > 1;) {
                     if(re->startp[top]) {
                         break;
@@ -314,33 +314,33 @@ builtin_match(parse, args, jmp)
 
                 /* And add all parameters up to highest onto list. */
                 /* Must have parameters to have results! */
-
-                for(i = 1; i <= top; i++) {
-                    char  buf[ MAXSYM ];
-                    int   l = re->endp[i] - re->startp[i];
-                    memcpy(buf, re->startp[i], l);
-                    buf[ l ] = 0;
-                    result   = list_new(result, buf, 0);
+                for(i = 1; i <= top; ++i) {
+                    char   buf[MAXSYM];
+                    iMaxT  len = re->endp[i] - re->startp[i];
+                    memcpy(buf, re->startp[i], len);
+                    buf[len] = '\0';
+                    result = list_new(result, buf, 0);
                 }
             }
         }
 
-        memoryRelease((voidT **)&re);
+        memoryRelease((voidT**)&re);
     }
 
     return(result);
-}
+END_FUNCTION(builtin_match)
 
 
 LIST *
-builtin_hdrmacro(parse, args, jmp)
-    PARSE  *parse;
-    LOL    *args;
-    int    *jmp;
-{
+builtin_hdrmacro DECLARE((parse, args, jmp))
+    PARSE  *parse  NP
+    LOL    *args   NP
+    int    *jmp    EP
+BEGIN
+    UNUSED(parse); UNUSED(jmp);
     LIST *l = lol_get(args, 0);
 
-    for( ; l; l = list_next(l)) {
+    for(; l; l = list_next(l)) {
         TARGET *t = bindtarget(l->string);
 
         /* scan file for header filename macro definitions */
@@ -353,4 +353,4 @@ builtin_hdrmacro(parse, args, jmp)
     }
 
     return(L0);
-}
+END_FUNCTION(builtin_hdrmacro)

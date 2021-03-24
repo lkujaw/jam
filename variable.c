@@ -1,25 +1,19 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * variable.c - handle jam multi-element variables
  *
  * External routines:
  *
  *      var_defines() - load a bunch of variable=value settings
- *      var_string() - expand a string with variables in it
- *      var_get() - get value of a user defined symbol
- *      var_set() - set a variable in jam's user defined symbol table
- *      var_swap() - swap a variable's value with the given one
- *      var_done() - free variable tables
+ *      var_string()  - expand a string with variables in it
+ *      var_get()     - get value of a user defined symbol
+ *      var_set()     - set a variable in jam's user defined symbol table
+ *      var_swap()    - swap a variable's value with the given one
+ *      var_done()    - free variable tables
  *
  * Internal routines:
  *
  *      var_enter() - make new var symbol table entry, returning var ptr
- *      var_dump() - dump a variable to stdout
+ *      var_dump()  - dump a variable to stdout
  *
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
  * 08/23/94 (seiwald) - Support for '+=' (append to variable)
@@ -39,7 +33,7 @@
 #include "str.h"
 #include "variable.h"
 
-static struct hash *varhash = 0;
+static struct hash *varhash = NIL(struct hash *);
 
 /*
  * VARIABLE - a user defined multi-value variable
@@ -52,8 +46,8 @@ struct _variable {
     LIST       *value;
 };
 
-static VARIABLE *var_enter _ARG_((const char *symbol));
-static void var_dump _ARG_((const char *symbol, LIST *value,
+static VARIABLE *var_enter PARAM((const char *symbol));
+static void var_dump PARAM((const char *symbol, LIST *value,
                             const char *what));
 
 /*
@@ -62,17 +56,16 @@ static void var_dump _ARG_((const char *symbol, LIST *value,
  * If variable name ends in PATH, split value at :'s.
  * Otherwise, split at blanks.
  */
-
 void
-var_defines(e)
-    const char **e;
-{
-    for( ; *e; e++) {
+var_defines DECLARE((e))
+    const char  **e  EP
+BEGIN
+    for(; *e; e++) {
         const char *val;
 
-        /* Just say "no": windows defines this in the env, */
-        /* but we don't want it to override our notion of OS. */
-
+        /* Just say "no": windows defines this in the env, but we
+         * don't want it to override our notion of OS.
+         */
         if(!strcmp(*e, "OS=Windows_NT")) {
             continue;
         }
@@ -86,7 +79,6 @@ var_defines(e)
 
 #ifdef OS_MAC
         /* On the mac (MPW), the var=val is actually var\0val */
-
         if((val = strchr(*e, '=')) || (val = *e + strlen(*e)))
 #else
         if((val = strchr(*e, '=')))
@@ -99,7 +91,7 @@ var_defines(e)
 #else
             char  split = ' ';
 #endif
-            char  buf[ MAXSYM ];
+            char  buf[MAXSYM];
 
             /* Split *PATH at :'s, not spaces */
 
@@ -130,28 +122,28 @@ var_defines(e)
             /* Get name */
 
             strncpy(buf, *e, val - *e);
-            buf[ val - *e ] = '\0';
+            buf[val - *e] = '\0';
 
             var_set(buf, l, VAR_SET);
         }
     }
-}
+END_FUNCTION(var_defines)
+
 
 /*
  * var_string() - expand a string with variables in it
  *
  * Copies in to out; doesn't modify targets & sources.
  */
-
 int
-var_string(in, out, outsize, lol)
-    const char  *in;
-          char  *out;
-           int   outsize;
-           LOL  *lol;
-{
-    char *out0 = out;
-    char *oute = out + outsize - 1;
+var_string DECLARE((in, out, outsize, lol))
+    const char  *in       NP
+          char  *out      NP
+           int   outsize  NP
+           LOL  *lol      EP
+BEGIN
+    char        *out0 = out;
+    char        *oute = out + outsize - 1;
 
     while(*in) {
         char *lastword;
@@ -170,7 +162,6 @@ var_string(in, out, outsize, lol)
         lastword = out;
 
         /* Copy non-white space, watching for variables */
-
         while(*in && !isspace(*in)) {
             if(out >= oute) {
                 return(-1);
@@ -185,7 +176,6 @@ var_string(in, out, outsize, lol)
 
         /* If a variable encountered, expand it and and embed the */
         /* space-separated members of the list in the output. */
-
         if(dollar) {
             LIST *l = var_expand(L0, lastword, out, lol, 0);
 
@@ -215,23 +205,22 @@ var_string(in, out, outsize, lol)
         return(-1);
     }
 
-
     *out++ = '\0';
 
     return(out - out0);
-}
+END_FUNCTION(var_string)
+
 
 /*
  * var_get() - get value of a user defined symbol
  *
  * Returns NULL if symbol unset.
  */
-
 LIST *
-var_get(symbol)
-    const char *symbol;
-{
-    VARIABLE  var, *v = &var;
+var_get DECLARE((symbol))
+    const char  *symbol  EP
+BEGIN
+    VARIABLE     var, *v = &var;
 
     v->symbol = symbol;
 
@@ -243,7 +232,8 @@ var_get(symbol)
     }
 
     return(0);
-}
+END_FUNCTION(var_get)
+
 
 /*
  * var_set() - set a variable in jam's user defined symbol table
@@ -255,14 +245,13 @@ var_get(symbol)
  *
  * Copies symbol.  Takes ownership of value.
  */
-
 void
-var_set(symbol, value, flag)
-    const char  *symbol;
-          LIST  *value;
-           int   flag;
-{
-    VARIABLE *v = var_enter(symbol);
+var_set DECLARE((symbol, value, flag))
+    const char  *symbol  NP
+          LIST  *value   NP
+           int   flag    EP
+BEGIN
+    VARIABLE    *v = var_enter(symbol);
 
     if(DEBUG_VARSET) {
         var_dump(symbol, value, "set");
@@ -274,12 +263,10 @@ var_set(symbol, value, flag)
         list_free(v->value);
         v->value = value;
         break;
-
     case VAR_APPEND:
         /* Append value */
         v->value = list_append(v->value, value);
         break;
-
     case VAR_DEFAULT:
         /* Set only if unset */
         if(!v->value) {
@@ -289,19 +276,19 @@ var_set(symbol, value, flag)
         }
         break;
     }
-}
+END_FUNCTION(var_set)
+
 
 /*
  * var_swap() - swap a variable's value with the given one
  */
-
 LIST *
-var_swap(symbol, value)
-    const char *symbol;
-          LIST *value;
-{
-    VARIABLE *v        = var_enter(symbol);
-    LIST     *oldvalue = v->value;
+var_swap DECLARE((symbol, value))
+    const char  *symbol  NP
+          LIST  *value   EP
+BEGIN
+    VARIABLE    *v        = var_enter(symbol);
+    LIST        *oldvalue = v->value;
 
     if(DEBUG_VARSET) {
         var_dump(symbol, value, "set");
@@ -310,17 +297,17 @@ var_swap(symbol, value)
     v->value = value;
 
     return(oldvalue);
-}
+END_FUNCTION(var_swap)
+
 
 /*
  * var_enter() - make new var symbol table entry, returning var ptr
  */
-
 static VARIABLE *
-var_enter(symbol)
-    const char *symbol;
-{
-    VARIABLE  var, *v = &var;
+var_enter DECLARE((symbol))
+    const char *symbol  EP
+BEGIN
+    VARIABLE    var, *v = &var;
 
     if(!varhash) {
         varhash = hashinit(sizeof(VARIABLE), "variables");
@@ -333,29 +320,29 @@ var_enter(symbol)
         v->symbol = newstr(symbol);             /* never freed */
     }
     return(v);
-}
+END_FUNCTION(var_enter)
+
 
 /*
  * var_dump() - dump a variable to stdout
  */
-
 static void
-var_dump(symbol, value, what)
-    const char  *symbol;
-          LIST  *value;
-    const char  *what;
-{
+var_dump DECLARE((symbol, value, what))
+    const char  *symbol  NP
+          LIST  *value   NP
+    const char  *what    EP
+BEGIN
     printf("%s %s = ", what, symbol);
     list_print(value);
     printf("\n");
-}
+END_FUNCTION(var_dump)
+
 
 /*
  * var_done() - free variable tables
  */
-
 void
-var_done _ARG_((void))
-{
+var_done NULLARY
+BEGIN
     hashdone(varhash);
-}
+END_FUNCTION(var_done)

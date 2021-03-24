@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * execvms.c - execute a shell script, ala VMS
  *
  * The approach is this:
@@ -21,7 +15,7 @@
  * 05/04/94 (seiwald) - async multiprocess interface; noop on VMS
  * 12/20/96 (seiwald) - rewritten to handle multi-line commands well
  * 01/14/96 (seiwald) - don't put -'s between "'s
- * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
 
 #include "jam.h"  /* Includes system headers */
@@ -46,16 +40,26 @@
 
 char  tempnambuf[ L_tmpnam + 1 + 4 ] = { 0 };
 
+
+/*
+ * execmax() - max permitted string to execcmd()
+ */
+int
+execmax NULLARY
+BEGIN
+    return MAXLINE;
+END_FUNCTION(execmax)
+
 void
-execcmd(
-    char *string,
-    void (*func)(void *closure, int status),
-    void *closure,
-    LIST *shell)
-{
-    char *s, *e, *p;
-    int   rstat = EXEC_CMD_OK;
-    int   status;
+execcmd DECLARE((string, func, closure, shell))
+    char    *string                            NP
+    void   (*func)(void *closure, int status)  NP
+    void    *closure                           NP
+    LIST    *shell                             EP
+BEGIN
+    char    *s, *e, *p;
+    int      rstat = EXEC_CMD_OK;
+    int      status;
 
     /* See if string is more than one line */
     /* discounting leading/trailing white space */
@@ -156,12 +160,14 @@ execcmd(
     }
 
     (*func)(closure, rstat);
-}
+END_FUNCTION(execcmd)
+
 
 int
-execwait()
-{
+execwait NULLARY
+BEGIN
     return(0);
-}
+END_FUNCTION(execwait)
+
 
 #endif  /* VMS */

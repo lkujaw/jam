@@ -1,23 +1,17 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * timestmp.h - get the timestamp of a file or archive member
  */
 
 #ifndef JAM_TIMESTMP_H
 #define JAM_TIMESTMP_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-void timestamp  _ARG_((char *target, time_t *time));
-void donestamps _ARG_((void));
+void timestamp  PARAM((char *target, time_t *time));
+void donestamps PARAM((void));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_TIMESTMP_H */

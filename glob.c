@@ -1,10 +1,4 @@
 /*
- * Copyright 1994 Christopher Seiwald.  All rights reserved.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * glob.c - match a string against a simple pattern
  *
  * Understands the following patterns:
@@ -28,40 +22,37 @@
 
 #include "jam.h"  /* Includes system headers */
 
-#include "ansi.h"
+#include "cstd.h"
 #include "glob.h"
 
 #define CHECK_BIT(tab, bit) (tab[ (bit) / 8 ] & (1 << ((bit) % 8)))
 #define BITLISTSIZE 16 /* bytes used for [chars] in compiled expr */
 
-static void globchars _ARG_((const char *s, const char *e, char *b));
+static void globchars PARAM((const char *s, const char *e, char *b));
 
 /*
  * glob() - match a string against a simple pattern
  */
 
 int
-glob(c, s)
-    const char *c;
-    const char *s;
-{
-    char        bitlist[ BITLISTSIZE ];
-    const char *here;
+glob DECLARE((c, s))
+    const char  *c  NP
+    const char  *s  EP
+BEGIN
+    char         bitlist[BITLISTSIZE];
+    const char  *here;
 
-    for( ;;) {
+    for(;;) {
         switch(*c++) {
         case '\0':
             return(*s ? -1 : 0);
-
         case '?':
             if(!*s++) {
                 return(1);
             }
             break;
-
         case '[':
             /* scan for matching ] */
-
             here = c;
             do{
                 if(!*c++) {
@@ -71,7 +62,6 @@ glob(c, s)
             c++;
 
             /* build character class bitlist */
-
             globchars(here, c, bitlist);
 
             if(!CHECK_BIT(bitlist, *(unsigned char *)s)) {
@@ -79,22 +69,19 @@ glob(c, s)
             }
             s++;
             break;
-
         case '*':
             here = s;
 
             while(*s) {
-                s++;
+                ++s;
             }
 
             /* Try to match the rest of the pattern in a recursive */
             /* call.  If the match fails we'll back up chars, retrying. */
-
             while(s != here) {
                 int  r;
 
                 /* A fast path for the last token in a pattern */
-
                 r = *c ? glob(c, s) : *s ? -1 : 0;
 
                 if(!r) {
@@ -105,7 +92,6 @@ glob(c, s)
                 --s;
             }
             break;
-
         case '\\':
             /* Force literal match of next char. */
 
@@ -113,7 +99,6 @@ glob(c, s)
                 return(1);
             }
             break;
-
         default:
             if(*s++ != c[-1]) {
                 return(1);
@@ -121,19 +106,19 @@ glob(c, s)
             break;
         }
     }
-}
+END_FUNCTION(glob)
+
 
 /*
  * globchars() - build a bitlist to check for character group match
  */
-
 static void
-globchars(s, e, b)
-    const char *s;
-    const char *e;
-    char *b;
-{
-    int  neg = 0;
+globchars DECLARE((s, e, b))
+    const  char *s  NP
+    const  char *e  NP
+    char  *b        EP
+BEGIN
+    int    neg = 0;
 
     memset(b, '\0', BITLISTSIZE);
 
@@ -165,4 +150,4 @@ globchars(s, e, b)
     /* Don't include \0 in either $[chars] or $[^chars] */
 
     b[0] &= 0376;
-}
+END_FUNCTION(globchars)

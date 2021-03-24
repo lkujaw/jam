@@ -10,10 +10,11 @@
 SHELL   = /bin/sh
 CC      = cc
 DELETE  = rm -f
-CFLAGS  =
+# Necessary to bootstrap scan.c
+CFLAGS  = $(CCFLAGS) -I.
 TARGET  = -o jam0
-# The Jam executable name. This is "jam" on Unix,
-# except Cygwin where it will be "jam.exe".
+# The Jam executable name.
+#   Cygwin: Substitute jam.exe
 JAMEXE  = jam
 
 all: FEATURE/jam jam0
@@ -21,7 +22,7 @@ all: FEATURE/jam jam0
 	./jam0
 
 FEATURE/jam: iffe.sh jam.iff
-	$(SHELL) iffe.sh --cc="$(CC) $(CFLAGS)" -v jam.iff
+	$(SHELL) iffe.sh -v --cc="$(CC) $(CFLAGS)" jam.iff
 
 check:
 	@echo There is no validation suite for this package.

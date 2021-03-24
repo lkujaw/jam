@@ -1,10 +1,4 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * pathvms.c - manipulate file names on VMS
  *
  * External routines:
@@ -38,12 +32,12 @@
  */
 
 void
-path_parse(file, f)
-    const char *file;
-    PATHNAME   *f;
-{
-    const char *p, *q;
-    const char *end;
+path_parse DECLARE((file, f))
+    const char  *file  NP
+    PATHNAME    *f     EP
+BEGIN
+    const char  *p, *q;
+    const char  *end;
 
     memset((char *)f, 0, sizeof(*f));
 
@@ -97,7 +91,8 @@ path_parse(file, f)
     /* Is this a directory without a file spec? */
 
     f->parent = 0;
-}
+END_FUNCTION(path_parse)
+
 
 /*
  *      dir             mods            result
@@ -216,16 +211,15 @@ dir_flags(buf, len, i)
     }
 
     /* But if its rooted in any way */
-
     if(i->dir.len == 8 && !strncmp(i->dir.ptr, "[000000]", 8)) {
         i->flags = DIR_ROOT;
     }
 }
 
+
 /*
  * path_build() - build a filename given dir/base/suffix/member
  */
-
 void
 path_build(f, file, binding)
     PATHNAME *f;

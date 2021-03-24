@@ -77,31 +77,31 @@ struct hash
     const char *name;    /* just for hashstats() */
 };
 
-static void hashrehash   _ARG_((struct hash *hp));
-static void hashstat     _ARG_((struct hash *hp));
-static void hashvalidate _ARG_((struct hash *hp));
+static void hashrehash   PARAM((struct hash *hp));
+static void hashstat     PARAM((struct hash *hp));
+static void hashvalidate PARAM((struct hash *hp));
 
 static void
-hashvalidate(hp)
-    struct hash *hp;
-{
+hashvalidate DECLARE((hp))
+    struct hash  *hp  EP
+BEGIN
     assert(hp);
-}
+END_FUNCTION(hashvalidate)
+
 
 /*
  * hashitem() - find a record in the table, and optionally enter a new one
  */
-
 int
-hashitem(hp, data, enter)
-    register struct hash *hp;
-    HASHDATA **data;
-    int enter;
-{
-    ITEM         **base;
-    register ITEM *i;
-    unsigned char *b;
-    unsigned int   keyval;
+hashitem DECLARE((hp, data, enter))
+    struct hash    *hp     NP
+    HASHDATA      **data   NP
+    int             enter  EP
+BEGIN
+    ITEM          **base;
+    ITEM           *i;
+    unsigned char  *b;
+    unsigned int    keyval;
 
     hashvalidate(hp);
     assert(data);
@@ -143,16 +143,17 @@ hashitem(hp, data, enter)
     }
 
     return(0);
-}
+END_FUNCTION(hashitem)
+
 
 /*
  * hashrehash() - resize and rebuild hp->tab, the hash table
  */
-
-static void hashrehash(hp)
-    register struct hash *hp;
-{
-    int  i;
+static void
+hashrehash DECLARE((hp))
+    struct hash  *hp  EP
+BEGIN
+    int           i;
 
     hashvalidate(hp);
 
@@ -162,7 +163,7 @@ static void hashrehash(hp)
 
     hp->items.more = i ? 2 * hp->items.nel : hp->inel;
 
-    hp->items.lists[i].base = _NIL_(char *);
+    hp->items.lists[i].base = NIL(char *);
 
     memoryAllocateOrFail((voidT **)&hp->items.lists[i].base,
                          hp->items.more * hp->items.size);
@@ -194,22 +195,22 @@ static void hashrehash(hp)
             *ip         = i;
         }
     }
-}
+END_FUNCTION(hash_rehash)
+
 
 /* --- */
-
 #define ALIGNED(x) ((x + sizeof(ITEM) - 1) & ~(sizeof(ITEM) - 1))
+
 
 /*
  * hashinit() - initialize a hash table, returning a handle
  */
-
 struct hash *
-hashinit(datalen, name)
-    int         datalen;
-    const char *name;
-{
-    struct hash *hp = _NIL_(struct hash *);
+hashinit DECLARE((datalen, name))
+    int          datalen  NP
+    const char  *name     EP
+BEGIN
+    struct hash  *hp = NIL(struct hash *);
 
     assert(datalen >= 0);
     assert(name);
@@ -217,7 +218,7 @@ hashinit(datalen, name)
     memoryAllocateOrFail((voidT **)&hp, sizeof(struct hash));
 
     hp->tab.nel       = 0;
-    hp->tab.base      = _NIL_(ITEM **);
+    hp->tab.base      = NIL(ITEM **);
     hp->bloat         = 3;
     hp->inel          = 11;
     hp->items.more    = 0;
@@ -228,17 +229,17 @@ hashinit(datalen, name)
     hp->name          = name;
 
     return(hp);
-}
+END_FUNCTION(hashinit)
+
 
 /*
  * hashdone() - free a hash table, given its handle
  */
-
 void
-hashdone(hp)
-    struct hash *hp;
-{
-    int  i;
+hashdone DECLARE((hp))
+    struct hash  *hp  EP
+BEGIN
+    int           i;
 
     hashvalidate(hp);
 
@@ -253,25 +254,25 @@ hashdone(hp)
         memoryRelease((voidT **)&hp->items.lists[i].base);
     }
     memoryRelease((voidT **)&hp);
-}
+END_FUNCTION(hashdone)
+
 
 /* ---- */
-
 static void
-hashstat(hp)
-    struct hash *hp;
-{
-    ITEM **tab = hp->tab.base;
-    int    nel = hp->tab.nel;
-    int    count = 0;
-    int    sets = 0;
-    int    run = (tab[nel - 1] != _NIL_(ITEM *));
-    int    i, here;
+hashstat DECLARE((hp))
+    struct hash  *hp  EP
+BEGIN
+    ITEM        **tab = hp->tab.base;
+    int           nel = hp->tab.nel;
+    int           count = 0;
+    int           sets = 0;
+    int           run = (tab[nel - 1] != NIL(ITEM *));
+    int           i, here;
 
     hashvalidate(hp);
 
     for(i = nel; i > 0; i--) {
-        if((here = (*tab++ != _NIL_(ITEM *)))) {
+        if((here = (*tab++ != NIL(ITEM *)))) {
             count++;
         }
         if(here && !run) {
@@ -291,4 +292,4 @@ hashstat(hp)
            hp->items.nel * hp->items.size / 1024,
            hp->tab.nel * (int)sizeof(ITEM **) / 1024,
            count, 10000 * (count % sets) / sets);
-}
+END_FUNCTION(hashstat)

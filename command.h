@@ -1,10 +1,4 @@
 /*
- * Copyright 1994 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * command.h - the CMD structure and routines to manipulate them
  *
  * Both ACTION and CMD contain a rule, targets, and sources.  An
@@ -38,7 +32,7 @@
 #ifndef JAM_COMMAND_H
 #define JAM_COMMAND_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 #include "lists.h"
 #include "rules.h"
 
@@ -47,17 +41,17 @@
 typedef struct _cmd CMD;
 
 struct _cmd {
-    CMD  *next;
-    CMD  *tail;             /* valid on in head */
-    RULE *rule;             /* rule->actions contains shell script */
-    LIST *shell;            /* $(SHELL) value */
-    LOL   args;             /* LISTs for $(<), $(>) */
-    char  buf[MAXLINE];     /* actual commands */
+    CMD    *next;
+    CMD    *tail;    /* valid on in head */
+    RULE   *rule;    /* rule->actions contains shell script */
+    LIST   *shell;   /* $(SHELL) value */
+    LOL     args;    /* LISTs for $(<), $(>) */
+    voidT  *buf;     /* actual commands */
 };
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-CMD *cmd_new _ARG_
+CMD *cmd_new PARAM
 ((
     RULE    *rule,          /* rule (referenced) */
     LIST    *targets,       /* $(<) (freed) */
@@ -66,8 +60,8 @@ CMD *cmd_new _ARG_
     int      maxline        /* max line length */
 ));
 
-void cmd_free _ARG_((CMD *cmd));
+void cmd_free PARAM((CMD *cmd));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_COMMAND_H */

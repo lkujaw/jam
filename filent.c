@@ -185,7 +185,7 @@ file_archscan(archive, func, closure)
 {
     char           buf[MAXJPATH];
     struct ar_hdr  ar_hdr;
-    char          *string_table     = _NIL_(char *);
+    char          *string_table     = NIL(char *);
     long           string_table_len = 0;
     long           offset;
     int            fd;

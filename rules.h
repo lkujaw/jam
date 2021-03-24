@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * rules.h -  targets, rules, and related information
  *
  * This file describes the structures holding the targets, rules, and
@@ -41,7 +35,7 @@
 
 #include "jam.h"  /* Includes system headers */
 
-#include "ansi.h"
+#include "cstd.h"
 #include "lists.h"
 #include "parse.h"
 
@@ -167,27 +161,27 @@ struct _target {
 
     int      asynccnt;                 /* child deps outstanding */
     TARGETS *parents;                  /* used by make1() for completion */
-    char    *cmds;                     /* type-punned command list */
+    voidT   *cmds;                     /* type-punned command list */
 };
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-RULE         *bindrule _ARG_((const char *rulename));
-TARGET     *bindtarget _ARG_((const char *targetname));
-TARGET     *copytarget _ARG_((const TARGET *t));
-void       touchtarget _ARG_((const char *t));
-TARGETS    *targetlist _ARG_((TARGETS *chain, LIST  *targets));
-TARGETS   *targetentry _ARG_((TARGETS *chain, TARGET *target));
-TARGETS   *targetchain _ARG_((TARGETS *chain, TARGETS *targets));
-ACTIONS    *actionlist _ARG_((ACTIONS *chain, ACTION *action));
-SETTINGS  *addsettings _ARG_((SETTINGS *v, int setflag,
+RULE         *bindrule PARAM((const char *rulename));
+TARGET     *bindtarget PARAM((const char *targetname));
+TARGET     *copytarget PARAM((const TARGET *t));
+void       touchtarget PARAM((const char *t));
+TARGETS    *targetlist PARAM((TARGETS *chain, LIST  *targets));
+TARGETS   *targetentry PARAM((TARGETS *chain, TARGET *target));
+TARGETS   *targetchain PARAM((TARGETS *chain, TARGETS *targets));
+ACTIONS    *actionlist PARAM((ACTIONS *chain, ACTION *action));
+SETTINGS  *addsettings PARAM((SETTINGS *v, int setflag,
                               const char *sym, LIST *val));
-SETTINGS *copysettings _ARG_((SETTINGS *v));
-void      pushsettings _ARG_((SETTINGS *v));
-void       popsettings _ARG_((SETTINGS *v));
-void      freesettings _ARG_((SETTINGS *v));
-void         donerules _ARG_((void));
+SETTINGS *copysettings PARAM((SETTINGS *v));
+void      pushsettings PARAM((SETTINGS *v));
+void       popsettings PARAM((SETTINGS *v));
+void      freesettings PARAM((SETTINGS *v));
+void         donerules PARAM((void));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_RULES_H */

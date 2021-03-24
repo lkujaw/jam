@@ -1,10 +1,4 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * expand.c - expand a buffer, given variable values
  *
  * External routines:
@@ -47,11 +41,11 @@ typedef struct {
     PATHPART join;                      /* :J -- join list with char */
 } VAR_EDITS;
 
-static void var_edit_parse _ARG_((char *mods, VAR_EDITS *edits));
-static void var_edit_file  _ARG_((const char *in, char *out,
+static void var_edit_parse PARAM((char *mods, VAR_EDITS *edits));
+static void var_edit_file  PARAM((const char *in, char *out,
                                   VAR_EDITS *edits));
-static void var_edit_shift _ARG_((char *out, VAR_EDITS *edits));
-static void var_edit_quote _ARG_((char*out));
+static void var_edit_shift PARAM((char *out, VAR_EDITS *edits));
+static void var_edit_quote PARAM((char*out));
 
 #define MAGIC_COLON    '\001'
 #define MAGIC_LEFT     '\002'
@@ -68,20 +62,19 @@ static void var_edit_quote _ARG_((char*out));
  *
  * Returns a newly created list.
  */
-
 LIST *
-var_expand(l, in, end, lol, cancopyin)
-    LIST        *l;
-    const char  *in;
-    const char  *end;
-    LOL         *lol;
-    int          cancopyin;
-{
-    char        out_buf[MAXSYM];
-    char       *out = out_buf;
-    const char *inp = in;
-    char       *ov;             /* for temp copy of variable in outbuf */
-    int         depth;
+var_expand DECLARE((l, in, end, lol, cancopyin))
+    LIST        *l          NP
+    const char  *in         NP
+    const char  *end        NP
+    LOL         *lol        NP
+    int          cancopyin  EP
+BEGIN
+    char         out_buf[MAXSYM];
+    char        *out = out_buf;
+    const char  *inp = in;
+    char        *ov;             /* for temp copy of variable in outbuf */
+    int          depth;
 
     if(DEBUG_VAREXP) {
         assert(end >= in && end - in < INT_MAX);
@@ -161,7 +154,6 @@ expand:
     }
 
     /* Copied ) - back up. */
-
     ov--;
 
     /*
@@ -181,7 +173,6 @@ expand:
      * so may each value for '$(variable element)', and so may 'remainder'.
      * Thus we produce a product of three lists.
      */
-
     {
         LIST *variables = 0;
         LIST *remainder = 0;
@@ -361,7 +352,8 @@ expand:
 
         return(l);
     }
-}
+END_FUNCTION(var_expand)
+
 
 /*
  * var_edit_parse() - parse : modifiers into PATHNAME structure
@@ -397,13 +389,13 @@ expand:
  *
  * var_edit_file() below and path_build() obligingly follow this convention.
  */
-
 static void
-var_edit_parse(mods, edits)
-    char       *mods;
-    VAR_EDITS  *edits;
-{
-    int  havezeroed = 0;
+var_edit_parse DECLARE((mods, edits))
+    char       *mods   NP
+    VAR_EDITS  *edits  EP
+BEGIN
+    int         havezeroed = 0;
+
     memset((char *)edits, '\0', sizeof(*edits));
 
     while(*mods) {
@@ -432,16 +424,15 @@ fileval:
         /* selects a particular file path element.  On the first such */
         /* char, we deselect all others (by setting ptr = "", len = 0) */
         /* and for each char we select that element (by setting ptr = 0) */
-
         edits->filemods = 1;
 
         if(*mods != '=') {
             int  i;
 
             if(!havezeroed++) {
-                for(i = 0; i < 6; i++) {
-                    edits->f.part[ i ].len = 0;
-                    edits->f.part[ i ].ptr = "";
+                for(i = 0; i < 6; ++i) {
+                    edits->f.part[i].len = 0;
+                    edits->f.part[i].ptr = "";
                 }
             }
 
@@ -451,14 +442,14 @@ fileval:
 
 strval:
         /* Handle :X=value, or :X */
-
         if(*mods != '=') {
             fp->ptr = "";
             fp->len = 0;
         } else if((p = strchr(mods, MAGIC_COLON))) {
             *p      = '\0';
             fp->ptr = ++mods;
-            fp->len = p - mods;
+            assert(p >= mods);
+            fp->len = (sizeT)(p - mods);
             mods    = p + 1;
         } else {
             fp->ptr = ++mods;
@@ -466,26 +457,24 @@ strval:
             mods   += fp->len;
         }
     }
-}
+END_FUNCTION(var_edit_parse)
+
 
 /*
  * var_edit_file() - copy input target name to output, modifying filename
  */
-
 static void
-var_edit_file(in, out, edits)
-    const char *in;
-    char       *out;
-    VAR_EDITS  *edits;
-{
-    PATHNAME  pathname;
+var_edit_file DECLARE((in, out, edits))
+    const char *in     NP
+    char       *out    NP
+    VAR_EDITS  *edits  EP
+BEGIN
+    PATHNAME    pathname;
 
     /* Parse apart original filename, putting parts into "pathname" */
-
     path_parse(in, &pathname);
 
     /* Replace any pathname with edits->f */
-
     if(edits->f.f_grist.ptr) {
         pathname.f_grist = edits->f.f_grist;
     }
@@ -519,39 +508,38 @@ var_edit_file(in, out, edits)
     /* Put filename back together */
 
     path_build(&pathname, out, 0);
-}
+END_FUNCTION(var_edit_file)
+
 
 /*
  * var_edit_shift() - do upshift/downshift mods
  */
-
 static void
-var_edit_shift(out, edits)
-    char      *out;
-    VAR_EDITS *edits;
-{
+var_edit_shift DECLARE((out, edits))
+    char       *out    NP
+    VAR_EDITS  *edits  EP
+BEGIN
     /* Handle upshifting, downshifting now */
-
     if(edits->upshift) {
         for( ; *out; ++out) {
-            *out = toupper(*out);
+            *out = (char)toupper(*out);
         }
     } else if(edits->downshift) {
         for( ; *out; ++out) {
-            *out = tolower(*out);
+            *out = (char)tolower(*out);
         }
     }
-}
+END_FUNCTION(var_edit_shift)
 
 
 static void
-var_edit_quote(out)
-    char  *out;
-{
+var_edit_quote DECLARE((out))
+    char  *out  EP
+BEGIN
     /* Handle quoting now */
-    int   count;
-    char *p = out;
-    char *q;
+    int    count;
+    char  *p = out;
+    char  *q;
 
     count = 0;
     for(p = out; *p; ++p) {
@@ -562,7 +550,7 @@ var_edit_quote(out)
 
     q = p + count;
 
-    for( ; p >= out;) {
+    for(; p >= out;) {
         if(*p == '\\') {
             *q-- = *p--;
             *q-- = '\\';
@@ -570,4 +558,4 @@ var_edit_quote(out)
             *q-- = *p--;
         }
     }
-}
+END_FUNCTION(var_edit_quote)

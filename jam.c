@@ -161,11 +161,11 @@ extern char **environ;
 #endif
 
 int
-main(argc, argv, arg_environ)
-    int    argc;
-    char **argv;
-    char **arg_environ;
-{
+main DECLARE((argc, argv, arg_environ))
+    int     argc         NP
+    char  **argv         NP
+    char  **arg_environ  EP
+BEGIN
     int            n, num_targets;
     const char    *s;
     struct option  optv[N_OPTS];
@@ -180,7 +180,9 @@ main(argc, argv, arg_environ)
 
     argc--, argv++;
 
-    if((num_targets = getoptions(argc, argv, "d:j:f:gs:t:ano:qv", optv, targets)) < 0) {
+    if((num_targets = getoptions(argc, argv, "d:j:f:gs:t:ano:qv",
+                                 optv, targets)) < 0)
+    {
         printf("\nusage: jam [ options ] targets...\n\n");
 
         printf("-a      Build all targets, even if they are current.\n");
@@ -395,4 +397,4 @@ main(argc, argv, arg_environ)
     xmemTerminate();
 
     return(status ? EXITFAIL : EXITOK);
-}
+END_FUNCTION(main)

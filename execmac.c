@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * execunix.c - execute a shell script on UNIX
  *
  * If $(JAMSHELL) is defined, uses that to formulate execvp().
@@ -31,40 +25,51 @@
  * 04/08/94 (seiwald) - Coherent/386 support added.
  * 05/04/94 (seiwald) - async multiprocess interface
  * 01/22/95 (seiwald) - $(JAMSHELL) support
- * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
 
+#include <errno.h>
 #include "jam.h"  /* Includes system headers */
 
 #include "lists.h"
 #include "execcmd.h"
-#include <errno.h>
 
 #ifdef OS_MAC
+
+
+/*
+ * execmax() - max permitted string to execcmd()
+ */
+int
+execmax NULLARY
+BEGIN
+    return MAXLINE;
+END_FUNCTION(execmax)
+
 
 /*
  * execcmd() - launch an async command execution
  */
-
 void
-execcmd(string, func, closure, shell)
-    char *string;
-    void (*func)(void *closure, int status);
-    void *closure;
-    LIST *shell;
-{
+execcmd DECLARE((string, func, closure, shell))
+    char *string                             NP
+    void (*func)(void *closure, int status)  NP
+    void *closure                            NP
+    LIST *shell                              EP
+BEGIN
     printf("%s", string);
     (*func)(closure, EXEC_CMD_OK);
-}
+END_FUNCTION(execcmd)
+
 
 /*
  * execwait() - wait and drive at most one execution completion
  */
-
 int
-execwait(void)
-{
+execwait NULLARY
+BEGIN
     return(0);
-}
+END_FUNCTION(execwait)
+
 
 #endif  /* OS_MAC */

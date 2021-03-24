@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * lists.h - the LIST structure and routines to manipulate them
  *
  * The whole of jam relies on lists of strings as a datatype.  This
@@ -47,11 +41,11 @@
 #ifndef JAM_LISTS_H
 #define JAM_LISTS_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
-#define LOL_MAX 9
+#define LOL_MAX      9
 #define list_next(l) ((l)->next)
-#define L0 ((LIST *)0)
+#define L0           NIL(LIST *)
 
 typedef struct _list LIST;
 
@@ -72,22 +66,22 @@ struct _lol {
     LIST *list[LOL_MAX];
 };
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-LIST *  list_append   _ARG_((LIST *l, LIST *nl));
-LIST *  list_copy     _ARG_((LIST *l, LIST  *nl));
-void    list_free     _ARG_((LIST *head));
-LIST *  list_new      _ARG_((LIST *head, const char *string, int copy));
-void    list_print    _ARG_((LIST *l));
-int     list_length   _ARG_((LIST *l));
-LIST *  list_sublist  _ARG_((LIST *l, int start, int count));
+LIST *  list_append   PARAM((LIST *l, LIST *nl));
+LIST *  list_copy     PARAM((LIST *l, LIST  *nl));
+void    list_free     PARAM((LIST *head));
+LIST *  list_new      PARAM((LIST *head, const char *string, int copy));
+void    list_print    PARAM((LIST *l));
+int     list_length   PARAM((LIST *l));
+LIST *  list_sublist  PARAM((LIST *l, int start, int count));
 
-void    lol_add    _ARG_((LOL *lol, LIST *l));
-void    lol_init   _ARG_((LOL *lol));
-void    lol_free   _ARG_((LOL *lol));
-LIST *  lol_get    _ARG_((LOL *lol, int i));
-void    lol_print  _ARG_((LOL *lol));
+void    lol_add    PARAM((LOL *lol, LIST *l));
+void    lol_init   PARAM((LOL *lol));
+void    lol_free   PARAM((LOL *lol));
+LIST *  lol_get    PARAM((LOL *lol, int i));
+void    lol_print  PARAM((LOL *lol));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_LISTS_H */

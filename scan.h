@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * scan.h - the jam yacc scanner
  *
  * External functions:
@@ -32,7 +26,7 @@
 #ifndef JAM_SCAN_H
 #define JAM_SCAN_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
 #define SCAN_NORMAL    0       /* normal parsing */
 #define SCAN_STRING    1       /* look only for matching } */
@@ -48,18 +42,18 @@ typedef struct _YYSTYPE {
     int         number;
 } YYSTYPE;
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
 extern YYSTYPE  yylval;
 
-void   yymode      _ARG_((int n));
-void   yyerror     _ARG_((const char *s));
-int    yyanyerrors _ARG_((void));
-void   yyfparse    _ARG_((const char *s));
-int    yyline      _ARG_((void));
-int    yylex       _ARG_((void));
-int    yyparse     _ARG_((void));
+void   yymode      PARAM((int n));
+void   yyerror     PARAM((const char *s));
+int    yyanyerrors PARAM((void));
+void   yyfparse    PARAM((const char *s));
+int    yyline      PARAM((void));
+int    yylex       PARAM((void));
+int    yyparse     PARAM((void));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_SCAN_H */

@@ -25,7 +25,7 @@
 #include "str.h"
 #include "xmem.h"
 
-static struct hash *strhash  = _NIL_(struct hash *);
+static struct hash *strhash  = NIL(struct hash *);
 static int          strtotal = 0;
 
 typedef struct {
@@ -33,16 +33,17 @@ typedef struct {
     sizeT refs;
 } strT;
 
+
 void
-sizeToSz(mNumber, pszNumeral)
-    sizeT  mNumber;
-    char  *pszNumeral;
-{
+sizeToSz DECLARE((mNumber, pszNumeral))
+    sizeT  mNumber     NP
+    char  *pszNumeral  EP
+BEGIN
     char  *pszNext = pszNumeral;
     sizeT  mC;
     char   chTemp;
 
-    assert(pszNumeral != _NIL_(char *));
+    assert(pszNumeral != NIL(char *));
     assert(mNumber > 0);
 
     do {
@@ -65,17 +66,18 @@ sizeToSz(mNumber, pszNumeral)
         *pszNext        = *pszNumeral;
         *(pszNumeral++) = chTemp;
     }
-}
+END_FUNCTION(sizeToSz)
+
 
 boolT
-fSToIMaxBounded(psNumeral, mNumeralLen, pmNumber)
-    char   *psNumeral;
-    sizeT   mNumeralLen;
-    iMaxT  *pmNumber;
-{
-    iMaxT  sum = 0;
-    sizeT  mX;
-    boolT  fParsed = FALSE;
+fSToIMaxBounded DECLARE((psNumeral, mNumeralLen, pmNumber))
+    char   *psNumeral    NP
+    sizeT   mNumeralLen  NP
+    iMaxT  *pmNumber     EP
+BEGIN
+    iMaxT   sum = 0;
+    sizeT   mX;
+    boolT   fParsed = FALSE;
 
     for(mX = 0; mX < mNumeralLen; ++mX) {
         char  chDigit = psNumeral[mX];
@@ -96,17 +98,18 @@ fSToIMaxBounded(psNumeral, mNumeralLen, pmNumber)
 
     *pmNumber = sum;
     return(fParsed);
-}
+END_FUNCTION(fSToIMaxBounded)
+
 
 /*
  * newstr() - return a malloc'ed copy of a string
  */
 
 const char *
-newstr(string)
-    const char *string;
-{
-    const char *str, **s = &str;
+newstr DECLARE((string))
+    const char  *string  EP
+BEGIN
+    const char  *str, **s = &str;
 
     if(!strhash) {
         strhash = hashinit(sizeof(const char *), "strings");
@@ -122,7 +125,7 @@ newstr(string)
 
     if(hashenter(strhash, (HASHDATA **)&s)) {
         const int  l = strlen(string);
-        char      *m = _NIL_(char *);
+        char      *m = NIL(char *);
 
         memoryAllocateOrFail((voidT **)&m, l + 1);
 
@@ -136,39 +139,39 @@ newstr(string)
     }
 
     return(*s);
-}
+END_FUNCTION(newstr)
+
 
 /*
  * copystr() - return a copy of a string previously returned by newstr()
  */
-
 const char *
-copystr(s)
-    const char *s;
-{
+copystr DECLARE((s))
+    const char  *s  EP
+BEGIN
     return(s);
-}
+END_FUNCTION(copystr)
+
 
 /*
  * freestr() - free a string returned by newstr() or copystr()
  */
-
 void
-freestr(s)
-    const char *s;
-{
-}
+freestr DECLARE((s))
+    const char  *s  EP
+BEGIN
+END_FUNCTION(freestr)
+
 
 /*
  * donestr() - free string tables
  */
-
 void
-donestr _ARG_((void))
-{
+donestr NULLARY
+BEGIN
     hashdone(strhash);
 
     if(DEBUG_MEM) {
         printf("%dK in strings\n", strtotal / 1024);
     }
-}
+END_FUNCTION(donestr)

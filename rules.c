@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * rules.c - access to RULEs, TARGETs, and ACTIONs
  *
  * External routines:
@@ -43,27 +37,27 @@
 #include "variable.h"
 #include "xmem.h"
 
-void targetInit _ARG_((TARGET *t));
+void targetInit PARAM((TARGET *t));
 
-static struct hash *rulehash   = _NIL_(struct hash *);
-static struct hash *targethash = _NIL_(struct hash *);
+static struct hash *rulehash   = NIL(struct hash *);
+static struct hash *targethash = NIL(struct hash *);
 
 void
-targetInit(target)
-    TARGET *target;
-{
-    assert(target != _NIL_(TARGET *));
+targetInit DECLARE((target))
+    TARGET  *target  EP
+BEGIN
+    assert(target != NIL(TARGET *));
     memset((char *)target, '\0', sizeof(*target));
-}
+END_FUNCTION(targetInit)
+
 
 /*
  * bindrule() - return pointer to RULE, creating it if necessary
  */
-
 RULE *
-bindrule(rulename)
-    const char *rulename;
-{
+bindrule DECLARE((rulename))
+    const char  *rulename  EP
+BEGIN
     RULE  rule, *r = &rule;
 
     if(!rulehash) {
@@ -74,24 +68,24 @@ bindrule(rulename)
 
     if(hashenter(rulehash, (HASHDATA **)&r)) {
         r->name      = newstr(rulename);         /* never freed */
-        r->procedure = _NIL_(PARSE *);
-        r->actions   = _NIL_(char *);
+        r->procedure = NIL(PARSE *);
+        r->actions   = NIL(char *);
         r->bindlist  = L0;
         r->params    = L0;
         r->flags     = 0;
     }
 
     return(r);
-}
+END_FUNCTION(bindrule)
+
 
 /*
  * bindtarget() - return pointer to TARGET, creating it if necessary
  */
-
 TARGET *
-bindtarget(targetname)
-    const char *targetname;
-{
+bindtarget DECLARE((targetname))
+    const char  *targetname  EP
+BEGIN
     TARGET  target, *t = &target;
 
     if(!targethash) {
@@ -107,19 +101,19 @@ bindtarget(targetname)
     }
 
     return(t);
-}
+END_FUNCTION(bindtarget)
+
 
 /*
  * copytarget() - make a new target with the old target's name
  *
  * Not entered into hash table -- for internal nodes.
  */
-
 TARGET *
-copytarget(ot)
-    const TARGET *ot;
-{
-    TARGET *t = _NIL_(TARGET *);
+copytarget DECLARE((ot))
+    const TARGET  *ot  EP
+BEGIN
+    TARGET        *t = NIL(TARGET *);
 
     memoryAllocateOrFail((voidT **)&t, sizeof(*t));
     targetInit(t);
@@ -128,18 +122,19 @@ copytarget(ot)
     t->flags    |= T_FLAG_NOTFILE | T_FLAG_INTERNAL;
 
     return(t);
-}
+END_FUNCTION(copytarget)
+
 
 /*
  * touchtarget() - mark a target to simulate being new
  */
-
 void
-touchtarget(t)
-    const char *t;
-{
+touchtarget DECLARE((t))
+    const char  *t  EP
+BEGIN
     bindtarget(t)->flags |= T_FLAG_TOUCHED;
-}
+END_FUNCTION(touchtarget)
+
 
 /*
  * targetlist() - turn list of target names into a TARGET chain
@@ -148,18 +143,18 @@ touchtarget(t)
  *      chain   existing TARGETS to append to
  *      targets list of target names
  */
-
 TARGETS *
-targetlist(chain, targets)
-    TARGETS *chain;
-    LIST    *targets;
-{
+targetlist DECLARE((chain, targets))
+    TARGETS  *chain    NP
+    LIST     *targets  EP
+BEGIN
     for(; targets; targets = list_next(targets)) {
         chain = targetentry(chain, bindtarget(targets->string));
     }
 
     return(chain);
-}
+END_FUNCTION(targetlist)
+
 
 /*
  * targetentry() - add a TARGET to a chain of TARGETS
@@ -168,13 +163,12 @@ targetlist(chain, targets)
  *      chain   exisitng TARGETS to append to
  *      target  new target to append
  */
-
 TARGETS *
-targetentry(chain, target)
-    TARGETS *chain;
-    TARGET  *target;
-{
-    TARGETS *c = _NIL_(TARGETS *);
+targetentry DECLARE((chain, target))
+    TARGETS  *chain   NP
+    TARGET   *target  EP
+BEGIN
+    TARGETS  *c = NIL(TARGETS *);
 
     memoryAllocateOrFail((voidT **)&c, sizeof(TARGETS));
     c->target = target;
@@ -189,7 +183,8 @@ targetentry(chain, target)
     c->next     = 0;
 
     return(chain);
-}
+END_FUNCTION(targetentry)
+
 
 /*
  * targetchain() - append two TARGET chains
@@ -198,12 +193,11 @@ targetentry(chain, target)
  *      chain   exisitng TARGETS to append to
  *      target  new target to append
  */
-
 TARGETS *
-targetchain(chain, targets)
-    TARGETS *chain;
-    TARGETS *targets;
-{
+targetchain DECLARE((chain, targets))
+    TARGETS  *chain    NP
+    TARGETS  *targets  EP
+BEGIN
     if(!targets) {
         return(chain);
     } else if(!chain) {
@@ -214,18 +208,18 @@ targetchain(chain, targets)
     chain->tail       = targets->tail;
 
     return(chain);
-}
+END_FUNCTION(targetchain)
+
 
 /*
  * actionlist() - append to an ACTION chain
  */
-
 ACTIONS *
-actionlist(chain, action)
-    ACTIONS *chain;
-    ACTION  *action;
-{
-    ACTIONS *actions = _NIL_(ACTIONS *);
+actionlist DECLARE((chain, action))
+    ACTIONS  *chain   NP
+    ACTION   *action  EP
+BEGIN
+    ACTIONS *actions = NIL(ACTIONS *);
 
     memoryAllocateOrFail((voidT **)&actions, sizeof(ACTIONS));
     actions->action = action;
@@ -240,7 +234,8 @@ actionlist(chain, action)
     actions->next = 0;
 
     return(chain);
-}
+END_FUNCTION(actionlist)
+
 
 /*
  * addsettings() - add a deferred "set" command to a target
@@ -250,18 +245,16 @@ actionlist(chain, action)
  * if any, unless 'append' says to append the new list onto the old.
  * Returns the head of the chain of settings.
  */
-
 SETTINGS *
-addsettings(head, setflag, symbol, value)
-    SETTINGS   *head;
-    int         setflag;
-    const char *symbol;
-    LIST       *value;
-{
-    SETTINGS *v;
+addsettings DECLARE((head, setflag, symbol, value))
+    SETTINGS    *head     NP
+    int          setflag  NP
+    const char  *symbol   NP
+    LIST        *value    EP
+BEGIN
+    SETTINGS    *v;
 
     /* Look for previous setting */
-
     for(v = head; v; v = v->next) {
         if(!strcmp(v->symbol, symbol)) {
             break;
@@ -299,7 +292,8 @@ addsettings(head, setflag, symbol, value)
     }
     /* Return (new) head of list. */
     return(head);
-}
+END_FUNCTION(addsettings)
+
 
 /*
  * copysettings() - copy a settings list for temp use
@@ -315,15 +309,14 @@ addsettings(head, setflag, symbol, value)
  * the target's original SETTINGS chain can be modified using the usual
  * "on target" syntax.
  */
-
 SETTINGS *
-copysettings(from)
-    SETTINGS *from;
-{
-    SETTINGS *head = _NIL_(SETTINGS *), *v;
+copysettings DECLARE((from))
+    SETTINGS  *from  EP
+BEGIN
+    SETTINGS  *head = NIL(SETTINGS *), *v;
 
     for(; from; from = from->next) {
-        v = _NIL_(SETTINGS*);
+        v = NIL(SETTINGS*);
         memoryAllocateOrFail((voidT **)&v, sizeof(SETTINGS));
         v->symbol = copystr(from->symbol);
         v->value  = list_copy(0, from->value);
@@ -332,43 +325,43 @@ copysettings(from)
     }
 
     return(head);
-}
+END_FUNCTION(copysettings)
+
 
 /*
  * pushsettings() - set all target specific variables
  */
-
 void
-pushsettings(v)
-    SETTINGS *v;
-{
+pushsettings DECLARE((v))
+    SETTINGS  *v  EP
+BEGIN
     for(; v; v = v->next) {
         v->value = var_swap(v->symbol, v->value);
     }
-}
+END_FUNCTION(pushsettings)
+
 
 /*
  * popsettings() - reset target specific variables to their pre-push values
  */
-
 void
-popsettings(v)
-    SETTINGS *v;
-{
+popsettings DECLARE((v))
+    SETTINGS  *v  EP
+BEGIN
     pushsettings(v);      /* just swap again */
-}
+END_FUNCTION(popsettings)
+
 
 /*
  *    freesettings() - delete a settings list
  */
-
 void
-freesettings(v)
-    SETTINGS *v;
-{
-    SETTINGS *n = _NIL_(SETTINGS *);
+freesettings DECLARE((v))
+    SETTINGS  *v  EP
+BEGIN
+    SETTINGS *n = NIL(SETTINGS *);
 
-    while(v != _NIL_(SETTINGS *)) {
+    while(v != NIL(SETTINGS *)) {
         n = v->next;
 
         freestr(v->symbol);
@@ -377,15 +370,15 @@ freesettings(v)
 
         v = n;
     }
-}
+END_FUNCTION(freesettings)
+
 
 /*
  * donerules() - free RULE and TARGET tables
  */
-
 void
-donerules()
-{
+donerules NULLARY
+BEGIN
     hashdone(rulehash);
     hashdone(targethash);
-}
+END_FUNCTION(donerules)

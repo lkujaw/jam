@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * execnt.c - execute a shell command on Windows NT and Windows 95/98
  *
  * If $(JAMSHELL) is defined, uses that to formulate execvp()/spawnvp().
@@ -51,7 +45,7 @@
 #  define wait my_wait
 static int my_wait(int *status);
 # endif
-static int   intr = 0;
+static int   intr        = 0;
 static int   cmdsrunning = 0;
 static void  (*istat)(int);
 
@@ -65,12 +59,12 @@ static struct {
     void  (*func)(void *closure, int status);
     void *closure;
     char *tempfile;
-} cmdtab[ MAXJOBS ] = { { 0 } };
+} cmdtab[MAXJOBS] = { { 0 } };
 
 
 static void
-set_is_win95(void)
-{
+set_is_win95 NULLARY
+BEGIN
     OSVERSIONINFO  os_info;
 
     os_info.dwOSVersionInfoSize = sizeof(os_info);
@@ -85,20 +79,20 @@ set_is_win95(void)
     if(os_info.dwPlatformId == VER_PLATFORM_WIN32_NT) {
         is_nt_351 = os_info.dwMajorVersion == 3;
     }
-}
+END_FUNCTION(set_is_win95)
 
 
 static char **
-string_to_args(string, pcount)
-    const char *string;
-    int        *pcount
-{
+string_to_args DECLARE((string, pcount))
+    const char *string  NP
+    int        *pcount  EP
+BEGIN
     int    total    = strlen(string);
     int    in_quote = 0, num_args;
-    char  *line     = _NIL_(char *);
+    char  *line     = NIL(char *);
     char  *p;
     char **arg;
-    char **args     = _NIL_(char **);
+    char **args     = NIL(char **);
 
     *pcount = 0;
 
@@ -164,22 +158,23 @@ string_to_args(string, pcount)
     *pcount = num_args;
     args[0] = line;
     return(args + 1);
-}
+END_FUNCTION(string_to_args)
+
 
 static void
-free_args(args)
-    char** args;
-{
+free_args DECLARE((args))
+    char**  args  EP
+BEGIN
     memoryRelease(&args[-1]);
     memoryRelease(&(args - 1));
-}
+END_FUNCTION(free_args)
 
 
 /* process a "del" or "erase" command under Windows 95/98 */
 static int
-process_del(command)
-    char*  command;
-{
+process_del DECLARE((command))
+    char*  command  EP
+BEGIN
     char**arg;
     char *p = command, *q;
     int   wildcard = 0, result = 0;
@@ -240,7 +235,7 @@ process_del(command)
                     if(!in_quote) {
                         int   len = p - q;
                         int   result;
-                        char *line = _NIL_(char *);
+                        char *line = NIL(char *);
 
                         /* q..p-1 contains the delete argument */
                         if(len <= 0) {
@@ -274,37 +269,36 @@ process_del(command)
             } /* while (go_on) */
         }
     }
-}
+END_FUNCTION(process_del)
 
 
 /*
  * onintr() - bump intr to note command interruption
  */
-
 static void
-onintr(disp)
-    int disp;
-{
+onintr DECLARE((disp))
+    int  disp  EP
+BEGIN
     intr++;
     printf("...interrupted\n");
-}
+END_FUNCTION(onintr)
+
 
 /*
  * execcmd() - launch an async command execution
  */
-
 void
-execcmd(string, func, closure, shell)
-    const char *string;
-    void      (*func)_ARG_((voidT *closure, int status));
-    voidT      *closure;
-    LIST       *shell;
-{
-    int   pid;
-    int   slot;
-    int   max_line;
-    char *argv[ MAXARGC + 1 ];          /* +1 for NULL */
-    char *p;
+execcmd DECLARE((string, func, closure, shell))
+    const char   *string                                    NP
+    void        (*func)PARAM((voidT *closure, int status))  NP
+    voidT        *closure                                   NP
+    LIST         *shell                                     EP
+BEGIN
+    int           pid;
+    int           slot;
+    int           max_line;
+    char         *argv[MAXARGC + 1];          /* +1 for NULL */
+    char         *p;
 
     if(!is_win95_defined) {
         set_is_win95();
@@ -326,7 +320,7 @@ execcmd(string, func, closure, shell)
         exit(EXITFAIL);
     }
 
-    if(!cmdtab[ slot ].tempfile) {
+    if(!cmdtab[slot].tempfile) {
         char *tempdir;
 
         if(!(tempdir = getenv("TEMP")) &&
@@ -342,7 +336,6 @@ execcmd(string, func, closure, shell)
     }
 
     /* Trim leading, ending white space */
-
     while(isspace(*string)) {
         ++string;
     }
@@ -361,12 +354,10 @@ execcmd(string, func, closure, shell)
     /* Otherwise, exec directly. */
     /* Frankly, if it is a single long line I don't think the */
     /* command interpreter will do any better -- it will fail. */
-
     if(p && *p || strlen(string) > max_line || shell) {
         FILE *f;
 
         /* Write command to bat file. */
-
         f = fopen(cmdtab[ slot ].tempfile, "w");
         fputs(string, f);
         fclose(f);
@@ -377,7 +368,6 @@ execcmd(string, func, closure, shell)
     /* Forumulate argv */
     /* If shell was defined, be prepared for % and ! subs. */
     /* Otherwise, use stock /bin/sh (on unix) or cmd.exe (on NT). */
-
     if(shell) {
         int   i;
         char  jobno[4];
@@ -401,7 +391,7 @@ execcmd(string, func, closure, shell)
         }
 
         argv[i] = 0;
-    } else   {
+    } else  {
         /* don't worry, this is ignored on Win95/98, see later.. */
         argv[0] = "cmd.exe";
         argv[1] = "/Q/C";               /* anything more is non-portable */
@@ -493,15 +483,15 @@ execcmd(string, func, closure, shell)
             break;
         }
     }
-}
+END_FUNCTION(execcmd)
+
 
 /*
  * execwait() - wait and drive at most one execution completion
  */
-
 int
-execwait _ARG_((void))
-{
+execwait NULLARY
+BEGIN
     int  i;
     int  status, w;
     int  rstat;
@@ -558,17 +548,18 @@ execwait _ARG_((void))
     (*cmdtab[i].func)(cmdtab[i].closure, rstat);
 
     return(1);
-}
+END_FUNCTION(execwait)
+
 
 # if !defined(__BORLANDC__)
 
 static int
-my_wait(status)
-    int *status;
-{
+my_wait DECLARE((status))
+    int  *status  EP
+BEGIN
     int            i, num_active = 0;
     DWORD          exitcode, waitcode;
-    static HANDLE *active_handles = _NIL_(HANDLE *);
+    static HANDLE *active_handles = NIL(HANDLE *);
 
     if(!active_handles) {
         memoryAllocateOrFail((voidT**)&active_handles, 
@@ -620,9 +611,8 @@ my_wait(status)
 FAILED:
     errno = GetLastError();
     return(-1);
+END_FUNCTION(my_wait)
 
-}
 
 # endif /* !__BORLANDC__ */
-
 #endif  /* USE_EXECNT */

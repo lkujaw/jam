@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * option.c - command line option processing
  *
  * {o >o
@@ -21,15 +15,15 @@
 #include "option.h"
 
 int
-getoptions(argc, argv, opts, optv, targets)
-    int         argc;
-    char      **argv;
-    const char *opts;
-    option     *optv;
-    char      **targets;
-{
-    int  i, n;
-    int  optc = N_OPTS;
+getoptions DECLARE((argc, argv, opts, optv, targets))
+    int          argc     NP
+    char       **argv     NP
+    const char  *opts     NP
+    option      *optv     NP
+    char       **targets  EP
+BEGIN
+    int          i, n;
+    int          optc = N_OPTS;
 
     memset((char *)optv, '\0', sizeof(*optv) * N_OPTS);
 
@@ -43,7 +37,7 @@ getoptions(argc, argv, opts, optv, targets)
                 return(-1);
             }
 
-            for(arg = &argv[i][1]; *arg; arg++) {
+            for(arg = &argv[i][1]; *arg; ++arg) {
                 const char *f;
 
                 for(f = opts; *f; f++) {
@@ -72,8 +66,8 @@ getoptions(argc, argv, opts, optv, targets)
                     return(-1);
                 }
             }
-        } else   {
-            /* something like VARNAME=.... is treated as an implicit '-s' flag */
+        } else {
+            /* something like VARNAME=... is treated as an implicit '-s' flag */
             if(argv[i][0] != '=' && strchr(argv[i], '=')) {
                 if(!optc--) {
                     printf("too many options (%d max)\n", N_OPTS);
@@ -93,25 +87,25 @@ getoptions(argc, argv, opts, optv, targets)
     }
 
     return(n);
-}
+END_FUNCTION(get_options)
+
 
 /*
  * Name: getoptval() - find an option given its character
  */
-
 const char *
-getoptval(optv, opt, subopt)
-    option *optv;
-    int     opt;
-    int     subopt;
-{
+getoptval DECLARE((optv, opt, subopt))
+    option  *optv    NP
+    int      opt     NP
+    int      subopt  EP
+BEGIN
     int  i;
 
-    for(i = 0; i < N_OPTS; i++, optv++) {
+    for(i = 0; i < N_OPTS; ++i, ++optv) {
         if(optv->flag == opt && !subopt--) {
             return(optv->val);
         }
     }
 
     return(0);
-}
+END_FUNCTION(getoptval)

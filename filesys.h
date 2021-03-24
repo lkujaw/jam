@@ -15,25 +15,25 @@
 
 #include "jam.h"  /* Includes system headers */
 
-#include "ansi.h"
+#include "cstd.h"
 
-typedef void (*scanback)_ARG_((voidT      *closure,
+typedef void (*scanback)PARAM((voidT      *closure,
                                const char *file,
                                int         found,
                                time_t      t));
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-void file_dirscan  _ARG_((const char *dir,
+void file_dirscan  PARAM((const char *dir,
                           scanback    func,
                           voidT      *closure));
 
-void file_archscan _ARG_((const char *arch,
+void file_archscan PARAM((const char *arch,
                           scanback    func,
                           voidT      *closure));
 
-int file_time _ARG_((const char *filename, time_t *time));
+int file_time PARAM((const char *filename, time_t *time));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_FILESYS_H */

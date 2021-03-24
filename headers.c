@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 2000 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * headers.c - handle #includes in source files
  *
  * Using regular expressions provided as the variable $(HDRSCAN),
@@ -43,7 +37,7 @@
 #include "xmem.h"
 
 
-static LIST *headers1 _ARG_((const char *file, LIST *hdrscan));
+static LIST *headers1 PARAM((const char *file, LIST *hdrscan));
 
 /*
  * headers() - scan a target for include files and call HDRRULE
@@ -52,15 +46,16 @@ static LIST *headers1 _ARG_((const char *file, LIST *hdrscan));
 #define MAXINC 10
 
 void
-headers(t)
-    TARGET *t;
-{
-    LIST *hdrscan;
-    LIST *hdrrule;
-    LOL   lol;
+headers DECLARE((t))
+    TARGET  *t  EP
+BEGIN
+    LIST    *hdrscan;
+    LIST    *hdrrule;
+    LOL      lol;
 
     if(!(hdrscan = var_get("HDRSCAN")) ||
-       !(hdrrule = var_get("HDRRULE"))) {
+       !(hdrrule = var_get("HDRRULE")))
+    {
         return;
     }
 
@@ -81,26 +76,25 @@ headers(t)
     }
 
     /* Clean up */
-
     lol_free(&lol);
-}
+END_FUNCTION(headers)
+
 
 /*
  * headers1() - using regexp, scan a file and build include LIST
  */
-
 static LIST *
-headers1(file, hdrscan)
-    const char *file;
-    LIST *hdrscan;
-{
+headers1 DECLARE((file, hdrscan))
+    const char  *file     NP
+    LIST        *hdrscan  EP
+BEGIN
     FILE   *f;
     int     i;
     int     rec    = 0;
-    LIST   *result = 0;
-    regexp *re[ MAXINC ];
+    LIST   *result = NIL(LIST*);
+    regexp *re[MAXINC];
     regexp *re_macros;
-    char    buf[ 1024 ];
+    char    buf[1024];
 
     if(!(f = fopen(file, "r"))) {
         return(result);
@@ -171,4 +165,4 @@ headers1(file, hdrscan)
 
     fclose(f);
     return(result);
-}
+END_FUNCTION(headers1)

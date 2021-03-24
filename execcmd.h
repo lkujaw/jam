@@ -1,34 +1,31 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * execcmd.h - execute a shell script
  *
  * 05/04/94 (seiwald) - async multiprocess interface
+ * 05/06/05 (seiwald) - new execmax() to return max command line len.
  */
 
 #ifndef JAM_EXECCMD_H
 #define JAM_EXECCMD_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
 #define EXEC_CMD_OK    0
 #define EXEC_CMD_FAIL  1
 #define EXEC_CMD_INTR  2
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-void execcmd _ARG_((
+int execmax();
+
+void execcmd PARAM((
     const char *string,   /* command to execute */
     void      (*func)(voidT *closure, int status),
     voidT      *closure,
     LIST       *shell));
 
-int execwait _ARG_((void));
+int execwait PARAM((void));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_EXECCMD_H */

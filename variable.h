@@ -13,7 +13,7 @@
 #ifndef JAM_VARIABLE_H
 #define JAM_VARIABLE_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
 /*
  * Defines for var_set().
@@ -23,15 +23,15 @@
 #define VAR_APPEND     1       /* append to previous value */
 #define VAR_DEFAULT    2       /* set only if no previous value */
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-void    var_defines _ARG_((const char **e));
-int     var_string  _ARG_((const char *in, char *out, int outsize, LOL *lol));
-LIST *  var_get     _ARG_((const char *symbol));
-void    var_set     _ARG_((const char *symbol, LIST *value, int flag));
-LIST *  var_swap    _ARG_((const char *symbol, LIST *value));
-void    var_done    _ARG_((void));
+void    var_defines PARAM((const char **e));
+int     var_string  PARAM((const char *in, char *out, int outsize, LOL *lol));
+LIST *  var_get     PARAM((const char *symbol));
+void    var_set     PARAM((const char *symbol, LIST *value, int flag));
+LIST *  var_swap    PARAM((const char *symbol, LIST *value));
+void    var_done    PARAM((void));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_VARIABLE_H */

@@ -10,7 +10,7 @@
 #ifndef JAM_REGEXP_H
 #define JAM_REGEXP_H 1
 
-#include "ansi.h"
+#include "cstd.h"
 
 #define NSUBEXP  10
 
@@ -30,12 +30,12 @@ typedef struct regexp {
     char        program[1]; /* Unwarranted chumminess with compiler. */
 } regexp;
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-regexp *regcomp  _ARG_((const char *exp));
-int     regexec  _ARG_((regexp *prog, const char *string));
-void    regerror _ARG_((const char *s));
+regexp *regcomp  PARAM((const char *exp));
+int     regexec  PARAM((regexp *prog, const char *string));
+void    regerror PARAM((const char *s));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_REGEXP_H */

@@ -21,7 +21,7 @@
 typedef struct _PARSE PARSE;
 
 struct _PARSE {
-    LIST       *(*func)_ARG_((PARSE *p, LOL *args, int *jmp));
+    LIST       *(*func)PARAM((PARSE *p, LOL *args, int *jmp));
     PARSE        *left;
     PARSE        *right;
     PARSE        *third;
@@ -31,13 +31,13 @@ struct _PARSE {
     int           refs;
 };
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-void    parse_file _ARG_((const char *f));
-void    parse_save _ARG_((PARSE *p));
+void    parse_file PARAM((const char *f));
+void    parse_save PARAM((PARSE *p));
 
-PARSE * parse_make _ARG_((
-        LIST            *(*func)_ARG_((PARSE *p, LOL *args, int *jmp)),
+PARSE * parse_make PARAM((
+        LIST            *(*func)PARAM((PARSE *p, LOL *args, int *jmp)),
         PARSE           *left,
         PARSE           *right,
         PARSE           *third,
@@ -45,9 +45,9 @@ PARSE * parse_make _ARG_((
         const char      *string1,
         int              num));
 
-void    parse_refer _ARG_((PARSE *p));
-void    parse_free  _ARG_((PARSE *p));
+void    parse_refer PARAM((PARSE *p));
+void    parse_free  PARAM((PARSE *p));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_PARSE_H */

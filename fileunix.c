@@ -1,10 +1,4 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * fileunix.c - manipulate file names and scan directories on UNIX/AmigaOS
  *
  * External routines:
@@ -20,10 +14,10 @@
  * timestamp, interested parties may later call file_time().
  *
  * 04/08/94 (seiwald) - Coherent/386 support added.
- * 12/19/94 (mikem) - solaris string table insanity support
+ * 12/19/94 (mikem)   - solaris string table insanity support
  * 02/14/95 (seiwald) - parse and build /xxx properly
  * 05/03/96 (seiwald) - split into pathunix.c
- * 11/21/96 (peterk) - BEOS does not have Unix-style archives
+ * 11/21/96 (peterk)  - BEOS does not have Unix-style archives
  * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
  * 04/03/01 (seiwald) - AIX uses SARMAG
  * 07/16/02 (seiwald) - Support BSD style long filename in archives.
@@ -47,8 +41,8 @@
  * defined. One must be selected as there is no default.
  */
 # if defined(OS_SEQUENT) || \
-     defined(OS_DGUX) || \
-     defined(OS_SCO) || \
+     defined(OS_DGUX)    || \
+     defined(OS_SCO)     || \
      defined(OS_ISC)
 #  define PORTAR 1
 # endif
@@ -58,9 +52,8 @@
 #  include <sys/stat.h>
 # endif
 
-# if defined(OS_RHAPSODY) || \
-     defined(OS_MACOSX) || \
-     defined(OS_NEXT)
+# if defined(OS_NEXT)    || \
+     defined(OS_DARWIN)
 /* need unistd for rhapsody's proper lseek */
 #  include <sys/dir.h>
 #  include <unistd.h>
@@ -75,7 +68,7 @@
 #  define HAVE_AR
 # endif
 
-# if defined(OS_QNX) || \
+# if defined(OS_QNX)  || \
      defined(OS_BEOS) || \
      defined(OS_MPEIX)
 #  define NO_AR
@@ -108,20 +101,18 @@ struct ar_hdr           /* archive file member header - printable ASCII */
 /*
  * file_dirscan() - scan a directory for files
  */
-
 void
-file_dirscan(dir, func, closure)
-    const char *dir;
-    scanback    func;
-    voidT      *closure;
-{
-    PATHNAME       f;
-    DIR           *d;
-    STRUCT_DIRENT *dirent;
-    char           filename[MAXJPATH];
+file_dirscan DECLARE((dir, func, closure))
+    const char     *dir      NP
+    scanback        func     NP
+    voidT          *closure  EP
+BEGIN
+    PATHNAME        f;
+    DIR            *d;
+    STRUCT_DIRENT  *dirent;
+    char            filename[MAXJPATH];
 
     /* First enter directory itself */
-
     memset((char *)&f, '\0', sizeof(f));
 
     f.f_dir.ptr = dir;
@@ -130,13 +121,11 @@ file_dirscan(dir, func, closure)
     dir = *dir ? dir : ".";
 
     /* Special case / : enter it */
-
     if(f.f_dir.len == 1 && f.f_dir.ptr[0] == '/') {
         (*func)(closure, dir, 0 /* not stat()'ed */, (time_t)0);
     }
 
     /* Now enter contents of directory */
-
     if(!(d = opendir(dir))) {
         return;
     }
@@ -160,17 +149,16 @@ file_dirscan(dir, func, closure)
     }
 
     closedir(d);
-}
+END_FUNCTION(file_dirscan)
 
 /*
  * file_time() - get timestamp of file, if not done by file_dirscan()
  */
-
 int
-file_time(filename, time)
-    const char *filename;
-    time_t     *time;
-{
+file_time DECLARE((filename, time))
+    const char  *filename  NP
+    time_t      *time      EP
+BEGIN
     struct stat  statbuf;
 
     if(stat(filename, &statbuf) < 0) {
@@ -179,27 +167,27 @@ file_time(filename, time)
 
     *time = statbuf.st_mtime;
     return(0);
-}
+END_FUNCTION(file_time)
+
 
 /*
  * file_archscan() - scan an archive for files
  */
-
-# ifndef AIAMAG /* God-fearing UNIX */
+# ifndef AIAMAG  /* UNIX */
 
 #  define SARFMAG 2
 #  define SARHDR sizeof(struct ar_hdr)
 
 void
-file_archscan(archive, func, closure)
-    const char *archive;
-    scanback    func;
-    voidT      *closure;
-{
+file_archscan DECLARE((archive, func, closure))
+    const char  *archive  NP
+    scanback     func     NP
+    voidT       *closure  EP
+BEGIN
 #  ifndef NO_AR
     char           buf[MAXJPATH];
     struct ar_hdr  ar_hdr;
-    char          *string_table = _NIL_(char *);
+    char          *string_table = NIL(char *);
     iMaxT          offset;
     int            fd;
 
@@ -224,7 +212,7 @@ file_archscan(archive, func, closure)
         iMaxT  lar_date;
         iMaxT  lar_size;
         char   lar_name[256];
-        char  *dst = lar_name, *end;
+        char  *dst = lar_name;
         boolT  success;
 
         /* solaris sscanf() does strlen first, so terminate somewhere */
@@ -249,7 +237,6 @@ file_archscan(archive, func, closure)
             /* traditional archive entry names:
             ** ends at the first space, /, or null.
             */
-
             char       *src = ar_hdr.ar_name;
             const char *e   = src + sizeof(ar_hdr.ar_name);
 
@@ -321,24 +308,25 @@ file_archscan(archive, func, closure)
     close(fd);
 
 #  endif /* NO_AR */
-}
+END_FUNCTION(file_archscan)
+
 
 # else /* AIAMAG - RS6000 AIX */
 
 void
-file_archscan(archive, func, closure)
-    const char *archive;
-    scanback    func;
-    voidT      *closure;
-{
+file_archscan DECLARE((archive, func, closure))
+    const char    *archive  NP
+    scanback       func     NP
+    voidT         *closure  EP
+BEGIN
     struct fl_hdr  fl_hdr;
 
     struct {
         struct ar_hdr hdr;
-        char          pad[ 256 ];
+        char          pad[256];
     } ar_hdr;
 
-    char  buf[ MAXJPATH ];
+    char  buf[MAXJPATH];
     long  offset;
     int   fd;
 
@@ -401,8 +389,7 @@ file_archscan(archive, func, closure)
     }
 
     close(fd);
-}
+END(file_archscan)
 
 # endif /* AIAMAG - RS6000 AIX */
-
 #endif  /* USE_FILEUNIX */

@@ -77,7 +77,7 @@ INSTALLING
             Platform            $(OS)
             -------------------------
             AIX                 AIX             *
-            BSD/386 1.0         BSDI
+            BSD/386 1.0         BSDOS
             COHERENT/386        COHERENT
             DGUX 5.4            DGUX
             FreeBSD             FREEBSD

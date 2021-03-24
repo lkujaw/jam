@@ -1,10 +1,4 @@
 /*
- * Copyright 1993, 1995 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * make.c - bring a target up to date, once rules are in place
  *
  * This modules controls the execution of rules to bring a target and
@@ -73,10 +67,10 @@ typedef struct {
     int     made;
 } COUNTS;
 
-static void make0 _ARG_((TARGET *t, TARGET *p, int depth,
+static void make0 PARAM((TARGET *t, TARGET *p, int depth,
                          COUNTS *counts, int anyhow));
 
-static TARGETS *make0sort _ARG_((TARGETS *c));
+static TARGETS *make0sort PARAM((TARGETS *c));
 
 static const char *target_fate[] =
 {
@@ -111,14 +105,14 @@ static const char  szSpaces[] = "                ";
  */
 
 int
-make(n_targets, targets, anyhow)
-    int          n_targets;
-    const char **targets;
-    int          anyhow;
-{
-    int     i;
-    COUNTS  counts[1];
-    int     status = 0;         /* 1 if anything fails */
+make DECLARE((n_targets, targets, anyhow))
+    int           n_targets  NP
+    const char  **targets    NP
+    int           anyhow     EP
+BEGIN
+    int           i;
+    COUNTS        counts[1];
+    int           status = 0;         /* 1 if anything fails */
 
     memset((char *)counts, 0, sizeof(*counts));
 
@@ -153,7 +147,8 @@ make(n_targets, targets, anyhow)
     }
 
     return(status);
-}
+END_FUNCTION(make)
+
 
 /*
  * make0() - bind and scan everything to make a TARGET
@@ -161,21 +156,20 @@ make(n_targets, targets, anyhow)
  * Make0() recursively binds a target, searches for #included headers,
  * calls itself on those headers, and calls itself on any dependents.
  */
-
 static void
-make0(t, p, depth, counts, anyhow)
-    TARGET  *t;
-    TARGET  *p;             /* parent */
-    int     depth;          /* for display purposes */
-    COUNTS  *counts;        /* for reporting */
-    int     anyhow;         /* forcibly touch all (real) targets */
-{
+make0 DECLARE((t, p, depth, counts, anyhow))
+    TARGET  *t       NP
+    TARGET  *p       NP      /* parent */
+    int      depth   NP      /* for display purposes */
+    COUNTS  *counts  NP      /* for reporting */
+    int      anyhow  EP      /* forcibly touch all (real) targets */
+BEGIN
     TARGETS    *c, *incs;
     TARGET     *ptime = t;
     time_t      last, leaf, hlast;
-    int         fate;
     const char *flag = "";
     SETTINGS   *s;
+    char        fate;
 
     /*
      * Step 1: initialize
@@ -233,7 +227,6 @@ make0(t, p, depth, counts, anyhow)
     /*
      * Pause for a little progress reporting
      */
-
     if(DEBUG_MAKEPROG) {
         if(strcmp(t->name, t->boundname)) {
             printf("bind\t--\t%s%s: %s\n",
@@ -245,9 +238,8 @@ make0(t, p, depth, counts, anyhow)
         case T_BIND_MISSING:
         case T_BIND_PARENTS:
             printf("time\t--\t%s%s: %s\n",
-                   spaces(depth), t->name, target_bind[ t->binding ]);
+                   spaces(depth), t->name, target_bind[(int)t->binding]);
             break;
-
         case T_BIND_EXISTS:
             printf("time\t--\t%s%s: %s",
                    spaces(depth), t->name, ctime(&t->time));
@@ -270,8 +262,9 @@ make0(t, p, depth, counts, anyhow)
                    t->name, c->target->name);
         }
 
-        /* Warn about circular deps, except for includes, */
-        /* which include each other alot. */
+        /* Warn about circular deps, except for includes,
+         * which frequently include each other.
+         */
 
         if(c->target->fate == T_FATE_INIT) {
             make0(c->target, ptime, depth + 1, counts, anyhow);
@@ -281,21 +274,21 @@ make0(t, p, depth, counts, anyhow)
     }
 
     /* Step 3b: recursively make0() internal includes node */
-
     if(t->includes) {
         make0(t->includes, p, depth + 1, counts, anyhow);
     }
 
     /* Step 3c: add dependents' includes to our direct dependencies */
-
     incs = 0;
 
     for(c = t->depends; c; c = c->next) {
         if(c->target->includes) {
             incs = targetentry(incs, c->target->includes);
-            /* If the includes are newer than we are their original target
-               also needs to be marked newer. This is needed so that 'updated'
-               correctly will include the original target in the $(<) variable. */
+            /* If the includes are newer than we are their original
+             * target also needs to be marked newer. This is needed so
+             * that 'updated' correctly will include the original
+             * target in the $(<) variable.
+             */
             if(c->target->includes->time > t->time) {
                 c->target->fate = MAX(T_FATE_NEWER, c->target->fate);
             }
@@ -310,14 +303,14 @@ make0(t, p, depth, counts, anyhow)
      */
 
     /* Step 4a: pick up dependents' time and fate */
-
     last = 0;
     leaf = 0;
     fate = T_FATE_STABLE;
 
     for(c = t->depends; c; c = c->next) {
-        /* If LEAVES has been applied, we only heed the timestamps of */
-        /* the leaf source nodes. */
+        /* If LEAVES has been applied, we only heed the timestamps of
+         * the leaf source nodes.
+         */
 
         leaf = MAX(leaf, c->target->leaf);
 
@@ -332,19 +325,17 @@ make0(t, p, depth, counts, anyhow)
 
     /* Step 4b: pick up included headers time */
 
-    /*
-     * If a header is newer than a temp source that includes it,
-     * the temp source will need building.
+    /* If a header is newer than a temp source that includes it, the
+     * temp source will need building.
      */
 
     hlast = t->includes ? t->includes->time : 0;
 
     /* Step 4c: handle NOUPDATE oddity */
 
-    /*
-     * If a NOUPDATE file exists, make dependents eternally old.
-     * Don't inherit our fate from our dependents.  Decide fate
-     * based only upon other flags and our binding (done later).
+    /* If a NOUPDATE file exists, make dependents eternally old.
+     * Don't inherit our fate from our dependents.  Decide fate based
+     * only upon other flags and our binding (done later).
      */
 
     if(t->flags & T_FLAG_NOUPDATE) {
@@ -399,24 +390,23 @@ make0(t, p, depth, counts, anyhow)
     }
 
     /* Step 4e: handle missing files */
-    /* If it's missing and there are no actions to create it, boom. */
-    /* If we can't make a target we don't care about, 'sokay */
-    /* We could insist that there are updating actions for all missing */
-    /* files, but if they have dependents we just pretend it's NOTFILE. */
 
+    /* If it is missing and there are no actions to create it, bail.
+     * If we cannot make a target we do not care about, ignore it.
+     * We could insist that there are updating actions for all missing
+     * files, but if they have dependents we just pretend it's NOTFILE.
+     */
     if(fate == T_FATE_MISSING && !t->actions && !t->depends) {
         if(t->flags & T_FLAG_NOCARE) {
             fate = T_FATE_STABLE;
         } else   {
             printf("don't know how to make %s\n", t->name);
-
             fate = T_FATE_CANTFIND;
         }
     }
 
     /* Step 4f: propagate dependents' time & fate. */
     /* Set leaf time to be our time only if this is a leaf. */
-
     t->time = MAX(t->time, last);
     t->leaf = leaf ? leaf : t->time;
     t->fate = fate;
@@ -424,7 +414,6 @@ make0(t, p, depth, counts, anyhow)
     /*
      * Step 5: sort dependents by their update time.
      */
-
     if(globs.newestfirst) {
         t->depends = make0sort(t->depends);
     }
@@ -434,7 +423,6 @@ make0(t, p, depth, counts, anyhow)
      */
 
     /* Don't count or report interal includes nodes. */
-
     if(t->flags & T_FLAG_INTERNAL) {
         return;
     }
@@ -461,26 +449,26 @@ make0(t, p, depth, counts, anyhow)
 
     if(DEBUG_MAKEPROG) {
         printf("made%s\t%s\t%s%s\n",
-               flag, target_fate[ t->fate ],
+               flag, target_fate[(int)t->fate],
                spaces(depth), t->name);
     }
 
     if(DEBUG_CAUSES &&
        t->fate >= T_FATE_NEWER &&
        t->fate <= T_FATE_MISSING) {
-        printf("%s %s\n", target_fate[ t->fate ], t->name);
+        printf("%s %s\n", target_fate[(int)t->fate], t->name);
     }
-}
+END_FUNCTION(make0)
+
 
 /*
  * make0sort() - reorder TARGETS chain by their time (newest to oldest)
  */
-
 static TARGETS *
-make0sort(chain)
-    TARGETS *chain;
-{
-    TARGETS *result = 0;
+make0sort DECLARE((chain))
+    TARGETS  *chain  EP
+BEGIN
+    TARGETS  *result = NIL(TARGETS*);
 
     /* We walk chain, taking each item and inserting it on the */
     /* sorted result, with newest items at the front.  This involves */
@@ -490,7 +478,6 @@ make0sort(chain)
     /* that while tail is a loop, next ends at the end of the chain. */
 
     /* Walk current target list */
-
     while(chain) {
         TARGETS *c = chain;
         TARGETS *s = result;
@@ -514,11 +501,11 @@ make0sort(chain)
             s = result;                         /* wrap to ensure a next */
         }
         if(result != c) {
-            s->tail->next = c;                   /* not head? be prev's next */
+            s->tail->next = c;                  /* not head? be prev's next */
         }
         c->tail = s->tail;                      /* take on next's prev */
         s->tail = c;                            /* make next's prev us */
     }
 
     return(result);
-}
+END_FUNCTION(make0sort)

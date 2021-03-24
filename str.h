@@ -6,23 +6,23 @@
 #ifndef JAM_STR_H
 #define JAM_STR_H 1
 
-#include "ansi.h"
 #include "bool.h"
+#include "cstd.h"
 
-_BEGIN_EXTERNS_
+BEGIN_EXTERNS
 
-const char *newstr  _ARG_((const char *string));
-const char *copystr _ARG_((const char *s));
+const char *newstr  PARAM((const char *string));
+const char *copystr PARAM((const char *s));
 
-void freestr _ARG_((const char *s));
-void donestr _ARG_((void));
+void freestr PARAM((const char *s));
+void donestr PARAM((void));
 
-void sizeToSz _ARG_((sizeT mNumber, char *pszNumeral));
+void sizeToSz PARAM((sizeT mNumber, char *pszNumeral));
 
-boolT fSToIMaxBounded _ARG_((char   *psNumeral,
+boolT fSToIMaxBounded PARAM((char   *psNumeral,
                              sizeT   mNumeralLen,
                              iMaxT  *pmNumber));
 
-_END_EXTERNS_
+END_EXTERNS
 
 #endif /* JAM_STR_H */

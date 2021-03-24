@@ -1,23 +1,4 @@
 /*
- * Copyright 1993, 2000 Christopher Seiwald.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-#include "jam.h"  /* Includes system headers */
-
-#include "compile.h"
-#include "hash.h"
-#include "hdrmacro.h"
-#include "lists.h"
-#include "parse.h"
-#include "regexp.h"
-#include "rules.h"
-#include "str.h"
-#include "variable.h"
-
-
-/*
  * hdrmacro.c - handle header files that define macros used in
  *              #include statements.
  *
@@ -41,6 +22,18 @@
  *              just to invoke a rule.
  */
 
+#include "jam.h"  /* Includes system headers */
+
+#include "compile.h"
+#include "hash.h"
+#include "hdrmacro.h"
+#include "lists.h"
+#include "parse.h"
+#include "regexp.h"
+#include "rules.h"
+#include "str.h"
+#include "variable.h"
+
 /* this type is used to store a dictionary of file header macros */
 typedef struct header_macro {
     const char*symbol;
@@ -48,7 +41,7 @@ typedef struct header_macro {
 
 } HEADER_MACRO;
 
-static struct hash *header_macros_hash = 0;
+static struct hash *header_macros_hash = NIL(struct hash*);
 
 /*
  * headers() - scan a target for include files and call HDRRULE
@@ -57,12 +50,12 @@ static struct hash *header_macros_hash = 0;
 #define MAXINC 10
 
 void
-macro_headers(t)
-    TARGET *t;
-{
-    regexp *re;
-    FILE   *f;
-    char    buf[ 1024 ];
+macro_headers DECLARE((t))
+    TARGET  *t  EP
+BEGIN
+    regexp  *re;
+    FILE    *f;
+    char     buf[1024];
 
     if(DEBUG_HEADER) {
         printf("macro header scan for %s\n", t->name);
@@ -124,13 +117,13 @@ macro_headers(t)
 
     fclose(f);
     free(re);
-}
+END_FUNCTION(macro_headers)
 
 
 const char*
-macro_header_get(macro_name)
-    const char*  macro_name;
-{
+macro_header_get DECLARE((macro_name))
+    const char*   macro_name  EP
+BEGIN
     HEADER_MACRO  var, *v = &var;
 
     v->symbol = (char*)macro_name;
@@ -142,4 +135,4 @@ macro_header_get(macro_name)
         return((const char*)v->filename);
     }
     return(0);
-}
+END_FUNCTION(macro_header_get)
