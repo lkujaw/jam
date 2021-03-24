@@ -286,11 +286,11 @@ BEGIN
         }
 
         if(DEBUG_EXEC) {
-            printf("%s\n", cmd->buf);
+            printf("%s\n", (char*)cmd->buf);
         }
 
         if(globs.cmdout) {
-            fprintf(globs.cmdout, "%s", cmd->buf);
+            fprintf(globs.cmdout, "%s", (char*)cmd->buf);
         }
 
         if(globs.noexec) {
@@ -370,12 +370,12 @@ BEGIN
         if( globs.quitquick || DEBUG_MAKE ) {
             /* Print command text on failure */
             if( !DEBUG_EXEC ) {
-                printf( "%s\n", cmd->buf );
+                printf("%s\n", (char*)cmd->buf);
             }
 
-            printf( "...failed %s ", cmd->rule->name );
-            list_print( lol_get( &cmd->args, 0 ) );
-            printf( "...\n" );
+            printf("...failed %s ", cmd->rule->name);
+            list_print(lol_get(&cmd->args, 0));
+            printf("...\n");
         }
     }
 
