@@ -445,6 +445,7 @@ typedef long int iMaxT;
          defined(ppc)       || \
        defined(__ppc__)     || \
       defined(__POWERPC__)  || \
+      defined(__powerpc)    || \
       defined(__powerpc__)
 #   define OSPLAT "OSPLAT=PPC"
 #  endif

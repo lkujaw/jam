@@ -1,16 +1,10 @@
 /*
- * Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
- *
- * This file is part of Jam - see jam.c for Copyright information.
- */
-
-/*
  * filent.c - scan directories and archives on NT
  *
  * External routines:
  *
- *      file_dirscan() - scan a directory for files
- *      file_time() - get timestamp of file, if not done by file_dirscan()
+ *      file_dirscan()  - scan a directory for files
+ *      file_time()     - get timestamp of file, if not done by file_dirscan()
  *      file_archscan() - scan an archive for files
  *
  * File_dirscan() and file_archscan() call back a caller provided function
@@ -19,10 +13,9 @@
  * file.   If file_dirscan() or file_archscan() do not provide the file's
  * timestamp, interested parties may later call file_time().
  *
- * 07/10/95 (taylor)  Findfirst() returns the first file on NT.
- * 05/03/96 (seiwald) split apart into pathnt.c
- * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
- * 10/03/00 (anton) - Porting for Borland C++ 5.5
+ * 07/10/95 (taylor)  - Findfirst() returns the first file on NT.
+ * 05/03/96 (seiwald) - split apart into pathnt.c
+ * 10/03/00 (anton)   - Porting for Borland C++ 5.5
  * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
  * 11/04/02 (seiwald) - const-ing for string literals
  * 01/23/03 (seiwald) - long long handles for NT IA64
@@ -51,13 +44,12 @@
 /*
  * file_dirscan() - scan a directory for files
  */
-
 void
-file_dirscan(dir, func, closure)
-    const char *dir;
-    scanback    func;
-    voidT      *closure;
-{
+file_dirscan DECLARE((dir, func, closure))
+    const char         *dir      NP
+    scanback            func     NP
+    voidT              *closure  EP
+BEGIN
     PATHNAME            f;
     char                filespec[MAXJPATH];
     char                filename[MAXJPATH];
@@ -128,18 +120,17 @@ file_dirscan(dir, func, closure)
 
     _findclose(handle);
 # endif
+END_FUNCTION(file_dirscan)
 
-}
 
 /*
  * file_time() - get timestamp of file, if not done by file_dirscan()
  */
-
 int
-file_time(filename, time)
-    const char *filename;
-    time_t     *time;
-{
+file_time DECLARE((filename, time))
+    const char *filename  NP
+    time_t     *time      EP
+BEGIN
     /* On NT this is called only for C:/ */
 
     struct stat  statbuf;
@@ -151,12 +142,12 @@ file_time(filename, time)
     *time = statbuf.st_mtime;
 
     return(0);
-}
+END_FUNCTION(file_time)
+
 
 /*
  * file_archscan() - scan an archive for files
  */
-
 /* Straight from SunOS */
 
 # define ARMAG   "!<arch>\n"
@@ -177,12 +168,13 @@ struct ar_hdr {
 # define SARFMAG 2
 # define SARHDR sizeof(struct ar_hdr)
 
+
 void
-file_archscan(archive, func, closure)
-    const char *archive;
-    scanback    func;
-    voidT      *closure;
-{
+file_archscan DECLARE((archive, func, closure))
+    const char    *archive  NP
+    scanback       func     NP
+    voidT         *closure  EP
+BEGIN
     char           buf[MAXJPATH];
     struct ar_hdr  ar_hdr;
     char          *string_table     = NIL(char *);
@@ -323,6 +315,7 @@ next:
     }
 
     close(fd);
-}
+END_FUNCTION(file_archscan)
+
 
 #endif  /* NT */

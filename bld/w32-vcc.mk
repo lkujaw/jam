@@ -3,16 +3,18 @@
 # To use it, you must be in the top Jam source directory,
 # have the compiler in your path, and call:
 #
-#  nmake -f builds\win32-visualc.mk
+#  nmake -f bld\win32-visualc.mk
 #
 # the program "jam.exe" will be created in a new directory
 # named "bin.ntx86"
 #
-
 CC       = cl /nologo
-CFLAGS   = -DNT -DCSTD
+CFLAGS   = /DNT /DCSTD /I.
 TARGET   = /Fejam0
 LINKLIBS = oldnames.lib kernel32.lib
+
+!IF [set JAM_TOOLSET=VISUALC]
+!ENDIF
 
 all: jam0
 	attrib -r jambase.c

@@ -10,11 +10,15 @@ arch:
 os:
   - linux
   - osx
+  - windows
 script:
 - |-
     case $TRAVIS_OS_NAME in
       windows)
-        nmake -f bld\w32-vcc.mk
+        cd bld
+        source winenv.sh "call vcvars.bat"
+        cd ..
+        nmake -f "bld\w32-vcc.mk"
       ;;
       *)
         make
