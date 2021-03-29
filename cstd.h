@@ -89,6 +89,10 @@
 # endif
 #endif
 
+#ifndef FOREVER
+# define FOREVER while(TRUE)
+#endif
+
 #ifndef NIL
 # define NIL(x) ((x)0)
 #endif

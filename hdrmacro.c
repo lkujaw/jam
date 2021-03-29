@@ -33,6 +33,7 @@
 #include "rules.h"
 #include "str.h"
 #include "variable.h"
+#include "xmem.h"
 
 /* this type is used to store a dictionary of file header macros */
 typedef struct header_macro {
@@ -116,7 +117,7 @@ BEGIN
     }
 
     fclose(f);
-    free(re);
+    memoryRelease((voidT**)&re);
 END_FUNCTION(macro_headers)
 
 

@@ -47,13 +47,13 @@
 #define P0 NIL(PARSE*)
 #define C0 NIL(char*)
 
-LIST *builtin_depends  PARAM((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_echo     PARAM((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_exit     PARAM((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_flags    PARAM((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_glob     PARAM((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_match    PARAM((PARSE *parse, LOL *args, int *jmp));
-LIST *builtin_hdrmacro PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_depends   PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_echo      PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_exit      PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_flags     PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_glob      PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_match     PARAM((PARSE *parse, LOL *args, int *jmp));
+LIST *builtin_hdrmacro  PARAM((PARSE *parse, LOL *args, int *jmp));
 
 static void builtin_glob_back PARAM((voidT      *closure,
                                      const char *file,
@@ -133,10 +133,10 @@ builtin_depends DECLARE((parse, args, jmp))
     LOL    *args   NP
     int    *jmp    EP
 BEGIN
-    UNUSED(jmp);
     LIST *targets = lol_get(args, 0);
     LIST *sources = lol_get(args, 1);
     LIST *l;
+    UNUSED(jmp);
 
     for(l = targets; l; l = list_next(l)) {
         TARGET *t = bindtarget(l->string);
@@ -211,10 +211,10 @@ builtin_flags DECLARE((parse, args, jmp))
     LOL    *args   NP
     int    *jmp    EP
 BEGIN
-    UNUSED(jmp);
     LIST *l = lol_get(args, 0);
+    UNUSED(jmp);
 
-    for( ; l; l = list_next(l)) {
+    for(; l; l = list_next(l)) {
         bindtarget(l->string)->flags |= parse->num;
     }
 
@@ -238,11 +238,11 @@ builtin_glob_back DECLARE((closure, file, status, time))
     int          status   NP
     time_t       time     EP
 BEGIN
-    UNUSED(status); UNUSED(time);
     struct globbing *globbing = (struct globbing *)closure;
     LIST            *l;
     PATHNAME         f;
     char             buf[MAXJPATH];
+    UNUSED(status); UNUSED(time);
 
     /* Null out directory for matching. */
     /* We wish we had file_dirscan() pass up a PATHNAME. */
@@ -266,11 +266,10 @@ builtin_glob DECLARE((parse, args, jmp))
     LOL    *args   NP
     int    *jmp    EP
 BEGIN
-    UNUSED(parse); UNUSED(jmp);
     LIST *l = lol_get(args, 0);
     LIST *r = lol_get(args, 1);
-
     struct globbing  globbing;
+    UNUSED(parse); UNUSED(jmp);
 
     globbing.results  = L0;
     globbing.patterns = r;
@@ -292,9 +291,9 @@ builtin_match DECLARE((parse, args, jmp))
     LOL    *args   NP
     int    *jmp    EP
 BEGIN
-    UNUSED(parse); UNUSED(jmp);
     LIST *l, *r;
     LIST *result = NIL(LIST*);
+    UNUSED(parse); UNUSED(jmp);
 
     /* For each pattern */
     for(l = lol_get(args, 0); l; l = l->next) {
@@ -337,8 +336,8 @@ builtin_hdrmacro DECLARE((parse, args, jmp))
     LOL    *args   NP
     int    *jmp    EP
 BEGIN
-    UNUSED(parse); UNUSED(jmp);
     LIST *l = lol_get(args, 0);
+    UNUSED(parse); UNUSED(jmp);
 
     for(; l; l = list_next(l)) {
         TARGET *t = bindtarget(l->string);

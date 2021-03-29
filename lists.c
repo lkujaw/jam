@@ -26,6 +26,7 @@
 
 static LIST *freelist = NIL(LIST*);  /* junkpile for list_free() */
 
+
 /*
  * list_append() - append a list onto another one, returning total
  */
@@ -34,14 +35,14 @@ list_append DECLARE((l, nl))
     LIST  *l   NP
     LIST  *nl  EP
 BEGIN
-    if(!nl) {
-        /* Just return l */
-    } else if(!l) {
-        l = nl;
-    } else   {
-        /* Graft two non-empty lists. */
-        l->tail->next = nl;
-        l->tail       = nl->tail;
+    if(nl) {
+        if(l) {
+            /* Graft two non-empty lists. */
+            l->tail->next = nl;
+            l->tail       = nl->tail;
+        } else {
+            l = nl;
+        }
     }
 
     return(l);
@@ -57,7 +58,7 @@ list_new DECLARE((head, string, copy))
     const char  *string  NP
     int          copy    EP
 BEGIN
-    LIST        *l = NIL(LIST *);
+    LIST        *l = NIL(LIST*);
 
     if(DEBUG_LISTS) {
         printf("list > %s <\n", string);
@@ -74,8 +75,8 @@ BEGIN
         l = freelist;
         freestr(l->string);
         freelist = freelist->next;
-    } else   {
-        memoryAllocateOrFail((voidT **)&l, sizeof(*l));
+    } else {
+        memoryAllocateOrFail((voidT**)&l, sizeof(*l));
     }
 
     /* If first on chain, head points here. */
@@ -142,11 +143,23 @@ void
 list_free DECLARE((head))
     LIST  *head  EP
 BEGIN
+    LIST  *prior;
+    assert(fValidPointer(head));
+
+    do {
+        prior = head;
+        head  = list_next(head);
+        freestr(prior->string);
+        memoryRelease((voidT**)&prior);
+    } while(head != NIL(LIST*));
+
+#if 0
     /* Just tack onto freelist. */
     if(head) {
         head->tail->next = freelist;
         freelist         = head;
     }
+#endif
 END_FUNCTION(list_free)
 
 
@@ -157,6 +170,8 @@ void
 list_print DECLARE((l))
     LIST  *l  EP
 BEGIN
+    assert(fValidPointer(l));
+
     for(; l; l = list_next(l)) {
         printf("%s ", l->string);
     }
@@ -214,8 +229,11 @@ lol_free DECLARE((lol))
 BEGIN
     int   i;
 
-    for(i = 0; i < lol->count; i++) {
-        list_free(lol->list[i]);
+    for(i = 0; i < lol->count; ++i) {
+        if(lol->list[i] != NIL(LIST*)) {
+            list_free(lol->list[i]);
+            lol->list[i] = NIL(LIST*);
+        }
     }
 
     lol->count = 0;

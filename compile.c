@@ -225,19 +225,21 @@ BEGIN
     /* we'll have to return a new string. */
 
     if(!status) {
-        t = 0;
+        t  = NIL(LIST*);
     } else if(ll) {
-        t = ll, ll = 0;
+        t  = ll;
+        ll = NIL(LIST*);
     } else if(lr) {
-        t = lr, lr = 0;
+        t  = lr;
+        lr = NIL(LIST*);
     } else {
         t = list_new(L0, "1", 0);
     }
 
-    if(ll) {
+    if(ll != NIL(LIST*)) {
         list_free(ll);
     }
-    if(lr) {
+    if(lr != NIL(LIST*)) {
         list_free(lr);
     }
     return(t);
@@ -270,7 +272,9 @@ BEGIN
         var_set(p->string, list_new(L0, l->string, 1), VAR_SET);
 
         /* Keep only last result. */
-        list_free(result);
+        if(result != NIL(LIST*)) {
+            list_free(result);
+        }
         result = (*p->right->func)(p->right, args, jmp);
 
         /* continue loop? */
@@ -306,9 +310,12 @@ compile_if DECLARE((p, args, jmp))
 BEGIN
     LIST *l = (*p->left->func)(p->left, args, jmp);
 
-    p = l ? p->right : p->third;
-
-    list_free(l);
+    if(l == NIL(LIST*)) {
+        p = p->third;
+    } else {
+        p = p->right;
+        list_free(l);
+    }
 
     return((*p->func)(p, args, jmp));
 END_FUNCTION(compile_if)
@@ -367,9 +374,9 @@ compile_list DECLARE((parse, args, jmp))
     LOL    *args   NP
     int    *jmp    EP
 BEGIN
-    UNUSED(jmp);
     /* voodoo 1 means: s is a copyable string */
     const char *s = parse->string;
+    UNUSED(jmp);
     return(var_expand(L0, s, s + strlen(s), args, 1));
 END_FUNCTION(compile_list)
 
@@ -403,10 +410,12 @@ BEGIN
 
     /* Initial value is ns */
     for(l = nt; l; l = list_next(l)) {
-        s = addsettings(s, 0, l->string, list_copy((LIST*)0, ns));
+        s = addsettings(s, 0, l->string, list_copy(NIL(LIST*), ns));
     }
 
-    list_free(ns);
+    if(ns != NIL(LIST*)) {
+        list_free(ns);
+    }
     list_free(nt);
 
     /* Note that callees of the current context get this "local" */
@@ -615,13 +624,17 @@ BEGIN
     LIST *result = NIL(LIST*);
 
     while(*jmp == JMP_NONE && parse->func == compile_rules) {
-        list_free(result);
+        if(result != NIL(LIST*)) {
+            list_free(result);
+        }
         result = (*parse->left->func)(parse->left, args, jmp);
         parse  = parse->right;
     }
 
     if(*jmp == JMP_NONE) {
-        list_free(result);
+        if(result != NIL(LIST*)) {
+            list_free(result);
+        }
         result = (*parse->func)(parse, args, jmp);
     }
 
@@ -680,10 +693,10 @@ compile_setcomp DECLARE((parse, args, jmp))
     LOL    *args   NP
     int    *jmp    EP
 BEGIN
-    UNUSED(args); UNUSED(jmp);
     RULE   *rule   = bindrule(parse->string);
     LIST   *params = NIL(LIST *);
     PARSE  *p;
+    UNUSED(args); UNUSED(jmp);
 
     /* Build param list */
     for(p = parse->left; p; p = p->left) {
@@ -741,7 +754,9 @@ BEGIN
     /* Free old one, if present */
     if(rule->actions) {
         freestr(rule->actions);
-        list_free(rule->bindlist);
+        if(rule->bindlist != NIL(LIST*)) {
+            list_free(rule->bindlist);
+        }
     }
 
     rule->actions  = copystr(parse->string1);

@@ -35,6 +35,7 @@ BEGIN
     while(TRUE) {
         LOL     l;
         PARSE  *p;
+        LIST   *pvalue;
         int     jmp = 0; /* JMP_NONE */
 
         /* $(<) and $(>) empty in outer scope. */
@@ -49,7 +50,10 @@ BEGIN
         }
 
         /* Run the parse tree. */
-        list_free((*(p->func))(p, &l, &jmp));
+        pvalue = (*(p->func))(p, &l, &jmp);
+        if(pvalue != NIL(LIST*)) {
+            list_free(pvalue);
+        }
 
         parse_free(p);
     }

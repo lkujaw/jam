@@ -56,7 +56,9 @@ cmd_free DECLARE((cmd))
     CMD *cmd  EP
 BEGIN
     lol_free(&cmd->args);
-    list_free(cmd->shell);
+    if(cmd->shell != NIL(LIST*)) {
+        list_free(cmd->shell);
+    }
     memoryRelease((voidT**)&cmd->buf);
     memoryRelease((voidT**)&cmd);
 END_FUNCTION(cmd_free)

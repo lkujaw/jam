@@ -45,7 +45,7 @@
 
 #define LOL_MAX      9
 #define list_next(l) ((l)->next)
-#define L0           NIL(LIST *)
+#define L0           NIL(LIST*)
 
 typedef struct _list LIST;
 

@@ -346,9 +346,9 @@ make1d DECLARE((closure, status))
     voidT  *closure  NP
     int     status   EP
 BEGIN
-    assert(status <= CHAR_MAX);
     TARGET *t   = (TARGET*)closure;
     CMD    *cmd = (CMD*)t->cmds;
+    assert(status <= CHAR_MAX);
 
     /* Execcmd() has completed.  All we need to do is fiddle with the */
     /* status and signal our completion so make1c() can run the next */
@@ -526,7 +526,9 @@ BEGIN
         /* These were always copied when used. */
 
         list_free(nt);
-        list_free(ns);
+        if(ns != NIL(LIST*)) {
+            list_free(ns);
+        }
 
         /* Free the variables whose values were bound by */
         /* 'actions xxx bind vars' */

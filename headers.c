@@ -72,7 +72,10 @@ BEGIN
     lol_add(&lol, headers1(t->boundname, hdrscan));
 
     if(lol_get(&lol, 1)) {
-        list_free(evaluate_rule(hdrrule->string, &lol, L0));
+        LIST *rvalue = evaluate_rule(hdrrule->string, &lol, L0);
+        if(rvalue != NIL(LIST*)) {
+            list_free(rvalue);
+        }
     }
 
     /* Clean up */

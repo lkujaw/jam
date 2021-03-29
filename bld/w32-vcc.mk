@@ -6,7 +6,7 @@
 #  nmake -f bld\win32-visualc.mk
 #
 # the program "jam.exe" will be created in a new directory
-# named "bin.ntx86"
+# named "tgt\nt.i386[-64]"
 #
 CC       = cl /nologo
 CFLAGS   = /DNT /DCSTD /I.

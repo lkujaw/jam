@@ -22,6 +22,7 @@
  * 09/11/00 (seiwald) - defunct var_list() removed
  * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
  * 11/04/02 (seiwald) - const-ing for string literals
+ * 06/11/03 (seiwald) - fix var_string mem leak found by Matt Armstrong
  */
 
 #include "jam.h"  /* Includes system headers */
@@ -178,6 +179,7 @@ BEGIN
         /* space-separated members of the list in the output. */
         if(dollar) {
             LIST *l = var_expand(L0, lastword, out, lol, 0);
+            LIST *h = l;
 
             out = lastword;
 
@@ -192,13 +194,14 @@ BEGIN
                 out += so;
 
                 /* Separate with space */
-
                 if((l = list_next(l))) {
                     *out++ = ' ';
                 }
             }
 
-            list_free(l);
+            if(h != NIL(LIST*)) {
+                list_free(h);
+            }
         }
     }
     if(out >= oute) {
@@ -260,7 +263,9 @@ BEGIN
     switch(flag) {
     case VAR_SET:
         /* Replace value */
-        list_free(v->value);
+        if(v->value != NIL(LIST*)) {
+            list_free(v->value);
+        }
         v->value = value;
         break;
     case VAR_APPEND:
@@ -272,7 +277,9 @@ BEGIN
         if(!v->value) {
             v->value = value;
         } else {
-            list_free(value);
+            if(value != NIL(LIST*)) {
+                list_free(value);
+            }
         }
         break;
     }

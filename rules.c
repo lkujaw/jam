@@ -264,7 +264,6 @@ BEGIN
     /* If not previously set, alloc a new. */
     /* If appending, do so. */
     /* Else free old and set new. */
-
     if(!v) {
         memoryAllocateOrFail((voidT **)&v, sizeof(*v));
         v->symbol = newstr(symbol);
@@ -275,7 +274,9 @@ BEGIN
         switch(setflag) {
         case VAR_SET:
             /* Toss old, set new */
-            list_free(v->value);
+            if(v->value != NIL(LIST*)) {
+                list_free(v->value);
+            }
             v->value = value;
             break;
 
@@ -365,7 +366,9 @@ BEGIN
         n = v->next;
 
         freestr(v->symbol);
-        list_free(v->value);
+        if(v->value != NIL(LIST*)) {
+            list_free(v->value);
+        }
         memoryRelease((voidT **)&v);
 
         v = n;
